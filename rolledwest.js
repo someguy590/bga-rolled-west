@@ -18,7 +18,8 @@
 define([
     "dojo", "dojo/_base/declare",
     "ebg/core/gamegui",
-    "ebg/counter"
+    "ebg/counter",
+    "ebg/stock"
 ],
     function (dojo, declare) {
         return declare("bgagame.rolledwest", ebg.core.gamegui, {
@@ -29,6 +30,13 @@ define([
                 // Example:
                 // this.myGlobalValue = 0;
 
+                this.diceWidth = 15;
+                this.diceHeight = 15;
+                this.playerResources = new ebg.stock();
+                this.playerResources.image_items_per_row = 4;
+                this.playerResources.create(this, $('dice'), this.diceWidth, this.diceHeight);
+                for (let resourceTypeId = 0; resourceTypeId < 4; resourceTypeId++)
+                    this.playerResources.addItemType(resourceTypeId, resourceTypeId, g_gamethemeurl + 'img/resource_icons.png', resourceTypeId);
             },
 
             /*
@@ -48,14 +56,14 @@ define([
                 console.log("Starting game setup");
 
                 // Setting up player boards
-                for (var player_id in gamedatas.players) {
-                    var player = gamedatas.players[player_id];
-
+                for (let [player_id, player] of Object.entries(gamedatas.players)) {
                     // TODO: Setting up players boards if needed
+                    let playerBoardDiv = $('player_board_' + player_id);
+                    dojo.place(this.format_block('jstpl_player_board', player), playerBoardDiv);
                 }
 
                 // TODO: Set up your game interface here, according to "gamedatas"
-
+                this.displayDice(this.gamedatas.dice);
 
                 // Setup game notifications to handle (see "setupNotifications" method below)
                 this.setupNotifications();
@@ -148,6 +156,21 @@ define([
                 script.
             
             */
+            displayDice: function (dice) {
+                for (let die of dice)
+                    this.playerResources.addToStock(this.getResourceType(die));
+            },
+
+            getResourceType: function (resource) {
+                if (resource >= 1 && resource <= 4)
+                    return 0;
+                else if (resource >= 5 && resource <= 7)
+                    return 1;
+                else if (resource >= 8 && resource <= 10)
+                    return 2;
+                else
+                    return 3;
+            },
 
 
             ///////////////////////////////////////////////////

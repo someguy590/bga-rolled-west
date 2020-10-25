@@ -62,7 +62,15 @@ $machinestates = array(
         "transitions" => array("" => 2)
     ),
 
-    // Note: ID=2 => your first state
+    2 => [
+        'name' => 'chooseTerrain',
+        'description' => clienttranslate('${actplayer} must choose 1 die to represent the terrain for the turn'),
+        'descriptionmyturn' => clienttranslate('${you} must choose 1 die to represent the terrain for the turn'),
+        'type' => 'activeplayer',
+        'possibleactions' => ['chooseTerrain'],
+        'action' => 'stChooseTerrain',
+        'transitions' => ['spendOrBank' => 3]
+    ],
 
     2 => array(
         "name" => "playerTurn",

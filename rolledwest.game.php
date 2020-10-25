@@ -34,12 +34,10 @@ class RolledWest extends Table
         parent::__construct();
 
         self::initGameStateLabels(array(
-            //    "my_first_global_variable" => 10,
-            //    "my_second_global_variable" => 11,
-            //      ...
-            //    "my_first_game_variant" => 100,
-            //    "my_second_game_variant" => 101,
-            //      ...
+            'die0' => 10,
+            'die1' => 11,
+            'die2' => 12,
+            'die3' => 13,
         ));
     }
 
@@ -80,7 +78,10 @@ class RolledWest extends Table
         /************ Start the game initialization *****/
 
         // Init global values with their initial values
-        //self::setGameStateInitialValue( 'my_first_global_variable', 0 );
+        $this->setGameStateInitialValue('die0', NULL);
+        $this->setGameStateInitialValue('die1', NULL);
+        $this->setGameStateInitialValue('die2', NULL);
+        $this->setGameStateInitialValue('die3', NULL);
 
         // Init game statistics
         // (note: statistics used in this file must be defined in your stats.inc.php file)
@@ -117,6 +118,10 @@ class RolledWest extends Table
         $result['players'] = self::getCollectionFromDb($sql);
 
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
+        $dice = [];
+        for ($i = 0; $i < 4; $i++)
+            $dice[] = $this->getGameStateValue('die' . $i);
+        $result['dice'] = $dice;
 
         return $result;
     }
@@ -147,7 +152,15 @@ class RolledWest extends Table
         In this space, you can put any utility methods useful for your game logic
     */
 
+    function rollDice()
+    {
+        $dice = [];
+        for ($i = 0; $i < 4; $i++) {
+            $dice[] = bga_rand(1, 12);
+        }
 
+        return $dice;
+    }
 
     //////////////////////////////////////////////////////////////////////////////
     //////////// Player actions
@@ -221,6 +234,14 @@ class RolledWest extends Table
         The action method of state X is called everytime the current game state is set to X.
     */
 
+    function stChooseTerrain()
+    {
+        $dice = $this->rollDice();
+
+        foreach ($dice as $i => $value)
+            $this->setGameStateValue('die' . $i, $value);
+    }
+    
     /*
     
     Example for game state "MyGameState":
