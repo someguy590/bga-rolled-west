@@ -24,8 +24,10 @@
     
     Please REMOVE this comment before publishing your game on BGA
 -->
-<div id="dice" class="whiteblock"></div>
-<div id="board"></div>
+<div id="dice_row" class="whiteblock">
+    <h3>{MY_DICE}</h3>
+    <div id="dice" class="dice"></div>
+</div>
 
 
 <script type="text/javascript">

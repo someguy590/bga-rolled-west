@@ -40,7 +40,7 @@ class view_rolledwest_rolledwest extends game_view
     $players_nbr = count($players);
 
     /*********** Place your code below:  ************/
-
+    $this->tpl['MY_DICE'] = $this->_('My dice');
 
     /*
         
