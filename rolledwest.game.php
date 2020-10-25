@@ -88,9 +88,6 @@ class RolledWest extends Table
         //self::initStat( 'table', 'table_teststat1', 0 );    // Init a table statistics
         //self::initStat( 'player', 'player_teststat1', 0 );  // Init a player statistics (for all players)
 
-        // TODO: setup the initial game situation here
-
-
         // Activate first player (which is in general a good idea :) )
         $this->activeNextPlayer();
 
@@ -241,19 +238,6 @@ class RolledWest extends Table
         foreach ($dice as $i => $value)
             $this->setGameStateValue('die' . $i, $value);
     }
-    
-    /*
-    
-    Example for game state "MyGameState":
-
-    function stMyGameState()
-    {
-        // Do some stuff ...
-        
-        // (very often) go to another gamestate
-        $this->gamestate->nextState( 'some_gamestate_transition' );
-    }    
-    */
 
     //////////////////////////////////////////////////////////////////////////////
     //////////// Zombie

@@ -72,7 +72,7 @@ $machinestates = array(
         'transitions' => ['spendOrBank' => 3]
     ],
 
-    2 => array(
+    3 => array(
         "name" => "playerTurn",
         "description" => clienttranslate('${actplayer} must play a card or pass'),
         "descriptionmyturn" => clienttranslate('${you} must play a card or pass'),
