@@ -12,5 +12,5 @@ jobs:
       uses: SamKirkland/FTP-Deploy-Action@3.1.1
       with:
         ftp-server: sftp://1.studio.boardgamearena.com/rolledwest/
-        ftp-username: someguy0
+        ftp-username: someguy
         ftp-password: ${{ secrets.FTP_PASS }}
