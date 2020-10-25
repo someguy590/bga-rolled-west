@@ -14,5 +14,4 @@ jobs:
         ftp-server: sftp://1.studio.boardgamearena.com/rolledwest/
         ftp-username: someguy
         ftp-password: ${{ secrets.FTP_PASS }}
-        known-hosts: [1.studio.boardgamearena.com]:22 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDnocQHlq3aDMKuU1EwjzJNa/UK4g1+XrfbWYR2CbMmqTzonC8/KxEVXwm548mRW7kHW3w7xB8oEdpmmykfxlwtE2AGYLqKYkX4DcbFTSuvZLLCU0ueXRQ66Qj0LO2TSyD9gubQVoHFoLJEeJ2Mhr0bln7l7d1/aiLxk6uOWr8VR7+Ek4Jn+qLJr/HjrXyH2nzcjg8+S6OLbFxKr0oN8/SYovSbix/uJUcF8MgSXEGiVA/IkpNZwWcoMsvKUL9o/whmPx5OoQYuhaQoyIXMc9TxpW7yDcNme+nT2Tb/kbV+p0ieLHgv9wLAkBb0p3EbHLO6WYE3EKEwIuuD+TeWURFN
-        
+        git-ftp-args: --insecure
