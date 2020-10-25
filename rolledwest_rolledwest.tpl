@@ -24,10 +24,17 @@
     
     Please REMOVE this comment before publishing your game on BGA
 -->
+<div id="dice_row" class="whiteblock">
+    <h3>{MY_DICE}</h3>
+    <div id="dice" class="dice"></div>
+</div>
+<div id="board">
+    <!-- BEGIN square -->
+    <div id="square_{X}_{Y}" class="square" style="left: {LEFT}px; top: {TOP}px;"></div>
+    <!-- END square -->
 
-
-This is your game interface. You can edit this HTML in your ".tpl" file.
-
+    <div id="marks"></div>
+</div>
 
 <script type="text/javascript">
 

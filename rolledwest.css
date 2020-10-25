@@ -46,20 +46,22 @@
 
 /********* You can start writing your CSS below this line: **********/
 
-/*
-    Example of CSS sprites (a black token and a white token, 20x20px each, embedded in the same "tokens.png" 40x20px image):
+#board {
+    position: relative;
+    width: 450px;
+    height: 400px;
+    margin-bottom: 5px;
+    background-image: url('img/board.jpg');
+}
 
-    .white_token {
-        background-image: url('img/tokens.png');
-        background-position: 0px 0px;
-    }
-    .black_token {
-        background-image: url('img/tokens.png');
-        background-position: -20px 0px;
-    }
-    .token {
-        width: 20px;
-        height: 20px;
-        background-repeat: none;
-    }
-*/
+.square {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+}
+
+.square:hover {
+    outline: rebeccapurple solid;
+    cursor: pointer;
+}
+
