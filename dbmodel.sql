@@ -33,3 +33,8 @@
 -- Example 2: add a custom field to the standard "player" table
 -- ALTER TABLE `player` ADD `player_my_custom_field` INT UNSIGNED NOT NULL DEFAULT '0';
 
+ALTER TABLE `player` ADD `wood` INT UNSIGNED NOT NULL DEFAULT '0';
+ALTER TABLE `player` ADD `copper` INT UNSIGNED NOT NULL DEFAULT '0';
+ALTER TABLE `player` ADD `silver` INT UNSIGNED NOT NULL DEFAULT '0';
+ALTER TABLE `player` ADD `gold` INT UNSIGNED NOT NULL DEFAULT '0';
+
