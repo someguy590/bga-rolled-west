@@ -118,6 +118,10 @@ class RolledWest extends Table
         $result['players'] = self::getCollectionFromDb($sql);
 
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
+        $dice = [];
+        for ($i = 0; $i < 4; $i++)
+            $dice[] = $this->getGameStateValue('die' . $i);
+        $result['dice'] = $dice;
 
         return $result;
     }

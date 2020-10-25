@@ -63,6 +63,7 @@ define([
                 }
 
                 // TODO: Set up your game interface here, according to "gamedatas"
+                this.displayDice(this.gamedatas.dice);
 
                 // Setup game notifications to handle (see "setupNotifications" method below)
                 this.setupNotifications();
@@ -155,6 +156,21 @@ define([
                 script.
             
             */
+            displayDice: function (dice) {
+                for (let die of dice)
+                    this.playerResources.addToStock(this.getResourceType(die));
+            },
+
+            getResourceType: function (resource) {
+                if (resource >= 1 && resource <= 4)
+                    return 0;
+                else if (resource >= 5 && resource <= 7)
+                    return 1;
+                else if (resource >= 8 && resource <= 10)
+                    return 2;
+                else
+                    return 3;
+            },
 
 
             ///////////////////////////////////////////////////
