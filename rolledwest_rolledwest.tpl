@@ -28,7 +28,13 @@
     <h3>{MY_DICE}</h3>
     <div id="dice" class="dice"></div>
 </div>
+<div id="board">
+    <!-- BEGIN square -->
+    <div id="square_{X}_{Y}" class="square" style="left: {LEFT}px; top: {TOP}px;"></div>
+    <!-- END square -->
 
+    <div id="marks"></div>
+</div>
 
 <script type="text/javascript">
 

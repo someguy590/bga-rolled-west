@@ -41,6 +41,18 @@ class view_rolledwest_rolledwest extends game_view
 
     /*********** Place your code below:  ************/
     $this->tpl['MY_DICE'] = $this->_('My dice');
+    $this->page->begin_block($this->getGameName() . '_' . $this->getGameName(), 'square');
+    $scale = 50;
+    for ($x = 0; $x < 9; $x++) {
+      for ($y = 0; $y < 8; $y++) {
+        $this->page->insert_block('square', [
+          'X' => $x,
+          'Y' => $y,
+          'LEFT' => round($x * $scale),
+          'TOP' => round($y * $scale),
+        ]);
+      }
+    }
 
     /*
         
