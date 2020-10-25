@@ -32,6 +32,11 @@ define([
 
                 this.diceWidth = 15;
                 this.diceHeight = 15;
+                this.playerResources = new ebg.stock();
+                this.playerResources.image_items_per_row = 4;
+                this.playerResources.create(this, $('dice'), this.diceWidth, this.diceHeight);
+                for (let resourceTypeId = 0; resourceTypeId < 4; resourceTypeId++)
+                    this.playerResources.addItemType(resourceTypeId, resourceTypeId, g_gamethemeurl + 'img/resource_icons.png', resourceTypeId);
             },
 
             /*
@@ -58,13 +63,6 @@ define([
                 }
 
                 // TODO: Set up your game interface here, according to "gamedatas"
-                this.playerResources = new ebg.stock();
-                this.playerResources.image_items_per_row = 4;
-                this.playerResources.create(this, $('dice'), this.diceWidth, this.diceHeight);
-                for (let resourceTypeId = 0; resourceTypeId < 4; resourceTypeId++)
-                    this.playerResources.addItemType(resourceTypeId, resourceTypeId, g_gamethemeurl + 'img/resource_icons.png', resourceTypeId);
-
-
 
                 // Setup game notifications to handle (see "setupNotifications" method below)
                 this.setupNotifications();
