@@ -48,10 +48,10 @@ define([
                 console.log("Starting game setup");
 
                 // Setting up player boards
-                for (var player_id in gamedatas.players) {
-                    var player = gamedatas.players[player_id];
-
+                for (let [player_id, player] of Object.entries(gamedatas.players)) {
                     // TODO: Setting up players boards if needed
+                    let playerBoardDiv = $('player_board_' + player_id);
+                    dojo.place(this.format_block('jstpl_player_board', player), playerBoardDiv);
                 }
 
                 // TODO: Set up your game interface here, according to "gamedatas"
