@@ -18,7 +18,8 @@
 define([
     "dojo", "dojo/_base/declare",
     "ebg/core/gamegui",
-    "ebg/counter"
+    "ebg/counter",
+    "ebg/stock"
 ],
     function (dojo, declare) {
         return declare("bgagame.rolledwest", ebg.core.gamegui, {
@@ -29,6 +30,8 @@ define([
                 // Example:
                 // this.myGlobalValue = 0;
 
+                this.diceWidth = 15;
+                this.diceHeight = 15;
             },
 
             /*
@@ -55,6 +58,12 @@ define([
                 }
 
                 // TODO: Set up your game interface here, according to "gamedatas"
+                this.playerResources = new ebg.stock();
+                this.playerResources.image_items_per_row = 4;
+                this.playerResources.create(this, $('dice'), this.diceWidth, this.diceHeight);
+                for (let resourceTypeId = 0; resourceTypeId < 4; resourceTypeId++)
+                    this.playerResources.addItemType(resourceTypeId, resourceTypeId, g_gamethemeurl + 'img/resource_icons.png', resourceTypeId);
+
 
 
                 // Setup game notifications to handle (see "setupNotifications" method below)
