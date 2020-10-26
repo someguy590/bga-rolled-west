@@ -158,19 +158,9 @@ define([
             */
             displayDice: function (dice) {
                 for (let die of dice)
-                    this.playerResources.addToStock(this.getResourceType(die));
+                    this.playerResources.addToStock(die);
             },
 
-            getResourceType: function (resource) {
-                if (resource >= 1 && resource <= 4)
-                    return 0;
-                else if (resource >= 5 && resource <= 7)
-                    return 1;
-                else if (resource >= 8 && resource <= 10)
-                    return 2;
-                else
-                    return 3;
-            },
 
 
             ///////////////////////////////////////////////////
