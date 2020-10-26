@@ -150,8 +150,12 @@ class RolledWest extends Table
     {
         $dice = [];
         for ($i = 0; $i < 4; $i++) {
-            $dice[] = bga_rand(1, 12);
+            $roll = bga_rand(1, 12);
+            $dice[] = $this->getDiceType($roll);
         }
+
+        return $dice;
+    }
 
     function getDiceType($value)
     {
