@@ -197,6 +197,7 @@ class RolledWest extends Table
                 $this->notifyAllPlayers('chooseTerrain', clienttranslate('${player_name} chooses ${terrain_name} to represent the terrain for the turn'), [
                     'player_name' => $this->getActivePlayerName(),
                     'terrain_name' => $this->dice_types[$terrain_type]['name'],
+                    'terrain_type' => $terrain_type
                 ]);
 
                 $this->gamestate->nextState('spendOrBank');

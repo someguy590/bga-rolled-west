@@ -199,7 +199,7 @@ define([
                             }, this, function (result) { }, function (is_error) { }
                         );
                     }
-
+                    this.playerResources.unselectAll();
                 }
             },
 
@@ -269,8 +269,8 @@ define([
             },
 
             // TODO: from this point and below, you can write your game notifications handling methods
-            notif_chooseTerrain: function(notif) {
-
+            notif_chooseTerrain: function (notif) {
+                this.playerResources.removeFromStock(notif.args.terrain_type);
             }
             /*
             Example:
