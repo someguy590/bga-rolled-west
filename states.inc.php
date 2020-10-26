@@ -50,6 +50,12 @@
 
 //    !! It is not a good idea to modify this file when a game is running !!
 
+if (!defined('STATE_END_GAME')) { // ensure this block is only invoked once, since it is included multiple times
+    define("STATE_CHOOSE_TERRAIN", 2);
+    define("STATE_SPEND_OR_BANK", 3);
+    define("STATE_END_GAME", 99);
+}
+
 
 $machinestates = array(
 
@@ -59,20 +65,20 @@ $machinestates = array(
         "description" => "",
         "type" => "manager",
         "action" => "stGameSetup",
-        "transitions" => array("" => 2)
+        "transitions" => array("" => STATE_CHOOSE_TERRAIN)
     ),
 
-    2 => [
+    STATE_CHOOSE_TERRAIN => [
         'name' => 'chooseTerrain',
         'description' => clienttranslate('${actplayer} must choose 1 die to represent the terrain for the turn'),
         'descriptionmyturn' => clienttranslate('${you} must choose 1 die to represent the terrain for the turn'),
         'type' => 'activeplayer',
         'possibleactions' => ['chooseTerrain'],
         'action' => 'stChooseTerrain',
-        'transitions' => ['spendOrBank' => 3]
+        'transitions' => ['spendOrBank' => STATE_SPEND_OR_BANK]
     ],
 
-    3 => [
+    STATE_SPEND_OR_BANK => [
         'name' => 'spendOrBank',
         'description' => clienttranslate('${actplayer} must play a card or pass'),
         'descriptionmyturn' => clienttranslate('${you} must play a card or pass'),
