@@ -78,10 +78,10 @@ class RolledWest extends Table
         /************ Start the game initialization *****/
 
         // Init global values with their initial values
-        $this->setGameStateInitialValue('die0', NULL);
-        $this->setGameStateInitialValue('die1', NULL);
-        $this->setGameStateInitialValue('die2', NULL);
-        $this->setGameStateInitialValue('die3', NULL);
+        $this->setGameStateInitialValue('die0', -1);
+        $this->setGameStateInitialValue('die1', -1);
+        $this->setGameStateInitialValue('die2', -1);
+        $this->setGameStateInitialValue('die3', -1);
 
         // Init game statistics
         // (note: statistics used in this file must be defined in your stats.inc.php file)
@@ -115,10 +115,7 @@ class RolledWest extends Table
         $result['players'] = self::getCollectionFromDb($sql);
 
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
-        $dice = [];
-        for ($i = 0; $i < 4; $i++)
-            $dice[] = $this->getGameStateValue('die' . $i);
-        $result['dice'] = $dice;
+        $result['dice'] = $this->getAvailableDice();
 
         return $result;
     }
@@ -153,9 +150,31 @@ class RolledWest extends Table
     {
         $dice = [];
         for ($i = 0; $i < 4; $i++) {
-            $dice[] = bga_rand(1, 12);
+            $roll = bga_rand(1, 12);
+            $dice[] = $this->getDiceType($roll);
         }
 
+        return $dice;
+    }
+
+    function getDiceType($value)
+    {
+        foreach ($this->dice_types as $type => $info) {
+            [$low, $high] = $info['range'];
+            if ($value >= $low && $value <= $high) {
+                return $type;
+            }
+        }
+    }
+
+    function getAvailableDice()
+    {
+        $dice = [];
+        for ($i = 0; $i < 4; $i++) {
+            $die = $this->getGameStateValue('die' . $i);
+            if ($die != -1)
+                $dice[] = $die;
+        }
         return $dice;
     }
 
