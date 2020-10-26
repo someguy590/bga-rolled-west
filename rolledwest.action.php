@@ -38,7 +38,13 @@ class action_rolledwest extends APP_GameAction
   }
 
   // TODO: defines your action entry points there
-
+  public function chooseTerrain()
+  {
+    $this->setAjaxMode();
+    $type = $this->getArg("type", AT_int, true);
+    $this->game->chooseTerrain($type);
+    $this->ajaxResponse();
+  }
 
   /*
     

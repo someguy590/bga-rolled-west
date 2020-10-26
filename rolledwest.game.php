@@ -186,6 +186,24 @@ class RolledWest extends Table
         Each time a player is doing some game action, one of the methods below is called.
         (note: each method below must match an input method in rolledwest.action.php)
     */
+    function chooseTerrain($terrain_type)
+    {
+        $this->checkAction('chooseTerrain', true);
+        $dice = $this->getAvailableDice();
+
+        foreach ($dice as $i => $die) {
+            if ($terrain_type == $die) {
+                $this->setGameStateValue('die' . $i, -1);
+                $this->notifyAllPlayers('chooseTerrain', clienttranslate('${player_name} chooses ${terrain_name} to represent the terrain for the turn'), [
+                    'player_name' => $this->getActivePlayerName(),
+                    'terrain_name' => $this->dice_types[$terrain_type]['name'],
+                ]);
+
+                $this->gamestate->nextState('spendOrBank');
+                return;
+            }
+        }
+    }
 
     /*
     

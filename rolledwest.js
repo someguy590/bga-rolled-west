@@ -64,6 +64,7 @@ define([
 
                 // TODO: Set up your game interface here, according to "gamedatas"
                 this.displayDice(this.gamedatas.dice);
+                dojo.connect(this.playerResources, 'onChangeSelection', this, 'onDiceSelected');
 
                 // Setup game notifications to handle (see "setupNotifications" method below)
                 this.setupNotifications();
@@ -161,7 +162,14 @@ define([
                     this.playerResources.addToStock(die);
             },
 
+            chooseTerrain: function (e) {
+                dojo.stopEvent(evt);
 
+                if (!this.checkAction)
+                    return;
+
+
+            },
 
             ///////////////////////////////////////////////////
             //// Player's action
@@ -176,6 +184,25 @@ define([
                 _ make a call to the game server
             
             */
+
+            onDiceSelected: function () {
+                let dice = this.playerResources.getSelectedItems();
+
+                if (dice.length > 0) {
+                    // choose terrain
+                    if (this.checkAction('chooseTerrain')) {
+                        this.ajaxcall(
+                            `/${this.game_name}/${this.game_name}/chooseTerrain.html`,
+                            {
+                                type: dice[0].type,
+                                lock: true
+                            }, this, function (result) { }, function (is_error) { }
+                        );
+                    }
+
+                }
+            },
+
 
             /* Example:
             
@@ -228,6 +255,7 @@ define([
                 console.log('notifications subscriptions setup');
 
                 // TODO: here, associate your game notifications with local methods
+                dojo.subscribe('chooseTerrain', this, "notif_chooseTerrain");
 
                 // Example 1: standard notification handling
                 // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
@@ -241,7 +269,9 @@ define([
             },
 
             // TODO: from this point and below, you can write your game notifications handling methods
+            notif_chooseTerrain: function(notif) {
 
+            }
             /*
             Example:
             
