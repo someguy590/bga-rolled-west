@@ -153,6 +153,16 @@ class RolledWest extends Table
             $dice[] = bga_rand(1, 12);
         }
 
+    function getDiceType($value)
+    {
+        foreach ($this->dice_types as $type => $info) {
+            [$low, $high] = $info['range'];
+            if ($value >= $low && $value <= $high) {
+                return $type;
+            }
+        }
+    }
+
     function getAvailableDice()
     {
         $dice = [];
