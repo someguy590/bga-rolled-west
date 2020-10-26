@@ -156,6 +156,14 @@ class RolledWest extends Table
             $dice[] = bga_rand(1, 12);
         }
 
+    function getAvailableDice()
+    {
+        $dice = [];
+        for ($i = 0; $i < 4; $i++) {
+            $die = $this->getGameStateValue('die' . $i);
+            if ($die != -1)
+                $dice[] = $die;
+        }
         return $dice;
     }
 
