@@ -78,10 +78,10 @@ class RolledWest extends Table
         /************ Start the game initialization *****/
 
         // Init global values with their initial values
-        $this->setGameStateInitialValue('die0', NULL);
-        $this->setGameStateInitialValue('die1', NULL);
-        $this->setGameStateInitialValue('die2', NULL);
-        $this->setGameStateInitialValue('die3', NULL);
+        $this->setGameStateInitialValue('die0', -1);
+        $this->setGameStateInitialValue('die1', -1);
+        $this->setGameStateInitialValue('die2', -1);
+        $this->setGameStateInitialValue('die3', -1);
 
         // Init game statistics
         // (note: statistics used in this file must be defined in your stats.inc.php file)
