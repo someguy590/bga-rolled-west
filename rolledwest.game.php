@@ -206,7 +206,38 @@ class RolledWest extends Table
     function pass()
     {
         $this->checkAction('pass', true);
+        $player = $this->getActivePlayerId();
+        $sql = "UPDATE player SET is_banking_during_turn=false WHERE player_id=$player";
+        $this->DbQuery($sql);
         $this->gamestate->nextState('rollDice');
+    }
+
+    function bank($resource)
+    {
+        $this->checkAction('bank', true);
+        $player = $this->getActivePlayerId();
+
+        // check if already banked
+        $sql = "SELECT is_banking_during_turn FROM player WHERE player_id=$player";
+        $is_banking_during_turn = $this->getUniqueValueFromDB($sql);
+        if ($is_banking_during_turn)
+            throw new BgaUserException($this->_('You already banked a resource this turn'));
+
+        // increment resource amount
+        $resource_name = $this->dice_types[$resource]['dbName'];
+        $sql = "SELECT $resource_name FROM player WHERE player_id=$player";
+        $resource_amount = $this->getUniqueValueFromDB($sql) + 1;
+        $sql = "UPDATE player SET $resource_name=$resource_amount WHERE player_id=$player";
+        $this->DbQuery($sql);
+
+        // once per turn bank used
+        $sql = "UPDATE player SET is_banking_during_turn=true WHERE player_id=$player";
+        $this->DbQuery($sql);
+
+        $this->notifyAllPlayers('bank', clienttranslate('${player_name} banked ${resource_name}'), [
+            'player_name' => $this->getActivePlayerName(),
+            'resource_name' => $resource_name
+        ]);
     }
 
     /*

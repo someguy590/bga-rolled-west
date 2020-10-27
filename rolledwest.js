@@ -194,11 +194,21 @@ define([
 
                 if (dice.length > 0) {
                     // choose terrain
-                    if (this.checkAction('chooseTerrain')) {
+                    if (this.checkAction('chooseTerrain', true)) {
                         this.ajaxcall(
                             `/${this.game_name}/${this.game_name}/chooseTerrain.html`,
                             {
                                 type: dice[0].type,
+                                lock: true
+                            }, this, function (result) { }, function (is_error) { }
+                        );
+                    }
+                    else if (this.checkAction('bank')) {
+                        // bank a resource
+                        this.ajaxcall(
+                            `/${this.game_name}/${this.game_name}/bank.html`,
+                            {
+                                resource: dice[0].type,
                                 lock: true
                             }, this, function (result) { }, function (is_error) { }
                         );
@@ -272,6 +282,7 @@ define([
                 // TODO: here, associate your game notifications with local methods
                 dojo.subscribe('chooseTerrain', this, "notif_chooseTerrain");
                 dojo.subscribe('diceRolled', this, "notif_diceRolled");
+                dojo.subscribe('bank', this, "notif_bank");
 
                 // Example 1: standard notification handling
                 // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
@@ -295,6 +306,8 @@ define([
                 for (let die of dice)
                     this.playerResources.addToStock(die);
             },
+
+            notif_bank: function (notif) { },
             /*
             Example:
             
