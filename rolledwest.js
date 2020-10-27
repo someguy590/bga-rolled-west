@@ -271,6 +271,7 @@ define([
 
                 // TODO: here, associate your game notifications with local methods
                 dojo.subscribe('chooseTerrain', this, "notif_chooseTerrain");
+                dojo.subscribe('diceRolled', this, "notif_diceRolled");
 
                 // Example 1: standard notification handling
                 // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
@@ -286,7 +287,14 @@ define([
             // TODO: from this point and below, you can write your game notifications handling methods
             notif_chooseTerrain: function (notif) {
                 this.playerResources.removeFromStock(notif.args.terrain_type);
-            }
+            },
+
+            notif_diceRolled: function (notif) {
+                this.playerResources.removeAll();
+                dice = notif.args.dice;
+                for (let die of dice)
+                    this.playerResources.addToStock(die);
+            },
             /*
             Example:
             

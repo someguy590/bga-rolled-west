@@ -282,6 +282,10 @@ class RolledWest extends Table
         foreach ($dice as $i => $value)
             $this->setGameStateValue('die' . $i, $value);
 
+        $this->notifyAllPlayers('diceRolled', clienttranslate('${player_name} rolls dice'), [
+            'player_name' => $this->getActivePlayerName(),
+            'dice' => $dice
+        ]);
         $this->gamestate->nextState('chooseTerrain');
     }
 
