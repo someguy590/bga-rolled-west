@@ -132,6 +132,10 @@ define([
 
                 if (this.isCurrentPlayerActive()) {
                     switch (stateName) {
+
+                        case 'spendOrBank':
+                            this.addActionButton('pass_button', _('pass'), 'pass');
+                            break;
                         /*               
                                          Example:
                          
@@ -200,6 +204,17 @@ define([
                         );
                     }
                     this.playerResources.unselectAll();
+                }
+            },
+
+            pass: function () {
+                if (this.checkAction('pass')) {
+                    this.ajaxcall(
+                        `/${this.game_name}/${this.game_name}/pass.html`,
+                        {
+                            lock: true
+                        }, this, function (result) { }, function (is_error) { }
+                    );
                 }
             },
 

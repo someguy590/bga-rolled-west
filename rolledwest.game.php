@@ -206,6 +206,10 @@ class RolledWest extends Table
         }
     }
 
+    function pass() {
+        $this->gamestate->nextState('pass');
+    }
+
     /*
     
     Example:

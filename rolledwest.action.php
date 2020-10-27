@@ -66,4 +66,10 @@ class action_rolledwest extends APP_GameAction
     }
     
     */
+  public function pass()
+  {
+    $this->setAjaxMode();
+    $this->game->pass();
+    $this->ajaxResponse();
+  }
 }
