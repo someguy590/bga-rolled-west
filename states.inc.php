@@ -51,9 +51,10 @@
 //    !! It is not a good idea to modify this file when a game is running !!
 
 if (!defined('STATE_END_GAME')) { // ensure this block is only invoked once, since it is included multiple times
-    define("STATE_CHOOSE_TERRAIN", 2);
-    define("STATE_SPEND_OR_BANK", 3);
-    define("STATE_END_GAME", 99);
+    define('STATE_ROLL_DICE', 2);
+    define('STATE_CHOOSE_TERRAIN', 3);
+    define('STATE_SPEND_OR_BANK', 4);
+    define('STATE_END_GAME', 99);
 }
 
 
@@ -65,8 +66,15 @@ $machinestates = array(
         "description" => "",
         "type" => "manager",
         "action" => "stGameSetup",
-        "transitions" => array("" => STATE_CHOOSE_TERRAIN)
+        "transitions" => array("" => STATE_ROLL_DICE)
     ),
+
+    STATE_ROLL_DICE => [
+        'name' => 'rollDice',
+        'type' => 'game',
+        'action' => 'stRollDice',
+        'transitions' => ['chooseTerrain' => STATE_CHOOSE_TERRAIN]
+    ],
 
     STATE_CHOOSE_TERRAIN => [
         'name' => 'chooseTerrain',
@@ -74,7 +82,6 @@ $machinestates = array(
         'descriptionmyturn' => clienttranslate('${you} must choose 1 die to represent the terrain for the turn'),
         'type' => 'activeplayer',
         'possibleactions' => ['chooseTerrain'],
-        'action' => 'stChooseTerrain',
         'transitions' => ['spendOrBank' => STATE_SPEND_OR_BANK]
     ],
 
@@ -83,8 +90,8 @@ $machinestates = array(
         'description' => clienttranslate('${actplayer} must play a card or pass'),
         'descriptionmyturn' => clienttranslate('${you} must play a card or pass'),
         'type' => 'activeplayer',
-        'possibleactions' => array('playCard', 'pass'),
-        'transitions' => array('playCard' => 2, 'pass' => 2)
+        'possibleactions' => ['pass'],
+        'transitions' => ['rollDice' => STATE_ROLL_DICE]
     ],
 
     // Final state.

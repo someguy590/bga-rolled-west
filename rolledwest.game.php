@@ -88,9 +88,6 @@ class RolledWest extends Table
         //self::initStat( 'table', 'table_teststat1', 0 );    // Init a table statistics
         //self::initStat( 'player', 'player_teststat1', 0 );  // Init a player statistics (for all players)
 
-        // Activate first player (which is in general a good idea :) )
-        $this->activeNextPlayer();
-
         /************ End of the game initialization *****/
     }
 
@@ -206,6 +203,12 @@ class RolledWest extends Table
         }
     }
 
+    function pass()
+    {
+        $this->checkAction('pass', true);
+        $this->gamestate->nextState('rollDice');
+    }
+
     /*
     
     Example:
@@ -269,12 +272,19 @@ class RolledWest extends Table
         The action method of state X is called everytime the current game state is set to X.
     */
 
-    function stChooseTerrain()
+    function stRollDice()
     {
+        $this->activeNextPlayer();
         $dice = $this->rollDice();
 
         foreach ($dice as $i => $value)
             $this->setGameStateValue('die' . $i, $value);
+
+        $this->notifyAllPlayers('diceRolled', clienttranslate('${player_name} rolls dice'), [
+            'player_name' => $this->getActivePlayerName(),
+            'dice' => $dice
+        ]);
+        $this->gamestate->nextState('chooseTerrain');
     }
 
     //////////////////////////////////////////////////////////////////////////////
