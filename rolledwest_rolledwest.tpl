@@ -23,20 +23,14 @@
 
 <script type="text/javascript">
 
-// Javascript HTML templates
-var jstpl_player_board = 
-'<div class="cp_board">\
-    <div id="copper_icon" class="bank_icon bank_icon_copper"></div><span id="copper_count">0</span>\
-    <div id="wood_icon" class="bank_icon bank_icon_wood"></div><span id="wood_count">0</span>\
-    <div id="silver_icon" class="bank_icon bank_icon_silver"></div><span id="silver_count">0</span>\
-    <div id="gold_icon" class="bank_icon bank_icon_gold"></div><span id="gold_count">0</span>\
-</div>';
-
-    /*
-    // Example:
-    var jstpl_some_game_item='<div class="my_game_item" id="my_game_item_${MY_ITEM_ID}"></div>';
-    
-    */
+    // Javascript HTML templates
+    var jstpl_player_board = '\
+    <div class="cp_board">\
+        <div class="bank_icon bank_icon_copper"></div><span id="copper_count_${playerId}">0</span>\
+        <div class="bank_icon bank_icon_wood"></div><span id="wood_count_${playerId}">0</span>\
+        <div class="bank_icon bank_icon_silver"></div><span id="silver_count_${playerId}">0</span>\
+        <div class="bank_icon bank_icon_gold"></div><span id="gold_count_${playerId}">0</span>\
+    </div>';
 
 </script>
 

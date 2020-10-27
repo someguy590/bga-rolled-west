@@ -108,7 +108,7 @@ class RolledWest extends Table
 
         // Get information about players
         // Note: you can retrieve some extra field you added for "player" table in "dbmodel.sql" if you need it.
-        $sql = "SELECT player_id id, player_score score FROM player ";
+        $sql = "SELECT player_id id, player_score score, copper, wood, silver, gold, is_banking_during_turn isBankingDuringTurn FROM player ";
         $result['players'] = self::getCollectionFromDb($sql);
 
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
@@ -206,7 +206,41 @@ class RolledWest extends Table
     function pass()
     {
         $this->checkAction('pass', true);
+        $player = $this->getActivePlayerId();
+        $sql = "UPDATE player SET is_banking_during_turn=false WHERE player_id=$player";
+        $this->DbQuery($sql);
         $this->gamestate->nextState('rollDice');
+    }
+
+    function bank($resource)
+    {
+        $this->checkAction('bank', true);
+        $player = $this->getActivePlayerId();
+
+        // check if already banked
+        $sql = "SELECT is_banking_during_turn FROM player WHERE player_id=$player";
+        $is_banking_during_turn = $this->getUniqueValueFromDB($sql);
+        if ($is_banking_during_turn)
+            throw new BgaUserException($this->_('You already banked a resource this turn'));
+
+        // increment resource amount
+        $resource_db_name = $this->dice_types[$resource]['dbName'];
+        $sql = "SELECT $resource_db_name FROM player WHERE player_id=$player";
+        $resource_amount = $this->getUniqueValueFromDB($sql) + 1;
+        $sql = "UPDATE player SET $resource_db_name=$resource_amount WHERE player_id=$player";
+        $this->DbQuery($sql);
+
+        // once per turn bank used
+        $sql = "UPDATE player SET is_banking_during_turn=true WHERE player_id=$player";
+        $this->DbQuery($sql);
+
+        $resource_name = $this->dice_types[$resource]['name'];
+        $this->notifyAllPlayers('bank', clienttranslate('${player_name} banked ${resource_name}'), [
+            'player_name' => $this->getActivePlayerName(),
+            'resource_name' => $resource_name,
+            'resourceType' => $resource,
+            'playerId' => $player
+        ]);
     }
 
     /*
@@ -274,7 +308,8 @@ class RolledWest extends Table
 
     function stRollDice()
     {
-        $this->activeNextPlayer();
+        $player = $this->activeNextPlayer();
+        $this->giveExtraTime($player);
         $dice = $this->rollDice();
 
         foreach ($dice as $i => $value)
