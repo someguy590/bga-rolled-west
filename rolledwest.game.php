@@ -88,9 +88,6 @@ class RolledWest extends Table
         //self::initStat( 'table', 'table_teststat1', 0 );    // Init a table statistics
         //self::initStat( 'player', 'player_teststat1', 0 );  // Init a player statistics (for all players)
 
-        // Activate first player (which is in general a good idea :) )
-        $this->activeNextPlayer();
-
         /************ End of the game initialization *****/
     }
 
@@ -277,6 +274,7 @@ class RolledWest extends Table
 
     function stRollDice()
     {
+        $this->activeNextPlayer();
         $dice = $this->rollDice();
 
         foreach ($dice as $i => $value)
