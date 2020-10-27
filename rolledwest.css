@@ -77,11 +77,11 @@
 }
 
 .bank_icon_copper {
-    background-position: -15px 0px;
+    background-position: 0px 0px;
 }
 
 .bank_icon_wood {
-    background-position: 0px 0px;
+    background-position: -15px 0px;
 }
 
 .bank_icon_silver {
