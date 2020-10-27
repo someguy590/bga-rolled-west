@@ -32,12 +32,6 @@ var jstpl_player_board =
     <div id="gold_icon" class="bank_icon bank_icon_gold"></div><span id="gold_count">0</span>\
 </div>';
 
-    /*
-    // Example:
-    var jstpl_some_game_item='<div class="my_game_item" id="my_game_item_${MY_ITEM_ID}"></div>';
-    
-    */
-
 </script>
 
 {OVERALL_GAME_FOOTER}
