@@ -224,10 +224,10 @@ class RolledWest extends Table
             throw new BgaUserException($this->_('You already banked a resource this turn'));
 
         // increment resource amount
-        $resource_name = $this->dice_types[$resource]['dbName'];
-        $sql = "SELECT $resource_name FROM player WHERE player_id=$player";
+        $resource_db_name = $this->dice_types[$resource]['dbName'];
+        $sql = "SELECT $resource_db_name FROM player WHERE player_id=$player";
         $resource_amount = $this->getUniqueValueFromDB($sql) + 1;
-        $sql = "UPDATE player SET $resource_name=$resource_amount WHERE player_id=$player";
+        $sql = "UPDATE player SET $resource_db_name=$resource_amount WHERE player_id=$player";
         $this->DbQuery($sql);
 
         // once per turn bank used
