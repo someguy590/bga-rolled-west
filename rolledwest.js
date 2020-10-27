@@ -224,6 +224,12 @@ define([
                         );
                     }
                     else if (this.checkAction('bank')) {
+                        if (this.gamedatas.players[this.player_id].isBankingDuringTurn == '1') {
+                            this.showMessage(_('You already banked a resource this turn'), 'error');
+                            this.playerResources.unselectAll();
+                            return;
+                        }
+
                         // bank a resource
                         this.ajaxcall(
                             `/${this.game_name}/${this.game_name}/bank.html`,
