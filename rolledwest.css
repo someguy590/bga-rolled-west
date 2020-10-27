@@ -66,26 +66,28 @@
 }
 
 .bank_icon {
-	width: 15px;
-	height: 15px;
-	display: inline-block;
+    width: 15px;
+    height: 15px;
+    display: inline-block;
     position: relative;
     background-repeat: no-repeat;
-    background-image: url( 'img/resource_icons.png');
+    background-image: url('img/resource_icons.png');
     margin-top: 4px;
     margin-right: 3px;
+}
+
+.bank_icon_copper {
+    background-position: -15px 0px;
 }
 
 .bank_icon_wood {
     background-position: 0px 0px;
 }
 
-.bank_icon_copper {
-    background-position: -15px 0px;
-}
 .bank_icon_silver {
     background-position: -30px 0px;
 }
+
 .bank_icon_gold {
     background-position: -45px 0px;
 }
