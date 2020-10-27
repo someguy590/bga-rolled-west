@@ -59,7 +59,7 @@ define([
                 for (let [player_id, player] of Object.entries(gamedatas.players)) {
                     // TODO: Setting up players boards if needed
                     let playerBoardDiv = $('player_board_' + player_id);
-                    dojo.place(this.format_block('jstpl_player_board', player), playerBoardDiv);
+                    dojo.place(this.format_block('jstpl_player_board', { playerId: player_id }), playerBoardDiv);
                 }
 
                 // TODO: Set up your game interface here, according to "gamedatas"
