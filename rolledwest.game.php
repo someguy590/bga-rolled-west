@@ -225,9 +225,7 @@ class RolledWest extends Table
 
         // increment resource amount
         $resource_db_name = $this->dice_types[$resource]['dbName'];
-        $sql = "SELECT $resource_db_name FROM player WHERE player_id=$player";
-        $resource_amount = $this->getUniqueValueFromDB($sql) + 1;
-        $sql = "UPDATE player SET $resource_db_name=$resource_amount WHERE player_id=$player";
+        $sql = "UPDATE player SET $resource_db_name=$resource_db_name + 1 WHERE player_id=$player";
         $this->DbQuery($sql);
 
         // once per turn bank used
