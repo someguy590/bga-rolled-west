@@ -327,6 +327,7 @@ define([
             },
 
             notif_diceRolled: function (notif) {
+                let dice = notif.args.dice;
                 this.playerResources.removeAll();
                 dice = notif.args.dice;
                 for (let die of dice)
