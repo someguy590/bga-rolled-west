@@ -327,9 +327,10 @@ define([
             },
 
             notif_diceRolled: function (notif) {
+                let playerId = notif.args.playerId;
                 let dice = notif.args.dice;
+                this.gamedatas.players[playerId].isBankingDuringTurn = '0';
                 this.playerResources.removeAll();
-                dice = notif.args.dice;
                 for (let die of dice)
                     this.playerResources.addToStock(die);
             },
@@ -345,6 +346,8 @@ define([
                     this.silverCounters[playerId].incValue(1);
                 else
                     this.goldCounters[playerId].incValue(1);
+
+                this.gamedatas.players[playerId].isBankingDuringTurn = '1';
             },
             /*
             Example:

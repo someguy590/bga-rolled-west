@@ -310,6 +310,7 @@ class RolledWest extends Table
             $this->setGameStateValue('die' . $i, $value);
 
         $this->notifyAllPlayers('diceRolled', clienttranslate('${player_name} rolls dice'), [
+            'playerId' => $player,
             'player_name' => $this->getActivePlayerName(),
             'dice' => $dice
         ]);
