@@ -234,9 +234,12 @@ class RolledWest extends Table
         $sql = "UPDATE player SET is_banking_during_turn=true WHERE player_id=$player";
         $this->DbQuery($sql);
 
+        $resource_name = $this->dice_types[$resource]['name'];
         $this->notifyAllPlayers('bank', clienttranslate('${player_name} banked ${resource_name}'), [
             'player_name' => $this->getActivePlayerName(),
-            'resource_name' => $resource_name
+            'resource_name' => $resource_name,
+            'resourceType' => $resource,
+            'playerId' => $player
         ]);
     }
 

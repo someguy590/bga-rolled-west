@@ -56,10 +56,23 @@ define([
                 console.log("Starting game setup");
 
                 // Setting up player boards
+                this.copperCounters = {};
+                this.woodCounters = {};
+                this.silverCounters = {};
+                this.goldCounters = {};
                 for (let [player_id, player] of Object.entries(gamedatas.players)) {
                     // TODO: Setting up players boards if needed
                     let playerBoardDiv = $('player_board_' + player_id);
                     dojo.place(this.format_block('jstpl_player_board', { playerId: player_id }), playerBoardDiv);
+
+                    this.copperCounters[player_id] = new ebg.counter();
+                    this.copperCounters[player_id].create('copper_count_' + player_id);
+                    this.woodCounters[player_id] = new ebg.counter();
+                    this.woodCounters[player_id].create('wood_count_' + player_id);
+                    this.silverCounters[player_id] = new ebg.counter();
+                    this.silverCounters[player_id].create('silver_count_' + player_id);
+                    this.goldCounters[player_id] = new ebg.counter();
+                    this.goldCounters[player_id].create('gold_count_' + player_id);
                 }
 
                 // TODO: Set up your game interface here, according to "gamedatas"
@@ -307,7 +320,18 @@ define([
                     this.playerResources.addToStock(die);
             },
 
-            notif_bank: function (notif) { },
+            notif_bank: function (notif) {
+                let resourceType = notif.args.resourceType;
+                let playerId = notif.args.playerId;
+                if (resourceType == 0)
+                    this.copperCounters[playerId].incValue(1);
+                else if (resourceType == 1)
+                    this.woodCounters[playerId].incValue(1);
+                else if (resourceType == 2)
+                    this.silverCounters[playerId].incValue(1);
+                else
+                    this.goldCounters[playerId].incValue(1);
+            },
             /*
             Example:
             
