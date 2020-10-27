@@ -67,12 +67,19 @@ define([
 
                     this.copperCounters[player_id] = new ebg.counter();
                     this.copperCounters[player_id].create('copper_count_' + player_id);
+                    this.copperCounters[player_id].setValue(player.copper);
+
                     this.woodCounters[player_id] = new ebg.counter();
                     this.woodCounters[player_id].create('wood_count_' + player_id);
+                    this.woodCounters[player_id].setValue(player.wood);
+
                     this.silverCounters[player_id] = new ebg.counter();
                     this.silverCounters[player_id].create('silver_count_' + player_id);
+                    this.silverCounters[player_id].setValue(player.silver);
+
                     this.goldCounters[player_id] = new ebg.counter();
                     this.goldCounters[player_id].create('gold_count_' + player_id);
+                    this.goldCounters[player_id].setValue(player.gold);
                 }
 
                 // TODO: Set up your game interface here, according to "gamedatas"
