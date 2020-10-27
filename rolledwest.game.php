@@ -305,14 +305,15 @@ class RolledWest extends Table
 
     function stRollDice()
     {
-        $this->activeNextPlayer();
+        $player = $this->activeNextPlayer();
+        $this->giveExtraTime($player);
         $dice = $this->rollDice();
 
         foreach ($dice as $i => $value)
             $this->setGameStateValue('die' . $i, $value);
 
         $this->notifyAllPlayers('diceRolled', clienttranslate('${player_name} rolls dice'), [
-            'player_name' => $this->getActivePlayerName(),
+            'player_name' => $player,
             'dice' => $dice
         ]);
         $this->gamestate->nextState('chooseTerrain');
