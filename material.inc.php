@@ -21,8 +21,8 @@
  */
 
 $this->dice_types = [
-  0 => ['name' => clienttranslate('copper'), 'range' => [1, 4]],
-  1 => ['name' => clienttranslate('wood'), 'range' => [5, 7]],
-  2 => ['name' => clienttranslate('silver'), 'range' => [8, 10]],
-  3 => ['name' => clienttranslate('gold'), 'range' => [11, 12]],
+  0 => ['name' => clienttranslate('copper'), 'range' => [1, 4], 'dbName' => 'copper'],
+  1 => ['name' => clienttranslate('wood'), 'range' => [5, 7], 'dbName' => 'wood'],
+  2 => ['name' => clienttranslate('silver'), 'range' => [8, 10], 'dbName' => 'silver'],
+  3 => ['name' => clienttranslate('gold'), 'range' => [11, 12], 'dbName' => 'gold'],
 ];
