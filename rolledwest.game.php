@@ -206,8 +206,10 @@ class RolledWest extends Table
         }
     }
 
-    function pass() {
-        $this->gamestate->nextState('pass');
+    function pass()
+    {
+        $this->checkAction('pass', true);
+        $this->gamestate->nextState('rollDice');
     }
 
     /*
@@ -273,12 +275,14 @@ class RolledWest extends Table
         The action method of state X is called everytime the current game state is set to X.
     */
 
-    function stChooseTerrain()
+    function stRollDice()
     {
         $dice = $this->rollDice();
 
         foreach ($dice as $i => $value)
             $this->setGameStateValue('die' . $i, $value);
+
+        $this->gamestate->nextState('chooseTerrain');
     }
 
     //////////////////////////////////////////////////////////////////////////////
