@@ -48,7 +48,7 @@ class view_rolledwest_rolledwest extends game_view
 
     foreach ($this->game->offices as $n => $office) {
       $this->page->insert_block('square', [
-        'SQUARE_ID' => 'office' . $n,
+        'SQUARE_ID' => 'office_' . $n,
         'LEFT' => round($n % 3 * $scale),
         'TOP' => round(intdiv($n, 3) * $scale),
       ]);
@@ -58,7 +58,7 @@ class view_rolledwest_rolledwest extends game_view
       $x_offset = 4;
       foreach ($shipment['spaces'] as $n => $space) {
         $this->page->insert_block('square', [
-          'SQUARE_ID' => $shipment['name'] . 'Shipment' . $n,
+          'SQUARE_ID' => $shipment['name'] . '_shipment_' . $n,
           'LEFT' => round(($n + $x_offset) * $scale),
           'TOP' => round($shipment_type * $scale),
         ]);
