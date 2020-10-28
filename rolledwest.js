@@ -81,6 +81,7 @@ define([
                 // TODO: Set up your game interface here, according to "gamedatas"
                 this.displayDice(this.gamedatas.dice);
                 dojo.connect(this.playerResources, 'onChangeSelection', this, 'onDiceSelected');
+                dojo.query('[id*=office]').connect('onclick', this, 'onPurchaseOffice');
 
                 // Setup game notifications to handle (see "setupNotifications" method below)
                 this.setupNotifications();
@@ -250,6 +251,24 @@ define([
                 }
             },
 
+            onPurchaseOffice: function (e) {
+                dojo.stopEvent(e);
+
+                if (!this.checkAction('purchaseOffice'))
+                    return;
+
+                let officeDiv = e.currentTarget.id.split('_');
+                let officeId = officeDiv[1];
+
+                this.ajaxcall(
+                    `/${this.game_name}/${this.game_name}/purchaseOffice.html`,
+                    {
+                        officeId: officeId,
+                        lock: true
+                    }, this, function (result) { }, function (is_error) { }
+                );
+            },
+
             ///////////////////////////////////////////////////
             //// Reaction to cometD notifications
 
@@ -268,6 +287,7 @@ define([
                 // TODO: here, associate your game notifications with local methods
                 dojo.subscribe('chooseTerrain', this, "notif_chooseTerrain");
                 dojo.subscribe('diceRolled', this, "notif_diceRolled");
+                dojo.subscribe('officePurchase', this, "notif_officePurchase");
                 dojo.subscribe('bank', this, "notif_bank");
 
                 // Example 1: standard notification handling
@@ -293,6 +313,10 @@ define([
                 this.playerResources.removeAll();
                 for (let die of dice)
                     this.playerResources.addToStock(die);
+            },
+
+            notif_officePurchase: function(notif) {
+                
             },
 
             notif_bank: function (notif) {

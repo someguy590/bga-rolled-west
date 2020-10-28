@@ -236,6 +236,24 @@ class RolledWest extends Table
         $this->gamestate->nextState('rollDice');
     }
 
+    function purchaseOffice($officeId)
+    {
+        // get office resource requirements
+        $office = $this->offices[$officeId];
+
+        // use rolled dice and/or banked resources and mark office as purchased or inform player not enough resources to purchase
+
+        // notify office purchased and if rolled dice and/or banked resources were used
+        $this->notifyAllPlayers(
+            'officePurchase',
+            clienttranslate('${player_name} purchased an office and will earn ${office_description} at the end of the game'),
+            [
+                'player_name' => $this->getActivePlayerName(),
+                'office_description' => $office['description']
+            ]
+        );
+    }
+
     function bank($resource)
     {
         $this->checkAction('bank', true);
