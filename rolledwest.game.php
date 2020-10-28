@@ -284,13 +284,13 @@ class RolledWest extends Table
         $resources_available = $this->getAvailableDice();
 
         // spend resources from dice
-        $spent_dice = [];
+        $spent_rolled_resources = [];
         foreach ($resources_available as $i => $available_resource) {
             if (key_exists($available_resource, $resources_needed) && $resources_needed[$available_resource] != 0) {
                 $resources_needed[$available_resource]--;
                 $this->removeAvailableDie($available_resource);
                 $this->setSpentOrBankedDie($available_resource);
-                $spent_dice[] = $available_resource;
+                $spent_rolled_resources[] = $available_resource;
             }
         }
 
@@ -338,7 +338,7 @@ class RolledWest extends Table
             [
                 'player_name' => $this->getActivePlayerName(),
                 'office_description' => $office['description'],
-                'spentDice' => $spent_dice
+                'spentRolledResources' => $spent_rolled_resources
             ]
         );
     }

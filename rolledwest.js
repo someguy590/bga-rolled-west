@@ -325,7 +325,7 @@ define([
             },
 
             notif_officePurchase: function (notif) {
-                for (let die of notif.args.spentDice) {
+                for (let die of notif.args.spentRolledResources) {
                     this.spentOrBankedResources.addToStock(die, 'rolled_dice');
                     this.playerResources.removeFromStock(die);
                 }
