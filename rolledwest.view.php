@@ -54,6 +54,17 @@ class view_rolledwest_rolledwest extends game_view
       ]);
     }
 
+    foreach ($this->game->shipments as $shipment_type => $shipment) {
+      $x_offset = 4;
+      foreach ($shipment['spaces'] as $n => $space) {
+        $this->page->insert_block('square', [
+          'SQUARE_ID' => $shipment['name'] . 'Shipment' . $n,
+          'LEFT' => round(($n + $x_offset) * $scale),
+          'TOP' => round($shipment_type * $scale),
+        ]);
+      }
+    }
+
     /*********** Do not change anything below this line  ************/
   }
 }
