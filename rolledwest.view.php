@@ -43,6 +43,7 @@ class view_rolledwest_rolledwest extends game_view
 
     /*********** Place your code below:  ************/
     $this->tpl['MY_DICE'] = $this->_('My dice');
+    $this->tpl['SPENT_OR_BANKED_DICE'] = $this->_('Spent or banked dice');
     $this->page->begin_block($this->getGameName() . '_' . $this->getGameName(), 'square');
     $scale = 50;
 

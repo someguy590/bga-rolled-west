@@ -9,9 +9,13 @@
 -- See http://en.boardgamearena.com/#!doc/Studio for more information.
 -------
 -->
-<div id="dice_row" class="whiteblock">
+<div id="rolled_dice_row" class="whiteblock">
     <h3>{MY_DICE}</h3>
-    <div id="dice" class="dice"></div>
+    <div id="rolled_dice" class="dice"></div>
+</div>
+<div id="used_dice_row" class="whiteblock">
+    <h3>{SPENT_OR_BANKED_DICE}</h3>
+    <div id="spent_or_banked_dice" class="dice"></div>
 </div>
 <div id="board">
     <!-- BEGIN square -->
