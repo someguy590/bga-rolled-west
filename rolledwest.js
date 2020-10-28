@@ -325,9 +325,22 @@ define([
             },
 
             notif_officePurchase: function (notif) {
+                let playerId = notif.args.playerId;
+
                 for (let die of notif.args.spentRolledResources) {
                     this.spentOrBankedResources.addToStock(die, 'rolled_dice');
                     this.playerResources.removeFromStock(die);
+                }
+
+                for (let [resourceType, resourceAmount] of Object.entries(notif.args.spentBankedResources)) {
+                    if (resourceType == 0)
+                        this.copperCounters[playerId].incValue(-resourceAmount);
+                    else if (resourceType == 1)
+                        this.woodCounters[playerId].incValue(-resourceAmount);
+                    else if (resourceType == 2)
+                        this.silverCounters[playerId].incValue(-resourceAmount);
+                    else
+                        this.goldCounters[playerId].incValue(-resourceAmount);
                 }
             },
 

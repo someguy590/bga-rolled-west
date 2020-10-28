@@ -303,6 +303,7 @@ class RolledWest extends Table
             }
         }
 
+        $spent_banked_resources = [];
         if ($isSpendingFromBank) {
             $player_id = $this->getActivePlayerId();
             $sql = "SELECT copper, wood, silver, gold FROM player WHERE player_id=$player_id";
@@ -316,8 +317,10 @@ class RolledWest extends Table
                     continue;
 
                 $resource_name = $this->dice_types[$needed_resource]['name'];
-                if ($banked_resources[$resource_name] >= $amount_needed)
+                if ($banked_resources[$resource_name] >= $amount_needed) {
                     $values[] = "$resource_name=$resource_name-$amount_needed";
+                    $spent_banked_resources[$needed_resource] = $amount_needed;
+                }
                 else {
                     $isMissingResources = true;
                     break;
@@ -336,9 +339,11 @@ class RolledWest extends Table
             'officePurchase',
             clienttranslate('${player_name} purchased an office and will earn ${office_description} at the end of the game'),
             [
+                'playerId' => $this->getActivePlayerId(),
                 'player_name' => $this->getActivePlayerName(),
                 'office_description' => $office['description'],
-                'spentRolledResources' => $spent_rolled_resources
+                'spentRolledResources' => $spent_rolled_resources,
+                'spentBankedResources' => $spent_banked_resources
             ]
         );
     }
