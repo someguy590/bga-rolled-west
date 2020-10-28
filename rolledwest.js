@@ -85,7 +85,7 @@ define([
                 }
 
                 // TODO: Set up your game interface here, according to "gamedatas"
-                this.displayDice(this.gamedatas.dice);
+                this.displayDice(this.gamedatas.dice, this.gamedatas.spentOrBankedDice);
                 dojo.connect(this.playerResources, 'onChangeSelection', this, 'onDiceSelected');
                 dojo.query('[id*=office]').connect('onclick', this, 'onPurchaseOffice');
 
@@ -184,9 +184,11 @@ define([
                 script.
             
             */
-            displayDice: function (dice) {
+            displayDice: function (dice, spentOrBankedDice) {
                 for (let die of dice)
                     this.playerResources.addToStock(die);
+                for (let die of spentOrBankedDice)
+                    this.spentOrBankedResources.addToStock(die);
             },
 
             chooseTerrain: function (e) {

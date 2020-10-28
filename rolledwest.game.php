@@ -38,6 +38,9 @@ class RolledWest extends Table
             'die1' => 11,
             'die2' => 12,
             'die3' => 13,
+            'spentOrBankedDie0' => 14,
+            'spentOrBankedDie1' => 15,
+            'spentOrBankedDie2' => 16,
         ));
     }
 
@@ -82,6 +85,9 @@ class RolledWest extends Table
         $this->setGameStateInitialValue('die1', -1);
         $this->setGameStateInitialValue('die2', -1);
         $this->setGameStateInitialValue('die3', -1);
+        $this->setGameStateInitialValue('spentOrBankedDie0', -1);
+        $this->setGameStateInitialValue('spentOrBankedDie1', -1);
+        $this->setGameStateInitialValue('spentOrBankedDie2', -1);
 
         // Init game statistics
         // (note: statistics used in this file must be defined in your stats.inc.php file)
@@ -137,6 +143,7 @@ class RolledWest extends Table
 
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
         $result['dice'] = $this->getAvailableDice();
+        $result['spentOrBankedDice'] = $this->getSpentOrBankedDice();
 
         return $result;
     }
@@ -206,6 +213,28 @@ class RolledWest extends Table
             if ($die != -1 && $die == $die_to_remove) {
                 $this->setGameStateValue('die' . $i, -1);
                 return;
+            }
+        }
+    }
+
+    function getSpentOrBankedDice()
+    {
+        $dice = [];
+        for ($i = 0; $i < 3; $i++) {
+            $die = $this->getGameStateValue('spentOrBankedDie' . $i);
+            if ($die != -1)
+                $dice[] = $die;
+        }
+        return $dice;
+    }
+
+    function setSpentOrBankedDie($die_to_set)
+    {
+        for ($i = 0; $i < 3; $i++) {
+            $die = $this->getGameStateValue('spentOrBankedDie' . $i);
+            if ($die == -1) {
+                $this->setGameStateValue('spentOrBankedDie' . $i, $die_to_set);
+                break;
             }
         }
     }
@@ -282,6 +311,7 @@ class RolledWest extends Table
         $this->DbQuery($sql);
 
         $this->removeAvailableDie($resource);
+        $this->setSpentOrBankedDie($resource);
 
         $resource_name = $this->dice_types[$resource]['name'];
         $this->notifyAllPlayers('bank', clienttranslate('${player_name} banked ${resource_name}'), [
@@ -363,6 +393,9 @@ class RolledWest extends Table
 
         foreach ($dice as $i => $value)
             $this->setGameStateValue('die' . $i, $value);
+
+        for ($i = 0; $i < 3; $i++)
+            $this->setGameStateValue('spentOrBankedDie' . $i, -1);
 
         $this->notifyAllPlayers('diceRolled', clienttranslate('${player_name} rolls dice'), [
             'playerId' => $player,
