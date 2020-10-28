@@ -199,6 +199,17 @@ class RolledWest extends Table
         return $dice;
     }
 
+    function removeAvailableDie($die_to_remove)
+    {
+        for ($i = 0; $i < 4; $i++) {
+            $die = $this->getGameStateValue('die' . $i);
+            if ($die != -1 && $die == $die_to_remove) {
+                $this->setGameStateValue('die' . $i, -1);
+                return;
+            }
+        }
+    }
+
     //////////////////////////////////////////////////////////////////////////////
     //////////// Player actions
     //////////// 
