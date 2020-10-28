@@ -324,8 +324,11 @@ define([
                     this.playerResources.addToStock(die);
             },
 
-            notif_officePurchase: function(notif) {
-                
+            notif_officePurchase: function (notif) {
+                for (let die of notif.args.spentDice) {
+                    this.spentOrBankedResources.addToStock(die, 'rolled_dice');
+                    this.playerResources.removeFromStock(die);
+                }
             },
 
             notif_bank: function (notif) {

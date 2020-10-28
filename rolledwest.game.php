@@ -280,8 +280,56 @@ class RolledWest extends Table
     {
         // get office resource requirements
         $office = $this->offices[$officeId];
+        $resources_needed = $office['resourcesNeeded'];
+        $resources_available = $this->getAvailableDice();
 
-        // use rolled dice and/or banked resources and mark office as purchased or inform player not enough resources to purchase
+        // spend resources from dice
+        $spent_dice = [];
+        foreach ($resources_available as $i => $available_resource) {
+            if (key_exists($available_resource, $resources_needed) && $resources_needed[$available_resource] != 0) {
+                $resources_needed[$available_resource]--;
+                $this->removeAvailableDie($available_resource);
+                $this->setSpentOrBankedDie($available_resource);
+                $spent_dice[] = $available_resource;
+            }
+        }
+
+        // spend resources from bank
+        $isSpendingFromBank = false;
+        foreach ($resources_needed as $needed_resource => $amount_needed) {
+            if ($amount_needed > 0) {
+                $isSpendingFromBank = true;
+                break;
+            }
+        }
+
+        if ($isSpendingFromBank) {
+            $player_id = $this->getActivePlayerId();
+            $sql = "SELECT copper, wood, silver, gold FROM player WHERE player_id=$player_id";
+            $banked_resources = $this->getNonEmptyObjectFromDB($sql);
+
+            $sql = "UPDATE player SET ";
+            $values = [];
+            $isMissingResources = false;
+            foreach ($resources_needed as $needed_resource => $amount_needed) {
+                if ($amount_needed == 0)
+                    continue;
+
+                $resource_name = $this->dice_types[$needed_resource]['name'];
+                if ($banked_resources[$resource_name] >= $amount_needed)
+                    $values[] = "$resource_name=$resource_name-$amount_needed";
+                else {
+                    $isMissingResources = true;
+                    break;
+                }
+            }
+            if ($isMissingResources) {
+                throw new BgaUserException($this->_('Not enough resources'));
+            } else {
+                $sql .= implode(',', $values) . " WHERE player_id=$player_id";
+                $this->DbQuery($sql);
+            }
+        }
 
         // notify office purchased and if rolled dice and/or banked resources were used
         $this->notifyAllPlayers(
@@ -289,7 +337,8 @@ class RolledWest extends Table
             clienttranslate('${player_name} purchased an office and will earn ${office_description} at the end of the game'),
             [
                 'player_name' => $this->getActivePlayerName(),
-                'office_description' => $office['description']
+                'office_description' => $office['description'],
+                'spentDice' => $spent_dice
             ]
         );
     }
