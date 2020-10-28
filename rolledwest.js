@@ -29,10 +29,16 @@ define([
                 this.diceWidth = 15;
                 this.diceHeight = 15;
                 this.playerResources = new ebg.stock();
+                this.spentOrBankedResources = new ebg.stock();
                 this.playerResources.image_items_per_row = 4;
-                this.playerResources.create(this, $('dice'), this.diceWidth, this.diceHeight);
-                for (let resourceTypeId = 0; resourceTypeId < 4; resourceTypeId++)
+                this.spentOrBankedResources.image_items_per_row = 4;
+                this.playerResources.create(this, $('rolled_dice'), this.diceWidth, this.diceHeight);
+                this.spentOrBankedResources.create(this, $('spent_or_banked_dice'), this.diceWidth, this.diceHeight);
+                for (let resourceTypeId = 0; resourceTypeId < 4; resourceTypeId++) {
                     this.playerResources.addItemType(resourceTypeId, resourceTypeId, g_gamethemeurl + 'img/resource_icons.png', resourceTypeId);
+                    this.spentOrBankedResources.addItemType(resourceTypeId, resourceTypeId, g_gamethemeurl + 'img/resource_icons.png', resourceTypeId);
+                }
+
             },
 
             /*
@@ -311,6 +317,7 @@ define([
                 let dice = notif.args.dice;
                 this.gamedatas.players[playerId].isBankingDuringTurn = '0';
                 this.playerResources.removeAll();
+                this.spentOrBankedResources.removeAll();
                 for (let die of dice)
                     this.playerResources.addToStock(die);
             },
@@ -332,6 +339,8 @@ define([
                     this.goldCounters[playerId].incValue(1);
 
                 this.gamedatas.players[playerId].isBankingDuringTurn = '1';
+                this.spentOrBankedResources.addToStock(resourceType, 'rolled_dice');
+                this.playerResources.removeFromStock(resourceType);
             },
             /*
             Example:
