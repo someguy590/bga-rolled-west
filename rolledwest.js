@@ -26,10 +26,6 @@ define([
             constructor: function () {
                 console.log('rolledwest constructor');
 
-                // Here, you can init the global variables of your user interface
-                // Example:
-                // this.myGlobalValue = 0;
-
                 this.diceWidth = 15;
                 this.diceHeight = 15;
                 this.playerResources = new ebg.stock();
