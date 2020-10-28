@@ -360,19 +360,5 @@ define([
                 this.spentOrBankedResources.addToStock(resourceType, 'rolled_dice');
                 this.playerResources.removeFromStock(resourceType);
             },
-            /*
-            Example:
-            
-            notif_cardPlayed: function( notif )
-            {
-                console.log( 'notif_cardPlayed' );
-                console.log( notif );
-                
-                // Note: notif.args contains the arguments specified during you "notifyAllPlayers" / "notifyPlayer" PHP call
-                
-                // TODO: play the card in the user interface.
-            },    
-            
-            */
         });
     });
