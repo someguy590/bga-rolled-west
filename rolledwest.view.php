@@ -39,12 +39,17 @@ class view_rolledwest_rolledwest extends game_view
     $players = $this->game->loadPlayersBasicInfos();
     $players_nbr = count($players);
 
+    $skip_list = [[3, 0], [3, 1], [3, 2], [0, 4], [0, 5], [0, 6], [0, 7]];
+
     /*********** Place your code below:  ************/
     $this->tpl['MY_DICE'] = $this->_('My dice');
     $this->page->begin_block($this->getGameName() . '_' . $this->getGameName(), 'square');
     $scale = 50;
     for ($x = 0; $x < 9; $x++) {
       for ($y = 0; $y < 8; $y++) {
+        if (in_array([$x, $y], $skip_list))
+          continue;
+
         $this->page->insert_block('square', [
           'X' => $x,
           'Y' => $y,
