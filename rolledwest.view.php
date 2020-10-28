@@ -45,18 +45,13 @@ class view_rolledwest_rolledwest extends game_view
     $this->tpl['MY_DICE'] = $this->_('My dice');
     $this->page->begin_block($this->getGameName() . '_' . $this->getGameName(), 'square');
     $scale = 50;
-    for ($x = 0; $x < 9; $x++) {
-      for ($y = 0; $y < 8; $y++) {
-        if (in_array([$x, $y], $skip_list))
-          continue;
 
-        $this->page->insert_block('square', [
-          'X' => $x,
-          'Y' => $y,
-          'LEFT' => round($x * $scale),
-          'TOP' => round($y * $scale),
-        ]);
-      }
+    foreach ($this->game->offices as $n => $office) {
+      $this->page->insert_block('square', [
+        'SQUARE_ID' => 'office' . $n,
+        'LEFT' => round($n % 3 * $scale),
+        'TOP' => round(intdiv($n, 3) * $scale),
+      ]);
     }
 
     /*********** Do not change anything below this line  ************/
