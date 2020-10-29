@@ -37,12 +37,12 @@ ALTER TABLE `player` ADD `is_banking_during_turn` BIT(1) NOT NULL DEFAULT FALSE;
 ALTER TABLE `player` ADD `is_purchasing_office` BIT(1) NOT NULL DEFAULT FALSE;
 
 CREATE TABLE IF NOT EXISTS `exclusive` (
-  `exclusive_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `type` varchar(16) NOT NULL,
+  `exclusive_id` int(10) unsigned NOT NULL,
+  `exclusive_type` varchar(16) NOT NULL,
   `marked_by` int(10) unsigned NULL,
-  PRIMARY KEY (`exclusive_id`),
+  PRIMARY KEY (`exclusive_id`, `exclusive_type`),
   FOREIGN KEY (`marked_by`) REFERENCES player(`player_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `claim` (
   `claim_id` int(10) unsigned NOT NULL AUTO_INCREMENT,

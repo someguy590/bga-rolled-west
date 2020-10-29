@@ -105,16 +105,14 @@ class RolledWest extends Table
         $sql .= implode(',', $values);
         $this->DbQuery($sql);
 
-        $sql = "INSERT INTO exclusive (type) VALUES ";
+        $sql = "INSERT INTO exclusive (exclusive_id, exclusive_type) VALUES ";
         $values = [];
-        foreach ($this->offices as $office)
-            $values[] = "('office')";
-        foreach ($this->shipments as $shipment) {
-            $values[] = "('shipment')";
-            $values[] = "('shipment')";
-        }
-        foreach ($this->contracts as $contract)
-            $values[] = "('contract')";
+        foreach ($this->offices as $i => $office)
+            $values[] = "($i, 'office')";
+        for ($i = 0; $i < 6; $i++)
+            $values[] = "($i, 'shipment')";
+        foreach ($this->contracts as $i => $contract)
+            $values[] = "($i, 'contract')";
         $sql .= implode(',', $values);
         $this->DbQuery($sql);
 
