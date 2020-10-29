@@ -278,6 +278,8 @@ class RolledWest extends Table
 
     function purchaseOffice($officeId)
     {
+        $this->checkAction('purchaseOffice', true);
+
         // get office resource requirements
         $office = $this->offices[$officeId];
         $resources_needed = $office['resourcesNeeded'];
