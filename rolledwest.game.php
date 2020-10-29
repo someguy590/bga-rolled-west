@@ -277,11 +277,17 @@ class RolledWest extends Table
     function purchaseOffice($officeId)
     {
         $this->checkAction('purchaseOffice', true);
+
         $player = $this->getActivePlayerId();
         $sql = "SELECT is_purchasing_office FROM player WHERE player_id=$player";
         $is_purchasing_office = $this->getUniqueValueFromDB($sql);
         if ($is_purchasing_office)
             throw new BgaUserException($this->_('You already purchased an office this turn'));
+
+        $sql = "SELECT marked_by FROM exclusive WHERE exclusive_type='office' AND exclusive_id=$officeId";
+        $is_office_purchased = !is_null($this->getUniqueValueFromDB($sql));
+        if ($is_office_purchased)
+            throw new BgaUserException($this->_('Office already purchased'));
 
         // get office resource requirements
         $office = $this->offices[$officeId];
@@ -340,6 +346,9 @@ class RolledWest extends Table
         }
 
         $sql = "UPDATE player SET is_purchasing_office=true WHERE player_id=$player";
+        $this->DbQuery($sql);
+
+        $sql = "UPDATE exclusive SET marked_by=$player WHERE exclusive_type='office' AND exclusive_id=$officeId";
         $this->DbQuery($sql);
 
         // notify office purchased and if rolled dice and/or banked resources were used
