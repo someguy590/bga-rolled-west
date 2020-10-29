@@ -200,6 +200,17 @@ define([
 
             },
 
+            addToResources: function (playerId, resourceType, amount) {
+                if (resourceType == 0)
+                    this.copperCounters[playerId].incValue(amount);
+                else if (resourceType == 1)
+                    this.woodCounters[playerId].incValue(amount);
+                else if (resourceType == 2)
+                    this.silverCounters[playerId].incValue(amount);
+                else
+                    this.goldCounters[playerId].incValue(amount);
+            },
+
             ///////////////////////////////////////////////////
             //// Player's action
 
@@ -332,33 +343,17 @@ define([
                     this.playerResources.removeFromStock(die);
                 }
 
-                for (let [resourceType, resourceAmount] of Object.entries(notif.args.spentBankedResources)) {
-                    if (resourceType == 0)
-                        this.copperCounters[playerId].incValue(-resourceAmount);
-                    else if (resourceType == 1)
-                        this.woodCounters[playerId].incValue(-resourceAmount);
-                    else if (resourceType == 2)
-                        this.silverCounters[playerId].incValue(-resourceAmount);
-                    else
-                        this.goldCounters[playerId].incValue(-resourceAmount);
-                }
+                for (let [resourceType, resourceAmount] of Object.entries(notif.args.spentBankedResources))
+                    this.addToResources(playerId, resourceType, -resourceAmount);
             },
 
             notif_bank: function (notif) {
                 let resourceType = notif.args.resourceType;
                 let playerId = notif.args.playerId;
-                if (resourceType == 0)
-                    this.copperCounters[playerId].incValue(1);
-                else if (resourceType == 1)
-                    this.woodCounters[playerId].incValue(1);
-                else if (resourceType == 2)
-                    this.silverCounters[playerId].incValue(1);
-                else
-                    this.goldCounters[playerId].incValue(1);
-
+                this.addToResources(playerId, resourceType, 1);
                 this.gamedatas.players[playerId].isBankingDuringTurn = '1';
                 this.spentOrBankedResources.addToStock(resourceType, 'rolled_dice');
                 this.playerResources.removeFromStock(resourceType);
-            },
+            }
         });
     });
