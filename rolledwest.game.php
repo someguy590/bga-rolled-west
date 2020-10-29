@@ -278,16 +278,17 @@ class RolledWest extends Table
     {
         $this->checkAction('purchaseOffice', true);
 
+        $sql = "SELECT marked_by FROM exclusive WHERE exclusive_type='office' AND exclusive_id=$officeId";
+        $is_office_purchased = !is_null($this->getUniqueValueFromDB($sql));
+        if ($is_office_purchased)
+            throw new BgaUserException($this->_('Office already purchased'));
+
         $player = $this->getActivePlayerId();
         $sql = "SELECT is_purchasing_office FROM player WHERE player_id=$player";
         $is_purchasing_office = $this->getUniqueValueFromDB($sql);
         if ($is_purchasing_office)
             throw new BgaUserException($this->_('You already purchased an office this turn'));
 
-        $sql = "SELECT marked_by FROM exclusive WHERE exclusive_type='office' AND exclusive_id=$officeId";
-        $is_office_purchased = !is_null($this->getUniqueValueFromDB($sql));
-        if ($is_office_purchased)
-            throw new BgaUserException($this->_('Office already purchased'));
 
         // get office resource requirements
         $office = $this->offices[$officeId];
