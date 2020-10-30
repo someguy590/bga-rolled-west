@@ -306,7 +306,7 @@ define([
                 // TODO: here, associate your game notifications with local methods
                 dojo.subscribe('chooseTerrain', this, "notif_chooseTerrain");
                 dojo.subscribe('diceRolled', this, "notif_diceRolled");
-                dojo.subscribe('officePurchase', this, "notif_officePurchase");
+                dojo.subscribe('purchaseOffice', this, "notif_purchaseOffice");
                 dojo.subscribe('bank', this, "notif_bank");
 
                 // Example 1: standard notification handling

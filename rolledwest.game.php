@@ -354,7 +354,7 @@ class RolledWest extends Table
 
         // notify office purchased and if rolled dice and/or banked resources were used
         $this->notifyAllPlayers(
-            'officePurchase',
+            'purchaseOffice',
             clienttranslate('${player_name} purchased an office and will earn ${office_description} at the end of the game'),
             [
                 'playerId' => $this->getActivePlayerId(),
