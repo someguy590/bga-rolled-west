@@ -36,6 +36,7 @@
         <div class="bank_icon bank_icon_gold"></div><span id="gold_count_${playerId}">0</span>\
     </div>';
 
+    var jstpl_mark = '<div id="${markId}" class="${classes}"></div>';
 </script>
 
 {OVERALL_GAME_FOOTER}

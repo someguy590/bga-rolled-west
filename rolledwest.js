@@ -86,9 +86,9 @@ define([
 
                 // TODO: Set up your game interface here, according to "gamedatas"
                 this.displayDice(this.gamedatas.dice, this.gamedatas.spentOrBankedDice);
+                this.displayMarks(this.gamedatas.marks);
                 dojo.connect(this.playerResources, 'onChangeSelection', this, 'onDiceSelected');
-                dojo.query('[id*=office]').connect('onclick', this, 'onPurchaseOffice');
-
+                dojo.query('[id*=office]:not([id*=mark])').connect('onclick', this, 'onPurchaseOffice');
                 // Setup game notifications to handle (see "setupNotifications" method below)
                 this.setupNotifications();
 
@@ -209,6 +209,28 @@ define([
                     this.silverCounters[playerId].incValue(amount);
                 else
                     this.goldCounters[playerId].incValue(amount);
+            },
+
+            displayMarks: function (marks) {
+                for (let { id, type, markedBy } of marks) {
+                    if (type == 'office' || type == 'contract') {
+                        // if marked by player is same player viewing in browser, display owning mark
+                        if (markedBy == this.player_id)
+                            classes = 'mark_circle';
+                        else
+                            classes = 'mark_x';
+                    }
+
+                    let markDivId = `${type}_mark_${id}`;
+                    dojo.place(this.format_block('jstpl_mark', {
+                        markId: markDivId,
+                        classes: classes
+                    }), 'marks');
+
+                    this.placeOnObject(markDivId, 'overall_player_board_' + this.player_id);
+                    this.slideToObject(markDivId, `${type}_${id}`).play();
+                }
+
             },
 
             ///////////////////////////////////////////////////
@@ -335,8 +357,9 @@ define([
                     this.playerResources.addToStock(die);
             },
 
-            notif_officePurchase: function (notif) {
+            notif_purchaseOffice: function (notif) {
                 let playerId = notif.args.playerId;
+                let officeId = notif.args.officeId;
 
                 for (let die of notif.args.spentRolledResources) {
                     this.spentOrBankedResources.addToStock(die, 'rolled_dice');
@@ -345,6 +368,22 @@ define([
 
                 for (let [resourceType, resourceAmount] of Object.entries(notif.args.spentBankedResources))
                     this.addToResources(playerId, resourceType, -resourceAmount);
+
+                // if marked by player is same player viewing in browser, display owning mark
+                if (playerId == this.player_id)
+                    classes = 'mark_circle';
+                else
+                    classes = 'mark_x';
+
+                dojo.place(this.format_block('jstpl_mark', {
+                    markId: 'office_mark_' + officeId,
+                    classes: classes
+                }), 'marks');
+
+
+
+                this.placeOnObject('office_mark_' + officeId, 'overall_player_board_' + this.player_id);
+                this.slideToObject('office_mark_' + officeId, 'office_' + officeId).play();
             },
 
             notif_bank: function (notif) {

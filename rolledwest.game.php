@@ -143,6 +143,9 @@ class RolledWest extends Table
         $result['dice'] = $this->getAvailableDice();
         $result['spentOrBankedDice'] = $this->getSpentOrBankedDice();
 
+        $sql = "SELECT exclusive_id id, exclusive_type type, marked_by markedBy FROM exclusive WHERE marked_by IS NOT NULL";
+        $result['marks'] = $this->getObjectListFromDB($sql);
+
         return $result;
     }
 
@@ -361,7 +364,8 @@ class RolledWest extends Table
                 'player_name' => $this->getActivePlayerName(),
                 'office_description' => $office['description'],
                 'spentRolledResources' => $spent_rolled_resources,
-                'spentBankedResources' => $spent_banked_resources
+                'spentBankedResources' => $spent_banked_resources,
+                'officeId' => $officeId
             ]
         );
     }
