@@ -38,6 +38,9 @@ class RolledWest extends Table
             'die1' => 11,
             'die2' => 12,
             'die3' => 13,
+            'spentOrBankedDie0' => 14,
+            'spentOrBankedDie1' => 15,
+            'spentOrBankedDie2' => 16,
         ));
     }
 
@@ -82,11 +85,36 @@ class RolledWest extends Table
         $this->setGameStateInitialValue('die1', -1);
         $this->setGameStateInitialValue('die2', -1);
         $this->setGameStateInitialValue('die3', -1);
+        $this->setGameStateInitialValue('spentOrBankedDie0', -1);
+        $this->setGameStateInitialValue('spentOrBankedDie1', -1);
+        $this->setGameStateInitialValue('spentOrBankedDie2', -1);
 
         // Init game statistics
         // (note: statistics used in this file must be defined in your stats.inc.php file)
         //self::initStat( 'table', 'table_teststat1', 0 );    // Init a table statistics
         //self::initStat( 'player', 'player_teststat1', 0 );  // Init a player statistics (for all players)
+
+        // init other db tables
+        $sql = "INSERT INTO claim (player_id, terrain_type) VALUES ";
+        $values = [];
+        foreach ($players as $player_id => $player) {
+            foreach ($this->dice_types as $type => $info) {
+                $values[] = '(' . $player_id . ',' . $type . ')';
+            }
+        }
+        $sql .= implode(',', $values);
+        $this->DbQuery($sql);
+
+        $sql = "INSERT INTO exclusive (exclusive_id, exclusive_type) VALUES ";
+        $values = [];
+        foreach ($this->offices as $i => $office)
+            $values[] = "($i, 'office')";
+        for ($i = 0; $i < 6; $i++)
+            $values[] = "($i, 'shipment')";
+        foreach ($this->contracts as $i => $contract)
+            $values[] = "($i, 'contract')";
+        $sql .= implode(',', $values);
+        $this->DbQuery($sql);
 
         /************ End of the game initialization *****/
     }
@@ -113,6 +141,10 @@ class RolledWest extends Table
 
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
         $result['dice'] = $this->getAvailableDice();
+        $result['spentOrBankedDice'] = $this->getSpentOrBankedDice();
+
+        $sql = "SELECT exclusive_id id, exclusive_type type, marked_by_player markedByPlayer FROM exclusive WHERE marked_by_player IS NOT NULL";
+        $result['marks'] = $this->getObjectListFromDB($sql);
 
         return $result;
     }
@@ -175,6 +207,39 @@ class RolledWest extends Table
         return $dice;
     }
 
+    function removeAvailableDie($die_to_remove)
+    {
+        for ($i = 0; $i < 4; $i++) {
+            $die = $this->getGameStateValue('die' . $i);
+            if ($die != -1 && $die == $die_to_remove) {
+                $this->setGameStateValue('die' . $i, -1);
+                return;
+            }
+        }
+    }
+
+    function getSpentOrBankedDice()
+    {
+        $dice = [];
+        for ($i = 0; $i < 3; $i++) {
+            $die = $this->getGameStateValue('spentOrBankedDie' . $i);
+            if ($die != -1)
+                $dice[] = $die;
+        }
+        return $dice;
+    }
+
+    function setSpentOrBankedDie($die_to_set)
+    {
+        for ($i = 0; $i < 3; $i++) {
+            $die = $this->getGameStateValue('spentOrBankedDie' . $i);
+            if ($die == -1) {
+                $this->setGameStateValue('spentOrBankedDie' . $i, $die_to_set);
+                break;
+            }
+        }
+    }
+
     //////////////////////////////////////////////////////////////////////////////
     //////////// Player actions
     //////////// 
@@ -207,9 +272,102 @@ class RolledWest extends Table
     {
         $this->checkAction('pass', true);
         $player = $this->getActivePlayerId();
-        $sql = "UPDATE player SET is_banking_during_turn=false WHERE player_id=$player";
+        $sql = "UPDATE player SET is_banking_during_turn=false, is_purchasing_office=false WHERE player_id=$player";
         $this->DbQuery($sql);
         $this->gamestate->nextState('rollDice');
+    }
+
+    function purchaseOffice($officeId)
+    {
+        $this->checkAction('purchaseOffice', true);
+
+        $sql = "SELECT marked_by_player FROM exclusive WHERE exclusive_type='office' AND exclusive_id=$officeId";
+        $is_office_purchased = !is_null($this->getUniqueValueFromDB($sql));
+        if ($is_office_purchased)
+            throw new BgaUserException($this->_('Office already purchased'));
+
+        $player = $this->getActivePlayerId();
+        $sql = "SELECT is_purchasing_office FROM player WHERE player_id=$player";
+        $is_purchasing_office = $this->getUniqueValueFromDB($sql);
+        if ($is_purchasing_office)
+            throw new BgaUserException($this->_('You already purchased an office this turn'));
+
+
+        // get office resource requirements
+        $office = $this->offices[$officeId];
+        $resources_needed = $office['resourcesNeeded'];
+        $resources_available = $this->getAvailableDice();
+
+        // spend resources from dice
+        $spent_rolled_resources = [];
+        foreach ($resources_available as $i => $available_resource) {
+            if (key_exists($available_resource, $resources_needed) && $resources_needed[$available_resource] != 0) {
+                $resources_needed[$available_resource]--;
+                $this->removeAvailableDie($available_resource);
+                $this->setSpentOrBankedDie($available_resource);
+                $spent_rolled_resources[] = $available_resource;
+            }
+        }
+
+        // spend resources from bank
+        $isSpendingFromBank = false;
+        foreach ($resources_needed as $needed_resource => $amount_needed) {
+            if ($amount_needed > 0) {
+                $isSpendingFromBank = true;
+                break;
+            }
+        }
+
+        $spent_banked_resources = [];
+        if ($isSpendingFromBank) {
+            $player_id = $this->getActivePlayerId();
+            $sql = "SELECT copper, wood, silver, gold FROM player WHERE player_id=$player_id";
+            $banked_resources = $this->getNonEmptyObjectFromDB($sql);
+
+            $sql = "UPDATE player SET ";
+            $values = [];
+            $isMissingResources = false;
+            foreach ($resources_needed as $needed_resource => $amount_needed) {
+                if ($amount_needed == 0)
+                    continue;
+
+                $resource_name = $this->dice_types[$needed_resource]['name'];
+                if ($banked_resources[$resource_name] >= $amount_needed) {
+                    $values[] = "$resource_name=$resource_name-$amount_needed";
+                    $spent_banked_resources[$needed_resource] = $amount_needed;
+                }
+                else {
+                    $isMissingResources = true;
+                    break;
+                }
+            }
+            if ($isMissingResources) {
+                throw new BgaUserException($this->_('Not enough resources'));
+            } else {
+                $sql .= implode(',', $values) . " WHERE player_id=$player_id";
+                $this->DbQuery($sql);
+            }
+        }
+
+        $sql = "UPDATE player SET is_purchasing_office=true WHERE player_id=$player";
+        $this->DbQuery($sql);
+
+        $sql = "UPDATE exclusive SET marked_by_player=$player WHERE exclusive_type='office' AND exclusive_id=$officeId";
+        $this->DbQuery($sql);
+
+        // notify office purchased and if rolled dice and/or banked resources were used
+        $this->notifyAllPlayers(
+            'purchaseOffice',
+            clienttranslate('${player_name} purchased an office and will earn ${office_description} at the end of the game'),
+            [
+                'playerId' => $this->getActivePlayerId(),
+                'player_name' => $this->getActivePlayerName(),
+                'office_description' => $office['description'],
+                'spentRolledResources' => $spent_rolled_resources,
+                'spentBankedResources' => $spent_banked_resources,
+                'officeId' => $officeId
+            ]
+        );
     }
 
     function bank($resource)
@@ -227,6 +385,9 @@ class RolledWest extends Table
         $resource_db_name = $this->dice_types[$resource]['dbName'];
         $sql = "UPDATE player SET $resource_db_name=$resource_db_name + 1, is_banking_during_turn=true WHERE player_id=$player";
         $this->DbQuery($sql);
+
+        $this->removeAvailableDie($resource);
+        $this->setSpentOrBankedDie($resource);
 
         $resource_name = $this->dice_types[$resource]['name'];
         $this->notifyAllPlayers('bank', clienttranslate('${player_name} banked ${resource_name}'), [
@@ -308,6 +469,9 @@ class RolledWest extends Table
 
         foreach ($dice as $i => $value)
             $this->setGameStateValue('die' . $i, $value);
+
+        for ($i = 0; $i < 3; $i++)
+            $this->setGameStateValue('spentOrBankedDie' . $i, -1);
 
         $this->notifyAllPlayers('diceRolled', clienttranslate('${player_name} rolls dice'), [
             'playerId' => $player,

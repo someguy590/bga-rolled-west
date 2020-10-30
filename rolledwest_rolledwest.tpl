@@ -9,13 +9,17 @@
 -- See http://en.boardgamearena.com/#!doc/Studio for more information.
 -------
 -->
-<div id="dice_row" class="whiteblock">
+<div id="rolled_dice_row" class="whiteblock">
     <h3>{MY_DICE}</h3>
-    <div id="dice" class="dice"></div>
+    <div id="rolled_dice" class="dice"></div>
+</div>
+<div id="used_dice_row" class="whiteblock">
+    <h3>{SPENT_OR_BANKED_DICE}</h3>
+    <div id="spent_or_banked_dice" class="dice"></div>
 </div>
 <div id="board">
     <!-- BEGIN square -->
-    <div id="square_{X}_{Y}" class="square" style="left: {LEFT}px; top: {TOP}px;"></div>
+    <div id="{SQUARE_ID}" class="square" style="left: {LEFT}px; top: {TOP}px;"></div>
     <!-- END square -->
 
     <div id="marks"></div>
@@ -32,6 +36,7 @@
         <div class="bank_icon bank_icon_gold"></div><span id="gold_count_${playerId}">0</span>\
     </div>';
 
+    var jstpl_mark = '<div id="${markId}" class="${classes}"></div>';
 </script>
 
 {OVERALL_GAME_FOOTER}

@@ -46,6 +46,14 @@ class action_rolledwest extends APP_GameAction
     $this->ajaxResponse();
   }
 
+  public function purchaseOffice()
+  {
+    $this->setAjaxMode();
+    $officeId = $this->getArg('officeId', AT_int, true);
+    $this->game->purchaseOffice($officeId);
+    $this->ajaxResponse();
+  }
+
   public function bank()
   {
     $this->setAjaxMode();

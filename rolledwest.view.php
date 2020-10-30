@@ -39,17 +39,29 @@ class view_rolledwest_rolledwest extends game_view
     $players = $this->game->loadPlayersBasicInfos();
     $players_nbr = count($players);
 
+    $skip_list = [[3, 0], [3, 1], [3, 2], [0, 4], [0, 5], [0, 6], [0, 7]];
+
     /*********** Place your code below:  ************/
     $this->tpl['MY_DICE'] = $this->_('My dice');
+    $this->tpl['SPENT_OR_BANKED_DICE'] = $this->_('Spent or banked dice');
     $this->page->begin_block($this->getGameName() . '_' . $this->getGameName(), 'square');
     $scale = 50;
-    for ($x = 0; $x < 9; $x++) {
-      for ($y = 0; $y < 8; $y++) {
+
+    foreach ($this->game->offices as $n => $office) {
+      $this->page->insert_block('square', [
+        'SQUARE_ID' => 'office_' . $n,
+        'LEFT' => round($n % 3 * $scale),
+        'TOP' => round(intdiv($n, 3) * $scale),
+      ]);
+    }
+
+    foreach ($this->game->shipments as $shipment_type => $shipment) {
+      $x_offset = 4;
+      foreach ($shipment['spaces'] as $n => $space) {
         $this->page->insert_block('square', [
-          'X' => $x,
-          'Y' => $y,
-          'LEFT' => round($x * $scale),
-          'TOP' => round($y * $scale),
+          'SQUARE_ID' => $shipment['name'] . '_shipment_' . $n,
+          'LEFT' => round(($n + $x_offset) * $scale),
+          'TOP' => round($shipment_type * $scale),
         ]);
       }
     }

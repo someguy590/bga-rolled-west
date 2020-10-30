@@ -26,17 +26,19 @@ define([
             constructor: function () {
                 console.log('rolledwest constructor');
 
-                // Here, you can init the global variables of your user interface
-                // Example:
-                // this.myGlobalValue = 0;
-
                 this.diceWidth = 15;
                 this.diceHeight = 15;
                 this.playerResources = new ebg.stock();
+                this.spentOrBankedResources = new ebg.stock();
                 this.playerResources.image_items_per_row = 4;
-                this.playerResources.create(this, $('dice'), this.diceWidth, this.diceHeight);
-                for (let resourceTypeId = 0; resourceTypeId < 4; resourceTypeId++)
+                this.spentOrBankedResources.image_items_per_row = 4;
+                this.playerResources.create(this, $('rolled_dice'), this.diceWidth, this.diceHeight);
+                this.spentOrBankedResources.create(this, $('spent_or_banked_dice'), this.diceWidth, this.diceHeight);
+                for (let resourceTypeId = 0; resourceTypeId < 4; resourceTypeId++) {
                     this.playerResources.addItemType(resourceTypeId, resourceTypeId, g_gamethemeurl + 'img/resource_icons.png', resourceTypeId);
+                    this.spentOrBankedResources.addItemType(resourceTypeId, resourceTypeId, g_gamethemeurl + 'img/resource_icons.png', resourceTypeId);
+                }
+
             },
 
             /*
@@ -83,9 +85,10 @@ define([
                 }
 
                 // TODO: Set up your game interface here, according to "gamedatas"
-                this.displayDice(this.gamedatas.dice);
+                this.displayDice(this.gamedatas.dice, this.gamedatas.spentOrBankedDice);
+                this.displayMarks(this.gamedatas.marks);
                 dojo.connect(this.playerResources, 'onChangeSelection', this, 'onDiceSelected');
-
+                dojo.query('[id*=office]:not([id*=mark])').connect('onclick', this, 'onPurchaseOffice');
                 // Setup game notifications to handle (see "setupNotifications" method below)
                 this.setupNotifications();
 
@@ -181,9 +184,11 @@ define([
                 script.
             
             */
-            displayDice: function (dice) {
+            displayDice: function (dice, spentOrBankedDice) {
                 for (let die of dice)
                     this.playerResources.addToStock(die);
+                for (let die of spentOrBankedDice)
+                    this.spentOrBankedResources.addToStock(die);
             },
 
             chooseTerrain: function (e) {
@@ -192,6 +197,39 @@ define([
                 if (!this.checkAction)
                     return;
 
+
+            },
+
+            addToResources: function (playerId, resourceType, amount) {
+                if (resourceType == 0)
+                    this.copperCounters[playerId].incValue(amount);
+                else if (resourceType == 1)
+                    this.woodCounters[playerId].incValue(amount);
+                else if (resourceType == 2)
+                    this.silverCounters[playerId].incValue(amount);
+                else
+                    this.goldCounters[playerId].incValue(amount);
+            },
+
+            displayMarks: function (marks) {
+                for (let { id, type, markedByPlayer } of marks) {
+                    if (type == 'office' || type == 'contract') {
+                        // if marked by player is same player viewing in browser, display owning mark
+                        if (markedByPlayer == this.player_id)
+                            classes = 'mark_circle';
+                        else
+                            classes = 'mark_x';
+                    }
+
+                    let markDivId = `${type}_mark_${id}`;
+                    dojo.place(this.format_block('jstpl_mark', {
+                        markId: markDivId,
+                        classes: classes
+                    }), 'marks');
+
+                    this.placeOnObject(markDivId, 'overall_player_board_' + this.player_id);
+                    this.slideToObject(markDivId, `${type}_${id}`).play();
+                }
 
             },
 
@@ -254,41 +292,23 @@ define([
                 }
             },
 
+            onPurchaseOffice: function (e) {
+                dojo.stopEvent(e);
 
-            /* Example:
-            
-            onMyMethodToCall1: function( evt )
-            {
-                console.log( 'onMyMethodToCall1' );
-                
-                // Preventing default browser reaction
-                dojo.stopEvent( evt );
-    
-                // Check that this action is possible (see "possibleactions" in states.inc.php)
-                if( ! this.checkAction( 'myAction' ) )
-                {   return; }
-    
-                this.ajaxcall( "/rolledwest/rolledwest/myAction.html", { 
-                                                                        lock: true, 
-                                                                        myArgument1: arg1, 
-                                                                        myArgument2: arg2,
-                                                                        ...
-                                                                     }, 
-                             this, function( result ) {
-                                
-                                // What to do after the server call if it succeeded
-                                // (most of the time: nothing)
-                                
-                             }, function( is_error) {
-    
-                                // What to do after the server call in anyway (success or failure)
-                                // (most of the time: nothing)
-    
-                             } );        
-            },        
-            
-            */
+                if (!this.checkAction('purchaseOffice'))
+                    return;
 
+                let officeDiv = e.currentTarget.id.split('_');
+                let officeId = officeDiv[1];
+
+                this.ajaxcall(
+                    `/${this.game_name}/${this.game_name}/purchaseOffice.html`,
+                    {
+                        officeId: officeId,
+                        lock: true
+                    }, this, function (result) { }, function (is_error) { }
+                );
+            },
 
             ///////////////////////////////////////////////////
             //// Reaction to cometD notifications
@@ -308,6 +328,7 @@ define([
                 // TODO: here, associate your game notifications with local methods
                 dojo.subscribe('chooseTerrain', this, "notif_chooseTerrain");
                 dojo.subscribe('diceRolled', this, "notif_diceRolled");
+                dojo.subscribe('purchaseOffice', this, "notif_purchaseOffice");
                 dojo.subscribe('bank', this, "notif_bank");
 
                 // Example 1: standard notification handling
@@ -331,37 +352,47 @@ define([
                 let dice = notif.args.dice;
                 this.gamedatas.players[playerId].isBankingDuringTurn = '0';
                 this.playerResources.removeAll();
+                this.spentOrBankedResources.removeAll();
                 for (let die of dice)
                     this.playerResources.addToStock(die);
+            },
+
+            notif_purchaseOffice: function (notif) {
+                let playerId = notif.args.playerId;
+                let officeId = notif.args.officeId;
+
+                for (let die of notif.args.spentRolledResources) {
+                    this.spentOrBankedResources.addToStock(die, 'rolled_dice');
+                    this.playerResources.removeFromStock(die);
+                }
+
+                for (let [resourceType, resourceAmount] of Object.entries(notif.args.spentBankedResources))
+                    this.addToResources(playerId, resourceType, -resourceAmount);
+
+                // if marked by player is same player viewing in browser, display owning mark
+                if (playerId == this.player_id)
+                    classes = 'mark_circle';
+                else
+                    classes = 'mark_x';
+
+                dojo.place(this.format_block('jstpl_mark', {
+                    markId: 'office_mark_' + officeId,
+                    classes: classes
+                }), 'marks');
+
+
+
+                this.placeOnObject('office_mark_' + officeId, 'overall_player_board_' + this.player_id);
+                this.slideToObject('office_mark_' + officeId, 'office_' + officeId).play();
             },
 
             notif_bank: function (notif) {
                 let resourceType = notif.args.resourceType;
                 let playerId = notif.args.playerId;
-                if (resourceType == 0)
-                    this.copperCounters[playerId].incValue(1);
-                else if (resourceType == 1)
-                    this.woodCounters[playerId].incValue(1);
-                else if (resourceType == 2)
-                    this.silverCounters[playerId].incValue(1);
-                else
-                    this.goldCounters[playerId].incValue(1);
-
+                this.addToResources(playerId, resourceType, 1);
                 this.gamedatas.players[playerId].isBankingDuringTurn = '1';
-            },
-            /*
-            Example:
-            
-            notif_cardPlayed: function( notif )
-            {
-                console.log( 'notif_cardPlayed' );
-                console.log( notif );
-                
-                // Note: notif.args contains the arguments specified during you "notifyAllPlayers" / "notifyPlayer" PHP call
-                
-                // TODO: play the card in the user interface.
-            },    
-            
-            */
+                this.spentOrBankedResources.addToStock(resourceType, 'rolled_dice');
+                this.playerResources.removeFromStock(resourceType);
+            }
         });
     });
