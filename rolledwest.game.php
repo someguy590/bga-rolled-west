@@ -143,7 +143,7 @@ class RolledWest extends Table
         $result['dice'] = $this->getAvailableDice();
         $result['spentOrBankedDice'] = $this->getSpentOrBankedDice();
 
-        $sql = "SELECT exclusive_id id, exclusive_type type, marked_by markedBy FROM exclusive WHERE marked_by IS NOT NULL";
+        $sql = "SELECT exclusive_id id, exclusive_type type, marked_by_player markedByPlayer FROM exclusive WHERE marked_by_player IS NOT NULL";
         $result['marks'] = $this->getObjectListFromDB($sql);
 
         return $result;
@@ -281,7 +281,7 @@ class RolledWest extends Table
     {
         $this->checkAction('purchaseOffice', true);
 
-        $sql = "SELECT marked_by FROM exclusive WHERE exclusive_type='office' AND exclusive_id=$officeId";
+        $sql = "SELECT marked_by_player FROM exclusive WHERE exclusive_type='office' AND exclusive_id=$officeId";
         $is_office_purchased = !is_null($this->getUniqueValueFromDB($sql));
         if ($is_office_purchased)
             throw new BgaUserException($this->_('Office already purchased'));
@@ -352,7 +352,7 @@ class RolledWest extends Table
         $sql = "UPDATE player SET is_purchasing_office=true WHERE player_id=$player";
         $this->DbQuery($sql);
 
-        $sql = "UPDATE exclusive SET marked_by=$player WHERE exclusive_type='office' AND exclusive_id=$officeId";
+        $sql = "UPDATE exclusive SET marked_by_player=$player WHERE exclusive_type='office' AND exclusive_id=$officeId";
         $this->DbQuery($sql);
 
         // notify office purchased and if rolled dice and/or banked resources were used

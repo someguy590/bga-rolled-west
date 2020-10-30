@@ -212,10 +212,10 @@ define([
             },
 
             displayMarks: function (marks) {
-                for (let { id, type, markedBy } of marks) {
+                for (let { id, type, markedByPlayer } of marks) {
                     if (type == 'office' || type == 'contract') {
                         // if marked by player is same player viewing in browser, display owning mark
-                        if (markedBy == this.player_id)
+                        if (markedByPlayer == this.player_id)
                             classes = 'mark_circle';
                         else
                             classes = 'mark_x';

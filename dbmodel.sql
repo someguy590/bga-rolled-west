@@ -39,9 +39,9 @@ ALTER TABLE `player` ADD `is_purchasing_office` BIT(1) NOT NULL DEFAULT FALSE;
 CREATE TABLE IF NOT EXISTS `exclusive` (
   `exclusive_id` int(10) unsigned NOT NULL,
   `exclusive_type` varchar(16) NOT NULL,
-  `marked_by` int(10) unsigned NULL,
+  `marked_by_player` int(10) unsigned NULL,
   PRIMARY KEY (`exclusive_id`, `exclusive_type`),
-  FOREIGN KEY (`marked_by`) REFERENCES player(`player_id`)
+  FOREIGN KEY (`marked_by_player`) REFERENCES player(`player_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `claim` (
