@@ -78,18 +78,36 @@ class view_rolledwest_rolledwest extends game_view
       ]);
     }
 
+    $shipment_x_start = 290;
+    $shipment_y_start = 16;
+    $shipment_x_small_scale = 37;
+    $shipment_big_x_scale = 65;
+    $shipment_y_scale = 55;
+    $shipment_y_offset = 14;
+
+    $y_px = $shipment_y_start;
     foreach ($this->game->shipments as $shipment_type => $shipment) {
-      $x_offset = 4;
+      $x_px = $shipment_x_start;
       foreach ($shipment['spaces'] as $n => $space) {
+        $classes = 'shipment';
+        if ($space['has2Numbers']) {
+          $classes .= ' shipment_big';
+        }
+
         $this->page->insert_block('square', [
           'SQUARE_ID' => $shipment['name'] . '_shipment_' . $n,
-          'LEFT' => round(($n + $x_offset) * $scale),
-          'TOP' => round($shipment_type * $scale),
-          'CLASSES' => 'square'
+          'LEFT' => $x_px,
+          'TOP' => $y_px,
+          'CLASSES' => $classes
         ]);
-      }
-    }
 
+        if ($space['has2Numbers'])
+          $x_px += $shipment_big_x_scale;
+        else
+          $x_px += $shipment_x_small_scale;
+      }
+      $y_px += $shipment_y_scale + $shipment_y_offset;
+    }
     /*********** Do not change anything below this line  ************/
   }
 }

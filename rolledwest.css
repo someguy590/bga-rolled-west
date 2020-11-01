@@ -63,6 +63,7 @@
     height: 52px;
     position: absolute;
 }
+
 .office_middle_row {
     height: 50px;
 }
@@ -71,7 +72,17 @@
     width: 50px;
 }
 
-.office:hover, .office_middle:hover {
+.shipment {
+    width: 37px;
+    height: 55px;
+    position: absolute;
+}
+
+.shipment_big {
+    width: 65px;
+}
+
+.office:hover, .shipment:hover {
     outline: rebeccapurple solid;
     cursor: pointer;
 }
