@@ -87,17 +87,6 @@
     cursor: pointer;
 }
 
-.square {
-    width: 55px;
-    height: 52px;
-    position: absolute;
-}
-
-.square:hover {
-    outline: rebeccapurple solid;
-    cursor: pointer;
-}
-
 .bank_icon {
     width: 15px;
     height: 15px;
