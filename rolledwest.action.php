@@ -54,6 +54,14 @@ class action_rolledwest extends APP_GameAction
     $this->ajaxResponse();
   }
 
+  public function completeContract()
+  {
+    $this->setAjaxMode();
+    $contractId = $this->getArg('contractId', AT_int, true);
+    $this->game->completeContract($contractId);
+    $this->ajaxResponse();
+  }
+
   public function bank()
   {
     $this->setAjaxMode();

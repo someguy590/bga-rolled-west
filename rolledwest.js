@@ -89,6 +89,7 @@ define([
                 this.displayMarks(this.gamedatas.marks);
                 dojo.connect(this.playerResources, 'onChangeSelection', this, 'onDiceSelected');
                 dojo.query('[id*=office]:not([id*=mark])').connect('onclick', this, 'onPurchaseOffice');
+                dojo.query('[id*=contract]:not([id*=mark])').connect('onclick', this, 'onCompleteContract');
                 // Setup game notifications to handle (see "setupNotifications" method below)
                 this.setupNotifications();
 
@@ -310,6 +311,24 @@ define([
                 );
             },
 
+            onCompleteContract: function (e) {
+                dojo.stopEvent(e);
+
+                if (!this.checkAction('completeContract'))
+                    return;
+
+                let contractDiv = e.currentTarget.id.split('_');
+                let contractId = contractDiv[1];
+
+                this.ajaxcall(
+                    `/${this.game_name}/${this.game_name}/completeContract.html`,
+                    {
+                        contractId: contractId,
+                        lock: true
+                    }, this, function (result) { }, function (is_error) { }
+                );
+            },
+
             ///////////////////////////////////////////////////
             //// Reaction to cometD notifications
 
@@ -329,6 +348,7 @@ define([
                 dojo.subscribe('chooseTerrain', this, "notif_chooseTerrain");
                 dojo.subscribe('diceRolled', this, "notif_diceRolled");
                 dojo.subscribe('purchaseOffice', this, "notif_purchaseOffice");
+                dojo.subscribe('completeContract', this, "notif_completeContract");
                 dojo.subscribe('bank', this, "notif_bank");
 
                 // Example 1: standard notification handling
@@ -384,6 +404,35 @@ define([
 
                 this.placeOnObject('office_mark_' + officeId, 'overall_player_board_' + this.player_id);
                 this.slideToObject('office_mark_' + officeId, 'office_' + officeId).play();
+            },
+
+            notif_completeContract: function (notif) {
+                let playerId = notif.args.playerId;
+                let contractId = notif.args.contractId;
+
+                for (let die of notif.args.spentRolledResources) {
+                    this.spentOrBankedResources.addToStock(die, 'rolled_dice');
+                    this.playerResources.removeFromStock(die);
+                }
+
+                for (let [resourceType, resourceAmount] of Object.entries(notif.args.spentBankedResources))
+                    this.addToResources(playerId, resourceType, -resourceAmount);
+
+                // if marked by player is same player viewing in browser, display owning mark
+                if (playerId == this.player_id)
+                    classes = 'mark_circle';
+                else
+                    classes = 'mark_x';
+
+                dojo.place(this.format_block('jstpl_mark', {
+                    markId: 'contract_mark_' + contractId,
+                    classes: classes
+                }), 'marks');
+
+
+
+                this.placeOnObject('contract_mark_' + contractId, 'overall_player_board_' + this.player_id);
+                this.slideToObject('contract_mark_' + contractId, 'contract_' + contractId).play();
             },
 
             notif_bank: function (notif) {
