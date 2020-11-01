@@ -47,11 +47,34 @@ class view_rolledwest_rolledwest extends game_view
     $this->page->begin_block($this->getGameName() . '_' . $this->getGameName(), 'square');
     $scale = 50;
 
+    $office_x_offset = 68;
+    $office_y_offset = 52;
+    $office_x_scale = 55;
+    $office_y_scale = 52;
+    $office_middle_column_offset = -5;
+    $office_middle_row_offset = -2;
+
     foreach ($this->game->offices as $n => $office) {
+      $classes = 'office';
+      $x_px = ($n % 3) * $office_x_scale + $office_x_offset;
+      $y_px = intdiv($n, 3) * $office_y_scale + $office_y_offset;
+
+      // middle rows and columns are thinner than others
+      if ($n % 3 == 1)
+        $classes .= ' office_middle_column';
+      if (intdiv($n, 3) == 1)
+        $classes .= ' office_middle_row';
+
+      if ($n % 3 == 2)
+        $x_px += $office_middle_column_offset;
+      if (intdiv($n, 3) == 2)
+        $y_px += $office_middle_row_offset;
+
       $this->page->insert_block('square', [
         'SQUARE_ID' => 'office_' . $n,
-        'LEFT' => round($n % 3 * $scale),
-        'TOP' => round(intdiv($n, 3) * $scale),
+        'LEFT' => $x_px,
+        'TOP' => $y_px,
+        'CLASSES' => $classes
       ]);
     }
 
@@ -62,6 +85,7 @@ class view_rolledwest_rolledwest extends game_view
           'SQUARE_ID' => $shipment['name'] . '_shipment_' . $n,
           'LEFT' => round(($n + $x_offset) * $scale),
           'TOP' => round($shipment_type * $scale),
+          'CLASSES' => 'square'
         ]);
       }
     }

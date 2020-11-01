@@ -48,15 +48,37 @@
 
 #board {
     position: relative;
-    width: 450px;
-    height: 400px;
-    margin-bottom: 5px;
+    width: 564px;
+    height: 630px;
     background-image: url('img/board.jpg');
+    margin: auto;
+}
+
+#rolled_dice_row {
+    margin: auto;
+}
+
+.office {
+    width: 55px;
+    height: 52px;
+    position: absolute;
+}
+.office_middle_row {
+    height: 50px;
+}
+
+.office_middle_column {
+    width: 50px;
+}
+
+.office:hover, .office_middle:hover {
+    outline: rebeccapurple solid;
+    cursor: pointer;
 }
 
 .square {
-    width: 50px;
-    height: 50px;
+    width: 55px;
+    height: 52px;
     position: absolute;
 }
 
