@@ -48,19 +48,41 @@
 
 #board {
     position: relative;
-    width: 450px;
-    height: 400px;
-    margin-bottom: 5px;
+    width: 564px;
+    height: 630px;
     background-image: url('img/board.jpg');
+    margin: auto;
 }
 
-.square {
-    width: 50px;
-    height: 50px;
+#rolled_dice_row {
+    margin: auto;
+}
+
+.office {
+    width: 55px;
+    height: 52px;
     position: absolute;
 }
 
-.square:hover {
+.office_middle_row {
+    height: 50px;
+}
+
+.office_middle_column {
+    width: 50px;
+}
+
+.shipment {
+    width: 37px;
+    height: 55px;
+    position: absolute;
+}
+
+.shipment_big {
+    width: 65px;
+}
+
+.office:hover, .shipment:hover {
     outline: rebeccapurple solid;
     cursor: pointer;
 }

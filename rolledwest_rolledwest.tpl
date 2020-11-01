@@ -19,7 +19,7 @@
 </div>
 <div id="board">
     <!-- BEGIN square -->
-    <div id="{SQUARE_ID}" class="square" style="left: {LEFT}px; top: {TOP}px;"></div>
+    <div id="{SQUARE_ID}" class="{CLASSES}" style="left: {LEFT}px; top: {TOP}px;"></div>
     <!-- END square -->
 
     <div id="marks"></div>
