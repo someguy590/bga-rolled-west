@@ -105,6 +105,25 @@ class view_rolledwest_rolledwest extends game_view
       }
       $y_px += $shipment_y_scale + $shipment_y_offset;
     }
+
+    $contract_x_start = 44;
+    $contract_y_start = 221;
+    $contract_x_scale = 51;
+    $contract_x_offset = 2;
+
+    $x_px = $contract_x_start;
+    $y_px = $contract_y_start;
+    $classes = 'contract';
+    foreach ($this->game->contracts as $n => $contract) {
+      $this->page->insert_block('square', [
+        'SQUARE_ID' => 'contract_' . $n,
+        'LEFT' => $x_px,
+        'TOP' => $y_px,
+        'CLASSES' => $classes
+      ]);
+
+      $x_px += $contract_x_scale + $contract_x_offset;
+    }
     /*********** Do not change anything below this line  ************/
   }
 }

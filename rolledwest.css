@@ -82,7 +82,13 @@
     width: 65px;
 }
 
-.office:hover, .shipment:hover {
+.contract {
+    width: 51px;
+    height: 101px;
+    position: absolute;
+}
+
+.office:hover, .shipment:hover, .contract:hover {
     outline: rebeccapurple solid;
     cursor: pointer;
 }
