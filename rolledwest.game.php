@@ -240,6 +240,60 @@ class RolledWest extends Table
         }
     }
 
+    function spendResources($player_id, $resources_available, $resources_needed)
+    {
+        // spend resources from dice
+        $spent_rolled_resources = [];
+        foreach ($resources_available as $i => $available_resource) {
+            if (key_exists($available_resource, $resources_needed) && $resources_needed[$available_resource] != 0) {
+                $resources_needed[$available_resource]--;
+                $this->removeAvailableDie($available_resource);
+                $this->setSpentOrBankedDie($available_resource);
+                $spent_rolled_resources[] = $available_resource;
+            }
+        }
+
+        // spend resources from bank
+        $isSpendingFromBank = false;
+        foreach ($resources_needed as $needed_resource => $amount_needed) {
+            if ($amount_needed > 0) {
+                $isSpendingFromBank = true;
+                break;
+            }
+        }
+
+        $spent_banked_resources = [];
+        if ($isSpendingFromBank) {
+            $sql = "SELECT copper, wood, silver, gold FROM player WHERE player_id=$player_id";
+            $banked_resources = $this->getNonEmptyObjectFromDB($sql);
+
+            $sql = "UPDATE player SET ";
+            $values = [];
+            $isMissingResources = false;
+            foreach ($resources_needed as $needed_resource => $amount_needed) {
+                if ($amount_needed == 0)
+                    continue;
+
+                $resource_name = $this->dice_types[$needed_resource]['name'];
+                if ($banked_resources[$resource_name] >= $amount_needed) {
+                    $values[] = "$resource_name=$resource_name-$amount_needed";
+                    $spent_banked_resources[$needed_resource] = $amount_needed;
+                } else {
+                    $isMissingResources = true;
+                    break;
+                }
+            }
+            if ($isMissingResources) {
+                throw new BgaUserException($this->_('Not enough resources'));
+            } else {
+                $sql .= implode(',', $values) . " WHERE player_id=$player_id";
+                $this->DbQuery($sql);
+            }
+        }
+
+        return [$spent_rolled_resources, $spent_banked_resources];
+    }
+
     //////////////////////////////////////////////////////////////////////////////
     //////////// Player actions
     //////////// 
@@ -298,56 +352,7 @@ class RolledWest extends Table
         $resources_needed = $office['resourcesNeeded'];
         $resources_available = $this->getAvailableDice();
 
-        // spend resources from dice
-        $spent_rolled_resources = [];
-        foreach ($resources_available as $i => $available_resource) {
-            if (key_exists($available_resource, $resources_needed) && $resources_needed[$available_resource] != 0) {
-                $resources_needed[$available_resource]--;
-                $this->removeAvailableDie($available_resource);
-                $this->setSpentOrBankedDie($available_resource);
-                $spent_rolled_resources[] = $available_resource;
-            }
-        }
-
-        // spend resources from bank
-        $isSpendingFromBank = false;
-        foreach ($resources_needed as $needed_resource => $amount_needed) {
-            if ($amount_needed > 0) {
-                $isSpendingFromBank = true;
-                break;
-            }
-        }
-
-        $spent_banked_resources = [];
-        if ($isSpendingFromBank) {
-            $player_id = $this->getActivePlayerId();
-            $sql = "SELECT copper, wood, silver, gold FROM player WHERE player_id=$player_id";
-            $banked_resources = $this->getNonEmptyObjectFromDB($sql);
-
-            $sql = "UPDATE player SET ";
-            $values = [];
-            $isMissingResources = false;
-            foreach ($resources_needed as $needed_resource => $amount_needed) {
-                if ($amount_needed == 0)
-                    continue;
-
-                $resource_name = $this->dice_types[$needed_resource]['name'];
-                if ($banked_resources[$resource_name] >= $amount_needed) {
-                    $values[] = "$resource_name=$resource_name-$amount_needed";
-                    $spent_banked_resources[$needed_resource] = $amount_needed;
-                }
-                else {
-                    $isMissingResources = true;
-                    break;
-                }
-            }
-            if ($isMissingResources) {
-                throw new BgaUserException($this->_('Not enough resources'));
-            } else {
-                $sql .= implode(',', $values) . " WHERE player_id=$player_id";
-                $this->DbQuery($sql);
-            }
-        }
+        [$spent_rolled_resources, $spent_banked_resources] = $this->spendResources($player, $resources_available, $resources_needed);
 
         $sql = "UPDATE player SET is_purchasing_office=true WHERE player_id=$player";
         $this->DbQuery($sql);
@@ -391,55 +396,7 @@ class RolledWest extends Table
         $resources_needed = $contract['resourcesNeeded'];
         $resources_available = $this->getAvailableDice();
 
-        // spend resources from dice
-        $spent_rolled_resources = [];
-        foreach ($resources_available as $i => $available_resource) {
-            if (key_exists($available_resource, $resources_needed) && $resources_needed[$available_resource] != 0) {
-                $resources_needed[$available_resource]--;
-                $this->removeAvailableDie($available_resource);
-                $this->setSpentOrBankedDie($available_resource);
-                $spent_rolled_resources[] = $available_resource;
-            }
-        }
-
-        // spend resources from bank
-        $isSpendingFromBank = false;
-        foreach ($resources_needed as $needed_resource => $amount_needed) {
-            if ($amount_needed > 0) {
-                $isSpendingFromBank = true;
-                break;
-            }
-        }
-
-        $spent_banked_resources = [];
-        if ($isSpendingFromBank) {
-            $player_id = $this->getActivePlayerId();
-            $sql = "SELECT copper, wood, silver, gold FROM player WHERE player_id=$player_id";
-            $banked_resources = $this->getNonEmptyObjectFromDB($sql);
-
-            $sql = "UPDATE player SET ";
-            $values = [];
-            $isMissingResources = false;
-            foreach ($resources_needed as $needed_resource => $amount_needed) {
-                if ($amount_needed == 0)
-                    continue;
-
-                $resource_name = $this->dice_types[$needed_resource]['name'];
-                if ($banked_resources[$resource_name] >= $amount_needed) {
-                    $values[] = "$resource_name=$resource_name-$amount_needed";
-                    $spent_banked_resources[$needed_resource] = $amount_needed;
-                } else {
-                    $isMissingResources = true;
-                    break;
-                }
-            }
-            if ($isMissingResources) {
-                throw new BgaUserException($this->_('Not enough resources'));
-            } else {
-                $sql .= implode(',', $values) . " WHERE player_id=$player_id";
-                $this->DbQuery($sql);
-            }
-        }
+        [$spent_rolled_resources, $spent_banked_resources] = $this->spendResources($player, $resources_available, $resources_needed);
 
         $sql = "UPDATE player SET is_purchasing_contract=true WHERE player_id=$player";
         $this->DbQuery($sql);
