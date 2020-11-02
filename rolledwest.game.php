@@ -325,8 +325,8 @@ class RolledWest extends Table
     function pass()
     {
         $this->checkAction('pass', true);
-        $player = $this->getActivePlayerId();
-        $sql = "UPDATE player SET is_banking_during_turn=false, is_purchasing_office=false, is_purchasing_contract=false WHERE player_id=$player";
+        $player_id = $this->getActivePlayerId();
+        $sql = "UPDATE player SET is_banking_during_turn=false, is_purchasing_office=false, is_purchasing_contract=false WHERE player_id=$player_id";
         $this->DbQuery($sql);
         $this->gamestate->nextState('rollDice');
     }
@@ -340,8 +340,8 @@ class RolledWest extends Table
         if ($is_office_purchased)
             throw new BgaUserException($this->_('Office already purchased'));
 
-        $player = $this->getActivePlayerId();
-        $sql = "SELECT is_purchasing_office FROM player WHERE player_id=$player";
+        $player_id = $this->getActivePlayerId();
+        $sql = "SELECT is_purchasing_office FROM player WHERE player_id=$player_id";
         $is_purchasing_office = $this->getUniqueValueFromDB($sql);
         if ($is_purchasing_office)
             throw new BgaUserException($this->_('You already purchased an office this turn'));
@@ -352,12 +352,12 @@ class RolledWest extends Table
         $resources_needed = $office['resourcesNeeded'];
         $resources_available = $this->getAvailableDice();
 
-        [$spent_rolled_resources, $spent_banked_resources] = $this->spendResources($player, $resources_available, $resources_needed);
+        [$spent_rolled_resources, $spent_banked_resources] = $this->spendResources($player_id, $resources_available, $resources_needed);
 
-        $sql = "UPDATE player SET is_purchasing_office=true WHERE player_id=$player";
+        $sql = "UPDATE player SET is_purchasing_office=true WHERE player_id=$player_id";
         $this->DbQuery($sql);
 
-        $sql = "UPDATE exclusive SET marked_by_player=$player WHERE exclusive_type='office' AND exclusive_id=$officeId";
+        $sql = "UPDATE exclusive SET marked_by_player=$player_id WHERE exclusive_type='office' AND exclusive_id=$officeId";
         $this->DbQuery($sql);
 
         // notify office purchased and if rolled dice and/or banked resources were used
@@ -365,7 +365,7 @@ class RolledWest extends Table
             'purchaseOffice',
             clienttranslate('${player_name} purchased an office and will earn ${office_description} at the end of the game'),
             [
-                'playerId' => $this->getActivePlayerId(),
+                'playerId' => $player_id,
                 'player_name' => $this->getActivePlayerName(),
                 'office_description' => $office['description'],
                 'spentRolledResources' => $spent_rolled_resources,
@@ -384,8 +384,8 @@ class RolledWest extends Table
         if ($is_contract_purchased)
             throw new BgaUserException($this->_('Contract already completed'));
 
-        $player = $this->getActivePlayerId();
-        $sql = "SELECT is_purchasing_contract FROM player WHERE player_id=$player";
+        $player_id = $this->getActivePlayerId();
+        $sql = "SELECT is_purchasing_contract FROM player WHERE player_id=$player_id";
         $is_purchasing_contract = $this->getUniqueValueFromDB($sql);
         if ($is_purchasing_contract)
             throw new BgaUserException($this->_('You already completed a contract this turn'));
@@ -395,13 +395,13 @@ class RolledWest extends Table
         $resources_needed = $contract['resourcesNeeded'];
         $resources_available = $this->getAvailableDice();
 
-        [$spent_rolled_resources, $spent_banked_resources] = $this->spendResources($player, $resources_available, $resources_needed);
+        [$spent_rolled_resources, $spent_banked_resources] = $this->spendResources($player_id, $resources_available, $resources_needed);
 
         $points = $this->contracts[$contractId]['points'];
-        $sql = "UPDATE player SET is_purchasing_contract=true, player_score=player_score+$points WHERE player_id=$player";
+        $sql = "UPDATE player SET is_purchasing_contract=true, player_score=player_score+$points WHERE player_id=$player_id";
         $this->DbQuery($sql);
 
-        $sql = "UPDATE exclusive SET marked_by_player=$player WHERE exclusive_type='contract' AND exclusive_id=$contractId";
+        $sql = "UPDATE exclusive SET marked_by_player=$player_id WHERE exclusive_type='contract' AND exclusive_id=$contractId";
         $this->DbQuery($sql);
 
         // notify contract completed and if rolled dice and/or banked resources were used
@@ -409,7 +409,7 @@ class RolledWest extends Table
             'completeContract',
             clienttranslate('${player_name} completed a contract and earns ${points} points'),
             [
-                'playerId' => $this->getActivePlayerId(),
+                'playerId' => $player_id,
                 'player_name' => $this->getActivePlayerName(),
                 'spentRolledResources' => $spent_rolled_resources,
                 'spentBankedResources' => $spent_banked_resources,
@@ -422,17 +422,17 @@ class RolledWest extends Table
     function bank($resource)
     {
         $this->checkAction('bank', true);
-        $player = $this->getActivePlayerId();
+        $player_id = $this->getActivePlayerId();
 
         // check if already banked
-        $sql = "SELECT is_banking_during_turn FROM player WHERE player_id=$player";
+        $sql = "SELECT is_banking_during_turn FROM player WHERE player_id=$player_id";
         $is_banking_during_turn = $this->getUniqueValueFromDB($sql);
         if ($is_banking_during_turn)
             throw new BgaUserException($this->_('You already banked a resource this turn'));
 
         // bank resource and mark player as having banked this turn
         $resource_db_name = $this->dice_types[$resource]['dbName'];
-        $sql = "UPDATE player SET $resource_db_name=$resource_db_name + 1, is_banking_during_turn=true WHERE player_id=$player";
+        $sql = "UPDATE player SET $resource_db_name=$resource_db_name + 1, is_banking_during_turn=true WHERE player_id=$player_id";
         $this->DbQuery($sql);
 
         $this->removeAvailableDie($resource);
@@ -443,7 +443,7 @@ class RolledWest extends Table
             'player_name' => $this->getActivePlayerName(),
             'resource_name' => $resource_name,
             'resourceType' => $resource,
-            'playerId' => $player
+            'playerId' => $player_id
         ]);
     }
 
@@ -485,8 +485,8 @@ class RolledWest extends Table
 
     function stRollDice()
     {
-        $player = $this->activeNextPlayer();
-        $this->giveExtraTime($player);
+        $player_id = $this->activeNextPlayer();
+        $this->giveExtraTime($player_id);
         $dice = $this->rollDice();
 
         foreach ($dice as $i => $value)
@@ -496,7 +496,7 @@ class RolledWest extends Table
             $this->setGameStateValue('spentOrBankedDie' . $i, -1);
 
         $this->notifyAllPlayers('diceRolled', clienttranslate('${player_name} rolls dice'), [
-            'playerId' => $player,
+            'playerId' => $player_id,
             'player_name' => $this->getActivePlayerName(),
             'dice' => $dice
         ]);
