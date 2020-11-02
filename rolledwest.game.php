@@ -382,14 +382,13 @@ class RolledWest extends Table
         $sql = "SELECT marked_by_player FROM exclusive WHERE exclusive_type='contract' AND exclusive_id=$contractId";
         $is_contract_purchased = !is_null($this->getUniqueValueFromDB($sql));
         if ($is_contract_purchased)
-            throw new BgaUserException($this->_('Contract already purchased'));
+            throw new BgaUserException($this->_('Contract already completed'));
 
         $player = $this->getActivePlayerId();
         $sql = "SELECT is_purchasing_contract FROM player WHERE player_id=$player";
         $is_purchasing_contract = $this->getUniqueValueFromDB($sql);
         if ($is_purchasing_contract)
-            throw new BgaUserException($this->_('You already purchased a contract this turn'));
-
+            throw new BgaUserException($this->_('You already completed a contract this turn'));
 
         // get contract resource requirements
         $contract = $this->contracts[$contractId];
