@@ -429,10 +429,10 @@ define([
                     classes: classes
                 }), 'marks');
 
-
-
                 this.placeOnObject('contract_mark_' + contractId, 'overall_player_board_' + this.player_id);
                 this.slideToObject('contract_mark_' + contractId, 'contract_' + contractId).play();
+
+                this.scoreCtrl[playerId].incValue(notif.args.points);
             },
 
             notif_bank: function (notif) {

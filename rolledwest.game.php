@@ -397,7 +397,8 @@ class RolledWest extends Table
 
         [$spent_rolled_resources, $spent_banked_resources] = $this->spendResources($player, $resources_available, $resources_needed);
 
-        $sql = "UPDATE player SET is_purchasing_contract=true WHERE player_id=$player";
+        $points = $this->contracts[$contractId]['points'];
+        $sql = "UPDATE player SET is_purchasing_contract=true, player_score=player_score+$points WHERE player_id=$player";
         $this->DbQuery($sql);
 
         $sql = "UPDATE exclusive SET marked_by_player=$player WHERE exclusive_type='contract' AND exclusive_id=$contractId";
@@ -413,7 +414,7 @@ class RolledWest extends Table
                 'spentRolledResources' => $spent_rolled_resources,
                 'spentBankedResources' => $spent_banked_resources,
                 'contractId' => $contractId,
-                'points' => $this->contracts[$contractId]['points']
+                'points' => $points
             ]
         );
     }
