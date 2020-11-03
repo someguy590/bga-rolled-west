@@ -328,10 +328,6 @@ class RolledWest extends Table
     {
         $this->checkAction('pass', true);
         $player_id = $this->getCurrentPlayerId();
-        if ($player_id == $this->getGameStateValue('diceRollerId')) {
-            $sql = "UPDATE player SET is_banking_during_turn=false, is_banking_in_between_turn=false, is_purchasing_office=false, is_purchasing_contract=false WHERE player_id=$player_id";
-            $this->DbQuery($sql);
-        }
         $this->gamestate->setPlayerNonMultiactive($player_id, 'rollDice');
     }
 
@@ -511,8 +507,10 @@ class RolledWest extends Table
     {
         $player_id = $this->activeNextPlayer();
         $this->giveExtraTime($player_id);
-        $dice = $this->rollDice();
+        $sql = "UPDATE player SET is_banking_during_turn=false, is_banking_in_between_turn=false, is_purchasing_office=false, is_purchasing_contract=false WHERE player_id=$player_id";
+        $this->DbQuery($sql);
 
+        $dice = $this->rollDice();
         foreach ($dice as $i => $value)
             $this->setGameStateValue('die' . $i, $value);
 
@@ -529,8 +527,11 @@ class RolledWest extends Table
 
     function stSpendOrBank()
     {
-        $this->setGameStateValue('diceRollerId', $this->getActivePlayerId());
-        $this->gamestate->setAllPlayersMultiactive();
+        $diceRollerId = $this->getActivePlayerId();
+        $this->setGameStateValue('diceRollerId', $diceRollerId);
+        $sql = "SELECT player_id FROM player WHERE is_banking_in_between_turn=false";
+        $active_players = $this->getObjectListFromDB($sql, true);
+        $this->gamestate->setPlayersMultiactive($active_players, 'rollDice');
     }
 
     //////////////////////////////////////////////////////////////////////////////
