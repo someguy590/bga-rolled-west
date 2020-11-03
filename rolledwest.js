@@ -252,8 +252,11 @@ define([
 
             onDiceSelected: function (diceId) {
                 let dice = this.playerResources.getSelectedItems();
-                if (diceId == 'spent_or_banked_dice')
+                let isResourceSpent = false;
+                if (diceId == 'spent_or_banked_dice') {
                     dice = this.spentOrBankedResources.getSelectedItems();
+                    isResourceSpent = true;
+                }
 
                 if (dice.length > 0) {
                     // choose terrain
@@ -272,6 +275,7 @@ define([
                             `/${this.game_name}/${this.game_name}/bank.html`,
                             {
                                 resource: dice[0].type,
+                                isResourceSpent: isResourceSpent,
                                 lock: true
                             }, this, function (result) { }, function (is_error) { }
                         );

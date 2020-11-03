@@ -66,7 +66,8 @@ class action_rolledwest extends APP_GameAction
   {
     $this->setAjaxMode();
     $resource = $this->getArg("resource", AT_int, true);
-    $this->game->bank($resource);
+    $isResourceSpent = $this->getArg("isResourceSpent", AT_bool, true);
+    $this->game->bank($resource, $isResourceSpent);
     $this->ajaxResponse();
   }
 

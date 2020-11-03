@@ -423,18 +423,20 @@ class RolledWest extends Table
         );
     }
 
-    function bank($resource)
+    function bank($resource, $isResourceSpent)
     {
         $this->checkAction('bank', true);
         $player_id = $this->getCurrentPlayerId();
         $dice_roller_id = $this->getGameStateValue('diceRollerId');
 
-        // check if already banked during turn
+        // check turn player banking
         if ($player_id == $dice_roller_id) {
             $sql = "SELECT is_banking_during_turn FROM player WHERE player_id=$player_id";
             $is_banking_during_turn = $this->getUniqueValueFromDB($sql);
             if ($is_banking_during_turn)
                 throw new BgaUserException($this->_('You already banked a resource this turn'));
+            if ($isResourceSpent)
+                throw new BgaUserException($this->_('You cannot bank a spent resource'));
         }
         // check if already banked in between turn
         else {
