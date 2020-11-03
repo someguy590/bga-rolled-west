@@ -89,7 +89,8 @@ $machinestates = array(
         'name' => 'spendOrBank',
         'description' => clienttranslate('${actplayer} must play a card or pass'),
         'descriptionmyturn' => clienttranslate('${you} must play a card or pass'),
-        'type' => 'activeplayer',
+        'type' => 'multipleactiveplayer',
+        'action' => 'stSpendOrBank',
         'possibleactions' => ['purchaseOffice', 'completeContract', 'bank', 'pass'],
         'transitions' => ['rollDice' => STATE_ROLL_DICE]
     ],

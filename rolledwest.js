@@ -88,8 +88,10 @@ define([
                 this.displayDice(this.gamedatas.dice, this.gamedatas.spentOrBankedDice);
                 this.displayMarks(this.gamedatas.marks);
                 dojo.connect(this.playerResources, 'onChangeSelection', this, 'onDiceSelected');
+                dojo.connect(this.spentOrBankedResources, 'onChangeSelection', this, 'onDiceSelected');
                 dojo.query('[id*=office]:not([id*=mark])').connect('onclick', this, 'onPurchaseOffice');
                 dojo.query('[id*=contract]:not([id*=mark])').connect('onclick', this, 'onCompleteContract');
+
                 // Setup game notifications to handle (see "setupNotifications" method below)
                 this.setupNotifications();
 
@@ -248,8 +250,10 @@ define([
             
             */
 
-            onDiceSelected: function () {
+            onDiceSelected: function (diceId) {
                 let dice = this.playerResources.getSelectedItems();
+                if (diceId == 'spent_or_banked_dice')
+                    dice = this.spentOrBankedResources.getSelectedItems();
 
                 if (dice.length > 0) {
                     // choose terrain
@@ -273,6 +277,7 @@ define([
                         );
                     }
                     this.playerResources.unselectAll();
+                    this.spentOrBankedResources.unselectAll();
                 }
             },
 
@@ -432,8 +437,11 @@ define([
                 let resourceType = notif.args.resourceType;
                 let playerId = notif.args.playerId;
                 this.addToResources(playerId, resourceType, 1);
-                this.spentOrBankedResources.addToStock(resourceType, 'rolled_dice');
-                this.playerResources.removeFromStock(resourceType);
+
+                if (playerId == notif.args.diceRollerId) {
+                    this.spentOrBankedResources.addToStock(resourceType, 'rolled_dice');
+                    this.playerResources.removeFromStock(resourceType);
+                }
             }
         });
     });
