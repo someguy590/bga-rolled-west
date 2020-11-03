@@ -263,12 +263,6 @@ define([
                         );
                     }
                     else if (this.checkAction('bank')) {
-                        if (this.gamedatas.players[this.player_id].isBankingDuringTurn == '1') {
-                            this.showMessage(_('You already banked a resource this turn'), 'error');
-                            this.playerResources.unselectAll();
-                            return;
-                        }
-
                         // bank a resource
                         this.ajaxcall(
                             `/${this.game_name}/${this.game_name}/bank.html`,
@@ -370,7 +364,6 @@ define([
             notif_diceRolled: function (notif) {
                 let playerId = notif.args.playerId;
                 let dice = notif.args.dice;
-                this.gamedatas.players[playerId].isBankingDuringTurn = '0';
                 this.playerResources.removeAll();
                 this.spentOrBankedResources.removeAll();
                 for (let die of dice)
@@ -439,7 +432,6 @@ define([
                 let resourceType = notif.args.resourceType;
                 let playerId = notif.args.playerId;
                 this.addToResources(playerId, resourceType, 1);
-                this.gamedatas.players[playerId].isBankingDuringTurn = '1';
                 this.spentOrBankedResources.addToStock(resourceType, 'rolled_dice');
                 this.playerResources.removeFromStock(resourceType);
             }
