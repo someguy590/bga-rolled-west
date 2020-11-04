@@ -110,6 +110,14 @@ define([
 
                 switch (stateName) {
 
+                    case 'spendOrBank':
+                        if (args.args.diceRollerId == this.player_id)
+                            this.gamedatas.gamestate.descriptionmyturn = this.gamedatas.gamestate.descriptionDiceRollerTurn;
+                        else
+                            this.gamedatas.gamestate.descriptionmyturn = this.gamedatas.gamestate.descriptionNonDiceRollerTurn;
+                        this.updatePageTitle();
+                        break;
+
                     /* Example:
                     
                     case 'myGameState':

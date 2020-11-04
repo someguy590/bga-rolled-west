@@ -87,12 +87,15 @@ $machinestates = array(
 
     STATE_SPEND_OR_BANK => [
         'name' => 'spendOrBank',
-        'description' => clienttranslate('${actplayer} must play a card or pass'),
-        'descriptionmyturn' => clienttranslate('${you} must play a card or pass'),
+        'description' => clienttranslate('Others may still play or pass'),
+        'descriptionmyturn' => '',
         'type' => 'multipleactiveplayer',
         'action' => 'stSpendOrBank',
+        'args' => 'argSpendOrBank',
         'possibleactions' => ['purchaseOffice', 'completeContract', 'bank', 'pass'],
-        'transitions' => ['rollDice' => STATE_ROLL_DICE]
+        'transitions' => ['rollDice' => STATE_ROLL_DICE],
+        'descriptionDiceRollerTurn' => '${you} may play your turn or pass',
+        'descriptionNonDiceRollerTurn' => '${you} may bank a resource or pass',
     ],
 
     // Final state.

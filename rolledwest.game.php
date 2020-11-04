@@ -479,6 +479,13 @@ class RolledWest extends Table
         game state.
     */
 
+    function argSpendOrBank()
+    {
+        return [
+            'diceRollerId' => $this->getGameStateValue('diceRollerId'),
+        ];
+    }
+
     /*
     
     Example for game state "MyGameState":
@@ -509,6 +516,7 @@ class RolledWest extends Table
     {
         $player_id = $this->activeNextPlayer();
         $this->giveExtraTime($player_id);
+        $this->setGameStateValue('diceRollerId', $player_id);
         $sql = "UPDATE player SET is_banking_during_turn=false, is_banking_in_between_turn=false, is_purchasing_office=false, is_purchasing_contract=false WHERE player_id=$player_id";
         $this->DbQuery($sql);
 
@@ -529,8 +537,6 @@ class RolledWest extends Table
 
     function stSpendOrBank()
     {
-        $diceRollerId = $this->getActivePlayerId();
-        $this->setGameStateValue('diceRollerId', $diceRollerId);
         $sql = "SELECT player_id FROM player WHERE is_banking_in_between_turn=false";
         $active_players = $this->getObjectListFromDB($sql, true);
         $this->gamestate->setPlayersMultiactive($active_players, 'rollDice');
