@@ -41,6 +41,7 @@ class RolledWest extends Table
             'spentOrBankedDie0' => 14,
             'spentOrBankedDie1' => 15,
             'spentOrBankedDie2' => 16,
+            'diceRollerId' => 17
         ));
     }
 
@@ -88,6 +89,7 @@ class RolledWest extends Table
         $this->setGameStateInitialValue('spentOrBankedDie0', -1);
         $this->setGameStateInitialValue('spentOrBankedDie1', -1);
         $this->setGameStateInitialValue('spentOrBankedDie2', -1);
+        $this->setGameStateInitialValue('diceRollerId', -1);
 
         // Init game statistics
         // (note: statistics used in this file must be defined in your stats.inc.php file)
@@ -325,22 +327,22 @@ class RolledWest extends Table
     function pass()
     {
         $this->checkAction('pass', true);
-        $player_id = $this->getActivePlayerId();
-        $sql = "UPDATE player SET is_banking_during_turn=false, is_purchasing_office=false, is_purchasing_contract=false WHERE player_id=$player_id";
-        $this->DbQuery($sql);
-        $this->gamestate->nextState('rollDice');
+        $player_id = $this->getCurrentPlayerId();
+        $this->gamestate->setPlayerNonMultiactive($player_id, 'rollDice');
     }
 
     function purchaseOffice($officeId)
     {
         $this->checkAction('purchaseOffice', true);
+        $player_id = $this->getCurrentPlayerId();
+        if ($player_id != $this->getGameStateValue('diceRollerId'))
+            throw new BgaUserException($this->_('You cannot purchase an office in between your turns'));
 
         $sql = "SELECT marked_by_player FROM exclusive WHERE exclusive_type='office' AND exclusive_id=$officeId";
         $is_office_purchased = !is_null($this->getUniqueValueFromDB($sql));
         if ($is_office_purchased)
             throw new BgaUserException($this->_('Office already purchased'));
 
-        $player_id = $this->getActivePlayerId();
         $sql = "SELECT is_purchasing_office FROM player WHERE player_id=$player_id";
         $is_purchasing_office = $this->getUniqueValueFromDB($sql);
         if ($is_purchasing_office)
@@ -366,7 +368,7 @@ class RolledWest extends Table
             clienttranslate('${player_name} purchased an office and will earn ${office_description} at the end of the game'),
             [
                 'playerId' => $player_id,
-                'player_name' => $this->getActivePlayerName(),
+                'player_name' => $this->getCurrentPlayerName(),
                 'office_description' => $office['description'],
                 'spentRolledResources' => $spent_rolled_resources,
                 'spentBankedResources' => $spent_banked_resources,
@@ -378,13 +380,15 @@ class RolledWest extends Table
     function completeContract($contractId)
     {
         $this->checkAction('completeContract', true);
+        $player_id = $this->getCurrentPlayerId();
+        if ($player_id != $this->getGameStateValue('diceRollerId'))
+            throw new BgaUserException($this->_('You cannot complete a contract in between your turns'));
 
         $sql = "SELECT marked_by_player FROM exclusive WHERE exclusive_type='contract' AND exclusive_id=$contractId";
         $is_contract_purchased = !is_null($this->getUniqueValueFromDB($sql));
         if ($is_contract_purchased)
             throw new BgaUserException($this->_('Contract already completed'));
 
-        $player_id = $this->getActivePlayerId();
         $sql = "SELECT is_purchasing_contract FROM player WHERE player_id=$player_id";
         $is_purchasing_contract = $this->getUniqueValueFromDB($sql);
         if ($is_purchasing_contract)
@@ -410,7 +414,7 @@ class RolledWest extends Table
             clienttranslate('${player_name} completed a contract and earns ${points} points'),
             [
                 'playerId' => $player_id,
-                'player_name' => $this->getActivePlayerName(),
+                'player_name' => $this->getCurrentPlayerName(),
                 'spentRolledResources' => $spent_rolled_resources,
                 'spentBankedResources' => $spent_banked_resources,
                 'contractId' => $contractId,
@@ -419,31 +423,49 @@ class RolledWest extends Table
         );
     }
 
-    function bank($resource)
+    function bank($resource, $isResourceSpent)
     {
         $this->checkAction('bank', true);
-        $player_id = $this->getActivePlayerId();
+        $player_id = $this->getCurrentPlayerId();
+        $dice_roller_id = $this->getGameStateValue('diceRollerId');
 
-        // check if already banked
-        $sql = "SELECT is_banking_during_turn FROM player WHERE player_id=$player_id";
-        $is_banking_during_turn = $this->getUniqueValueFromDB($sql);
-        if ($is_banking_during_turn)
-            throw new BgaUserException($this->_('You already banked a resource this turn'));
+        // check turn player banking
+        if ($player_id == $dice_roller_id) {
+            $sql = "SELECT is_banking_during_turn FROM player WHERE player_id=$player_id";
+            $is_banking_during_turn = $this->getUniqueValueFromDB($sql);
+            if ($is_banking_during_turn)
+                throw new BgaUserException($this->_('You already banked a resource this turn'));
+            if ($isResourceSpent)
+                throw new BgaUserException($this->_('You cannot bank a spent resource'));
+        }
+        // check if already banked in between turn
+        else {
+            $sql = "SELECT is_banking_in_between_turn FROM player WHERE player_id=$player_id";
+            $is_banking_in_between_turn = $this->getUniqueValueFromDB($sql);
+            if ($is_banking_in_between_turn)
+                throw new BgaUserException($this->_('You already banked a resource in between your turn'));
+        }
 
         // bank resource and mark player as having banked this turn
         $resource_db_name = $this->dice_types[$resource]['dbName'];
-        $sql = "UPDATE player SET $resource_db_name=$resource_db_name + 1, is_banking_during_turn=true WHERE player_id=$player_id";
+        if ($player_id == $dice_roller_id) {
+            $sql = "UPDATE player SET $resource_db_name=$resource_db_name + 1, is_banking_during_turn=true WHERE player_id=$player_id";
+            $this->removeAvailableDie($resource);
+            $this->setSpentOrBankedDie($resource);
+        } else {
+            $sql = "UPDATE player SET $resource_db_name=$resource_db_name + 1, is_banking_in_between_turn=true WHERE player_id=$player_id";
+            $this->gamestate->setPlayerNonMultiactive($player_id, 'rollDice');
+        }
         $this->DbQuery($sql);
 
-        $this->removeAvailableDie($resource);
-        $this->setSpentOrBankedDie($resource);
 
         $resource_name = $this->dice_types[$resource]['name'];
         $this->notifyAllPlayers('bank', clienttranslate('${player_name} banked ${resource_name}'), [
-            'player_name' => $this->getActivePlayerName(),
+            'player_name' => $this->getCurrentPlayerName(),
             'resource_name' => $resource_name,
             'resourceType' => $resource,
-            'playerId' => $player_id
+            'playerId' => $player_id,
+            'diceRollerId' => $dice_roller_id
         ]);
     }
 
@@ -456,6 +478,13 @@ class RolledWest extends Table
         These methods function is to return some additional information that is specific to the current
         game state.
     */
+
+    function argSpendOrBank()
+    {
+        return [
+            'diceRollerId' => $this->getGameStateValue('diceRollerId'),
+        ];
+    }
 
     /*
     
@@ -487,8 +516,11 @@ class RolledWest extends Table
     {
         $player_id = $this->activeNextPlayer();
         $this->giveExtraTime($player_id);
-        $dice = $this->rollDice();
+        $this->setGameStateValue('diceRollerId', $player_id);
+        $sql = "UPDATE player SET is_banking_during_turn=false, is_banking_in_between_turn=false, is_purchasing_office=false, is_purchasing_contract=false WHERE player_id=$player_id";
+        $this->DbQuery($sql);
 
+        $dice = $this->rollDice();
         foreach ($dice as $i => $value)
             $this->setGameStateValue('die' . $i, $value);
 
@@ -501,6 +533,13 @@ class RolledWest extends Table
             'dice' => $dice
         ]);
         $this->gamestate->nextState('chooseTerrain');
+    }
+
+    function stSpendOrBank()
+    {
+        $sql = "SELECT player_id FROM player WHERE is_banking_in_between_turn=false";
+        $active_players = $this->getObjectListFromDB($sql, true);
+        $this->gamestate->setPlayersMultiactive($active_players, 'rollDice');
     }
 
     //////////////////////////////////////////////////////////////////////////////

@@ -25,6 +25,7 @@ ALTER TABLE `player` ADD `copper` INT UNSIGNED NOT NULL DEFAULT '0';
 ALTER TABLE `player` ADD `silver` INT UNSIGNED NOT NULL DEFAULT '0';
 ALTER TABLE `player` ADD `gold` INT UNSIGNED NOT NULL DEFAULT '0';
 ALTER TABLE `player` ADD `is_banking_during_turn` BIT(1) NOT NULL DEFAULT FALSE;
+ALTER TABLE `player` ADD `is_banking_in_between_turn` BIT(1) NOT NULL DEFAULT FALSE;
 ALTER TABLE `player` ADD `is_purchasing_office` BIT(1) NOT NULL DEFAULT FALSE;
 ALTER TABLE `player` ADD `is_purchasing_contract` BIT(1) NOT NULL DEFAULT FALSE;
 
