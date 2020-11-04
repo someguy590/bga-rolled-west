@@ -118,17 +118,6 @@ define([
                         this.updatePageTitle();
                         break;
 
-                    /* Example:
-                    
-                    case 'myGameState':
-                    
-                        // Show some HTML block at this game state
-                        dojo.style( 'my_html_block_id', 'display', 'block' );
-                        
-                        break;
-                   */
-
-
                     case 'dummmy':
                         break;
                 }
