@@ -28,6 +28,7 @@ ALTER TABLE `player` ADD `is_banking_during_turn` BIT(1) NOT NULL DEFAULT FALSE;
 ALTER TABLE `player` ADD `is_banking_in_between_turn` BIT(1) NOT NULL DEFAULT FALSE;
 ALTER TABLE `player` ADD `is_purchasing_office` BIT(1) NOT NULL DEFAULT FALSE;
 ALTER TABLE `player` ADD `is_purchasing_contract` BIT(1) NOT NULL DEFAULT FALSE;
+ALTER TABLE `player` ADD `is_building_claim` BIT(1) NOT NULL DEFAULT FALSE;
 
 CREATE TABLE IF NOT EXISTS `exclusive` (
   `exclusive_id` int(10) unsigned NOT NULL,
@@ -40,16 +41,18 @@ CREATE TABLE IF NOT EXISTS `exclusive` (
 CREATE TABLE IF NOT EXISTS `claim` (
   `claim_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `player_id` int(10) unsigned NOT NULL,
-  `terrain_type` int(11) NOT NULL,
-  `space0` int(11) NULL,
-  `space1` int(11) NULL,
-  `space2` int(11) NULL,
-  `space3` int(11) NULL,
-  `space4` int(11) NULL,
-  `space5` int(11) NULL,
-  `space6` int(11) NULL,
-  `space7` int(11) NULL,
-  `space8` int(11) NULL,
+  `terrain_type_id` int(11) NOT NULL,
+  `space0` varchar(16) NULL,
+  `space1` varchar(16) NULL,
+  `space2` varchar(16) NULL,
+  `space3` varchar(16) NULL,
+  `space4` varchar(16) NULL,
+  `space5` varchar(16) NULL,
+  `space6` varchar(16) NULL,
+  `space7` varchar(16) NULL,
+  `space8` varchar(16) NULL,
+  `camps` INT UNSIGNED NOT NULL DEFAULT '0',
+  `settlements` INT UNSIGNED NOT NULL DEFAULT '0',
   PRIMARY KEY (`claim_id`),
   FOREIGN KEY (`player_id`) REFERENCES player(`player_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
