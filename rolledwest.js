@@ -213,6 +213,7 @@ define([
 
             displayMarks: function (marks) {
                 for (let { id, type, markedByPlayer } of marks) {
+                    let classes = '';
                     if (type == 'office' || type == 'contract') {
                         // if marked by player is same player viewing in browser, display owning mark
                         if (markedByPlayer == this.player_id)
@@ -389,6 +390,7 @@ define([
                     this.addToResources(playerId, resourceType, -resourceAmount);
 
                 // if marked by player is same player viewing in browser, display owning mark
+                let classes = '';
                 if (playerId == this.player_id)
                     classes = 'mark_circle';
                 else
@@ -418,6 +420,7 @@ define([
                     this.addToResources(playerId, resourceType, -resourceAmount);
 
                 // if marked by player is same player viewing in browser, display owning mark
+                let classes = '';
                 if (playerId == this.player_id)
                     classes = 'mark_circle';
                 else
