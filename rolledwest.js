@@ -86,11 +86,12 @@ define([
 
                 // TODO: Set up your game interface here, according to "gamedatas"
                 this.displayDice(this.gamedatas.dice, this.gamedatas.spentOrBankedDice);
-                this.displayMarks(this.gamedatas.marks);
+                this.displayMarks(this.gamedatas.marks, this.gamedatas.claims);
                 dojo.connect(this.playerResources, 'onChangeSelection', this, 'onDiceSelected');
                 dojo.connect(this.spentOrBankedResources, 'onChangeSelection', this, 'onDiceSelected');
                 dojo.query('[id*=office]:not([id*=mark])').connect('onclick', this, 'onPurchaseOffice');
                 dojo.query('[id*=contract]:not([id*=mark])').connect('onclick', this, 'onCompleteContract');
+                dojo.query('[id*=claim]:not([id*=mark])').connect('onclick', this, 'onBuildClaim');
 
                 // Setup game notifications to handle (see "setupNotifications" method below)
                 this.setupNotifications();
@@ -211,7 +212,7 @@ define([
                     this.goldCounters[playerId].incValue(amount);
             },
 
-            displayMarks: function (marks) {
+            displayMarks: function (marks, claims) {
                 for (let { id, type, markedByPlayer } of marks) {
                     let classes = '';
                     if (type == 'office' || type == 'contract') {
@@ -230,6 +231,25 @@ define([
 
                     this.placeOnObject(markDivId, 'overall_player_board_' + this.player_id);
                     this.slideToObject(markDivId, `${type}_${id}`).play();
+                }
+
+                for (let { playerId, terrainTypeId, spaceId, claimType } of claims) {
+                    if (playerId != this.player_id)
+                        continue;
+
+                    let markId = `claim_mark_${terrainTypeId}_${spaceId}`;
+                    let classes = 'claim';
+                    let jstpl = 'jstpl_mark_triangle';
+                    if (claimType == 'settlement') {
+                        classes += ' settlement';
+                        jstpl = 'jstpl_mark';
+                    }
+                    dojo.place(this.format_block(jstpl, {
+                        markId: markId,
+                        classes: classes
+                    }), 'marks');
+                    this.placeOnObject(markId, 'overall_player_board_' + this.player_id);
+                    this.slideToObject(markId, `claim_${terrainTypeId}_${spaceId}`).play();
                 }
 
             },
@@ -330,6 +350,26 @@ define([
                 );
             },
 
+            onBuildClaim: function (e) {
+                dojo.stopEvent(e);
+
+                if (!this.checkAction('buildClaim'))
+                    return;
+
+                let claimDiv = e.currentTarget.id.split('_');
+                let terrainTypeId = claimDiv[1];
+                let spaceId = claimDiv[2];
+
+                this.ajaxcall(
+                    `/${this.game_name}/${this.game_name}/buildClaim.html`,
+                    {
+                        terrainTypeId: terrainTypeId,
+                        spaceId: spaceId,
+                        lock: true
+                    }, this, function (result) { }, function (is_error) { }
+                );
+            },
+
             ///////////////////////////////////////////////////
             //// Reaction to cometD notifications
 
@@ -351,6 +391,7 @@ define([
                 dojo.subscribe('purchaseOffice', this, "notif_purchaseOffice");
                 dojo.subscribe('completeContract', this, "notif_completeContract");
                 dojo.subscribe('bank', this, "notif_bank");
+                dojo.subscribe('buildClaim', this, 'notif_buildClaim');
 
                 // Example 1: standard notification handling
                 // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
@@ -435,6 +476,41 @@ define([
                 this.slideToObject('contract_mark_' + contractId, 'contract_' + contractId).play();
 
                 this.scoreCtrl[playerId].incValue(notif.args.points);
+            },
+
+            notif_buildClaim: function (notif) {
+                let playerId = notif.args.playerId;
+                let terrainTypeId = notif.args.terrainTypeId;
+                let claimsBuilt = notif.args.claimsBuilt;
+
+                for (let die of notif.args.spentRolledResources) {
+                    this.spentOrBankedResources.addToStock(die, 'rolled_dice');
+                    this.playerResources.removeFromStock(die);
+                }
+
+                for (let [resourceType, resourceAmount] of Object.entries(notif.args.spentBankedResources))
+                    this.addToResources(playerId, resourceType, -resourceAmount);
+
+                if (playerId == this.player_id) {
+                    for (let [spaceId, claimType] of Object.entries(claimsBuilt)) {
+                        let markId = `claim_mark_${terrainTypeId}_${spaceId}`;
+                        let classes = 'claim';
+                        let jstpl = 'jstpl_mark_triangle';
+                        if (claimType == 'settlement') {
+                            classes += ' settlement';
+                            jstpl = 'jstpl_mark';
+                        }
+                        dojo.place(this.format_block(jstpl, {
+                            markId: markId,
+                            classes: classes
+                        }), 'marks');
+                        this.placeOnObject(markId, 'overall_player_board_' + this.player_id);
+                        this.slideToObject(markId, `claim_${terrainTypeId}_${spaceId}`).play();
+                    }
+                }
+
+                if (notif.args.points > 0)
+                    this.scoreCtrl[notif.args.playerId].incValue(notif.args.points);
             },
 
             notif_bank: function (notif) {
