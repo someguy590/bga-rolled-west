@@ -92,7 +92,7 @@ class view_rolledwest_rolledwest extends game_view
         }
 
         $this->page->insert_block('square', [
-          'SQUARE_ID' => $shipment['name'] . '_shipment_' . $n,
+          'SQUARE_ID' => 'shipment_' . $shipment_type . '_' . $n,
           'LEFT' => $x_px,
           'TOP' => $y_px,
           'CLASSES' => $classes

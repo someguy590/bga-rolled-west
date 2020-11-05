@@ -103,7 +103,7 @@ $this->shipments = [
       ]
     ]
   ],
-  1 => [
+  2 => [
     'name' => clienttranslate($this->gameConstants['SILVER_RESOURCE_NAME']),
     'spaces' => [
       [
@@ -133,7 +133,7 @@ $this->shipments = [
       ]
     ]
   ],
-  2 => [
+  3 => [
     'name' => clienttranslate($this->gameConstants['GOLD_RESOURCE_NAME']),
     'spaces' => [
       [
