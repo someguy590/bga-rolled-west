@@ -124,6 +124,28 @@ class view_rolledwest_rolledwest extends game_view
 
       $x_px += $contract_x_scale + $contract_x_offset;
     }
+
+    $claim_x_start = 70;
+    $claim_y_start = 378;
+    $claim_scale = 51;
+    $claim_x_offset = 2;
+    $claim_y_offset = 5;
+
+    $y_px = $claim_y_start;
+    $classes = 'claim';
+    foreach ($this->game->claims as $terrain_id => $claim) {
+      $x_px = $claim_x_start;
+      foreach ($claim['spaces'] as $space_id => $space) {
+        $this->page->insert_block('square', [
+          'SQUARE_ID' => 'claim_' . $terrain_id . '_' . $space_id,
+          'LEFT' => $x_px,
+          'TOP' => $y_px,
+          'CLASSES' => $classes
+        ]);
+        $x_px += $claim_scale + $claim_x_offset;
+      }
+      $y_px += $claim_scale + $claim_y_offset;
+    }
     /*********** Do not change anything below this line  ************/
   }
 }

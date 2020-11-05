@@ -41,7 +41,8 @@ class RolledWest extends Table
             'spentOrBankedDie0' => 14,
             'spentOrBankedDie1' => 15,
             'spentOrBankedDie2' => 16,
-            'diceRollerId' => 17
+            'diceRollerId' => 17,
+            'chosenTerrain' => 18,
         ));
     }
 
@@ -90,6 +91,7 @@ class RolledWest extends Table
         $this->setGameStateInitialValue('spentOrBankedDie1', -1);
         $this->setGameStateInitialValue('spentOrBankedDie2', -1);
         $this->setGameStateInitialValue('diceRollerId', -1);
+        $this->setGameStateInitialValue('chosenTerrain', -1);
 
         // Init game statistics
         // (note: statistics used in this file must be defined in your stats.inc.php file)
@@ -97,11 +99,13 @@ class RolledWest extends Table
         //self::initStat( 'player', 'player_teststat1', 0 );  // Init a player statistics (for all players)
 
         // init other db tables
-        $sql = "INSERT INTO claim (player_id, terrain_type) VALUES ";
+        $sql = "INSERT INTO claim (player_id, terrain_type_id, space_id) VALUES ";
         $values = [];
         foreach ($players as $player_id => $player) {
-            foreach ($this->dice_types as $type => $info) {
-                $values[] = '(' . $player_id . ',' . $type . ')';
+            foreach ($this->claims as $terrain_type_id => $terrain) {
+                foreach ($terrain['spaces'] as $space_id => $space) {
+                    $values[] = '(' . $player_id . ',' . $terrain_type_id . ',' . $space_id . ')';
+                }
             }
         }
         $sql .= implode(',', $values);
@@ -147,6 +151,9 @@ class RolledWest extends Table
 
         $sql = "SELECT exclusive_id id, exclusive_type type, marked_by_player markedByPlayer FROM exclusive WHERE marked_by_player IS NOT NULL";
         $result['marks'] = $this->getObjectListFromDB($sql);
+
+        $sql = "SELECT player_id playerId, terrain_type_id terrainTypeId, space_id spaceId, claim_type claimType FROM claim WHERE claim_type IS NOT NULL";
+        $result['claims'] = $this->getObjectListFromDB($sql);
 
         return $result;
     }
@@ -312,6 +319,7 @@ class RolledWest extends Table
         foreach ($dice as $i => $die) {
             if ($terrain_type == $die) {
                 $this->setGameStateValue('die' . $i, -1);
+                $this->setGameStateValue('chosenTerrain', $terrain_type);
                 $this->notifyAllPlayers('chooseTerrain', clienttranslate('${player_name} chooses ${terrain_name} to represent the terrain for the turn'), [
                     'player_name' => $this->getActivePlayerName(),
                     'terrain_name' => $this->dice_types[$terrain_type]['name'],
@@ -423,6 +431,83 @@ class RolledWest extends Table
         );
     }
 
+    function buildClaim($terrainTypeId, $targetSpaceId)
+    {
+        $this->checkAction('buildClaim');
+        $player_id = $this->getCurrentPlayerId();
+        if ($player_id != $this->getGameStateValue('diceRollerId'))
+            throw new BgaUserException($this->_('You cannot build a claim in between your turns'));
+
+        $sql = "SELECT claim_type FROM claim WHERE player_id=$player_id AND terrain_type_id=$terrainTypeId AND space_id=$targetSpaceId";
+        $is_space_built_on = !is_null($this->getUniqueValueFromDB($sql));
+        if ($is_space_built_on)
+            throw new BgaUserException($this->_('You already built a claim on this space'));
+
+        $sql = "SELECT is_building_claim FROM player WHERE player_id=$player_id";
+        $is_building_claim = $this->getUniqueValueFromDB($sql);
+        if ($is_building_claim)
+            throw new BgaUserException($this->_('You already built a claim this turn'));
+
+        // get claim resource requirements
+        $sql = "SELECT MAX(space_id) as rightmost_claim_id FROM claim WHERE player_id=$player_id AND terrain_type_id=$terrainTypeId AND claim_type IS NOT NULL";
+        $rightmost_claim_id = $this->getUniqueValueFromDB($sql);
+        if (is_null($rightmost_claim_id))
+            $rightmost_claim_id = -1;
+
+        $isBuildingSettlement = false;
+        $resources_needed = [];
+        if (($rightmost_claim_id + 1) == $targetSpaceId) {
+            $resources_needed[1] = 1;
+        } 
+        else if (($rightmost_claim_id + 2) == $targetSpaceId) {
+            $resources_needed[1] = 2;
+            $isBuildingSettlement = true;
+        } 
+        else
+            throw new BgaUserException($this->_('You cannot build a claim more than 2 spaces away from the leftmost empty space'));
+
+        $resources_available = $this->getAvailableDice();
+        [$spent_rolled_resources, $spent_banked_resources] = $this->spendResources($player_id, $resources_available, $resources_needed);
+
+        $claims_built = [];
+        $points = $this->claims[$terrainTypeId]['spaces'][$targetSpaceId]['points'];
+        if ($isBuildingSettlement) {
+            $points += $this->claims[$terrainTypeId]['spaces'][$targetSpaceId - 1]['points'];
+            $sql = "UPDATE claim SET claim_type='camp' WHERE player_id=$player_id AND terrain_type_id=$terrainTypeId AND space_id=$targetSpaceId-1";
+            $this->DbQuery($sql);
+            $sql = "UPDATE claim SET claim_type='settlement' WHERE player_id=$player_id AND terrain_type_id=$terrainTypeId AND space_id=$targetSpaceId";
+            $this->DbQuery($sql);
+            $claims_built = [$targetSpaceId - 1 => 'camp', $targetSpaceId => 'settlement'];
+        }
+        else {
+            $sql = "UPDATE claim SET claim_type='camp' WHERE player_id=$player_id AND terrain_type_id=$terrainTypeId AND space_id=$targetSpaceId";
+            $this->DbQuery($sql);
+            $claims_built = [$targetSpaceId => 'camp'];
+        }
+        $sql = "UPDATE player SET is_building_claim=true, player_score=player_score+$points WHERE player_id=$player_id";
+        $this->DbQuery($sql);
+
+        $notification_msg = clienttranslate('${player_name} built a claim');
+        if ($points > 0)
+            $notification_msg = clienttranslate('${player_name} built a claim(s) and earns ${points} points');
+
+        // notify claim(s) built and if rolled dice and/or banked resources were used
+        $this->notifyAllPlayers(
+            'buildClaim',
+            $notification_msg,
+            [
+                'playerId' => $player_id,
+                'player_name' => $this->getCurrentPlayerName(),
+                'spentRolledResources' => $spent_rolled_resources,
+                'spentBankedResources' => $spent_banked_resources,
+                'terrainTypeId' => $terrainTypeId,
+                'claimsBuilt' => $claims_built,
+                'points' => $points,
+                'chosenTerrain' => $this->getGameStateValue('chosenTerrain')
+            ]
+        );
+    }
+
     function bank($resource, $isResourceSpent)
     {
         $this->checkAction('bank', true);
@@ -517,7 +602,7 @@ class RolledWest extends Table
         $player_id = $this->activeNextPlayer();
         $this->giveExtraTime($player_id);
         $this->setGameStateValue('diceRollerId', $player_id);
-        $sql = "UPDATE player SET is_banking_during_turn=false, is_banking_in_between_turn=false, is_purchasing_office=false, is_purchasing_contract=false WHERE player_id=$player_id";
+        $sql = "UPDATE player SET is_banking_during_turn=false, is_banking_in_between_turn=false, is_purchasing_office=false, is_purchasing_contract=false, is_building_claim=false WHERE player_id=$player_id";
         $this->DbQuery($sql);
 
         $dice = $this->rollDice();

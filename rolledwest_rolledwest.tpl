@@ -37,6 +37,15 @@
     </div>';
 
     var jstpl_mark = '<div id="${markId}" class="${classes}"></div>';
+
+    var jstpl_mark_triangle = '\
+    <div id="${markId}" class="${classes}">\
+        <svg width="51" height="51" >\
+            <polygon points="0,51 25,0 51,51" style="fill:none;stroke:black;stroke-width:1" />\
+        </svg>\
+    </div>'
+
+    
 </script>
 
 {OVERALL_GAME_FOOTER}

@@ -88,9 +88,24 @@
     position: absolute;
 }
 
-.office:hover, .shipment:hover, .contract:hover {
-    outline: rebeccapurple solid;
+.claim {
+    width: 50px;
+    height: 53px;
+    position: absolute;
+    border-radius: 50%;
+}
+
+.office:hover, .shipment:hover, .contract:hover, .claim:hover {
     cursor: pointer;
+    box-shadow: 0 0 0 3px rebeccapurple;
+}
+
+.settlement {
+    position: absolute;
+    border: 3px solid black;
+    height: 25px;
+    width: 25px;
+    border-radius: 50%;
 }
 
 .bank_icon {

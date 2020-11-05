@@ -62,6 +62,15 @@ class action_rolledwest extends APP_GameAction
     $this->ajaxResponse();
   }
 
+  public function buildClaim()
+  {
+    $this->setAjaxMode();
+    $terrainTypeId = $this->getArg('terrainTypeId', AT_int, true);
+    $spaceId = $this->getArg('spaceId', AT_int, true);
+    $this->game->buildClaim($terrainTypeId, $spaceId);
+    $this->ajaxResponse();
+  }
+
   public function bank()
   {
     $this->setAjaxMode();

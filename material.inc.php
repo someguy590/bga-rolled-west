@@ -178,7 +178,7 @@ $this->contracts = [
 ];
 
 $this->claims = [
-  0 => [
+  1 => [
     'spaces' => [
       ['points' => 1, 'isStarred' => true],
       ['points' => 2, 'isStarred' => true],
@@ -191,7 +191,7 @@ $this->claims = [
     ],
     'claimMajorityPoints' => [3, 1]
   ],
-  1 => [
+  0 => [
     'spaces' => [
       ['points' => 0, 'isStarred' => false],
       ['points' => 2, 'isStarred' => true],
