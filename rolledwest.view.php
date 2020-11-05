@@ -125,10 +125,11 @@ class view_rolledwest_rolledwest extends game_view
       $x_px += $contract_x_scale + $contract_x_offset;
     }
 
-    $claim_x_start = 77;
-    $claim_y_start = 377;
-    $claim_x_scale = 50;
-    $claim_y_scale = 53;
+    $claim_x_start = 70;
+    $claim_y_start = 378;
+    $claim_scale = 51;
+    $claim_x_offset = 2;
+    $claim_y_offset = 5;
 
     $y_px = $claim_y_start;
     $classes = 'claim';
@@ -141,9 +142,9 @@ class view_rolledwest_rolledwest extends game_view
           'TOP' => $y_px,
           'CLASSES' => $classes
         ]);
-        $x_px += $claim_x_scale;
+        $x_px += $claim_scale + $claim_x_offset;
       }
-      $y_px += $claim_y_scale;
+      $y_px += $claim_scale + $claim_y_offset;
     }
     /*********** Do not change anything below this line  ************/
   }
