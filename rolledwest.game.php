@@ -97,11 +97,13 @@ class RolledWest extends Table
         //self::initStat( 'player', 'player_teststat1', 0 );  // Init a player statistics (for all players)
 
         // init other db tables
-        $sql = "INSERT INTO claim (player_id, terrain_type_id) VALUES ";
+        $sql = "INSERT INTO claim (player_id, terrain_type_id, space_id) VALUES ";
         $values = [];
         foreach ($players as $player_id => $player) {
-            foreach ($this->dice_types as $type => $info) {
-                $values[] = '(' . $player_id . ',' . $type . ')';
+            foreach ($this->claims as $terrain_type_id => $terrain) {
+                foreach ($terrain['spaces'] as $space_id => $space) {
+                    $values[] = '(' . $player_id . ',' . $terrain_type_id . ',' . $space_id . ')';
+                }
             }
         }
         $sql .= implode(',', $values);
