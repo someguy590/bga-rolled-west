@@ -54,6 +54,15 @@ class action_rolledwest extends APP_GameAction
     $this->ajaxResponse();
   }
 
+  public function ship()
+  {
+    $this->setAjaxMode();
+    $resourceTypeId = $this->getArg('resourceTypeId', AT_int, true);
+    $spaceId = $this->getArg('spaceId', AT_int, true);
+    $this->game->ship($resourceTypeId, $spaceId);
+    $this->ajaxResponse();
+  }
+
   public function completeContract()
   {
     $this->setAjaxMode();

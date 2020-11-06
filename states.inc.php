@@ -92,7 +92,7 @@ $machinestates = array(
         'type' => 'multipleactiveplayer',
         'action' => 'stSpendOrBank',
         'args' => 'argSpendOrBank',
-        'possibleactions' => ['purchaseOffice', 'completeContract', 'buildClaim', 'bank', 'pass'],
+        'possibleactions' => ['purchaseOffice', 'ship', 'completeContract', 'buildClaim', 'bank', 'pass'],
         'transitions' => ['rollDice' => STATE_ROLL_DICE],
         'descriptionDiceRollerTurn' => '${you} may play your turn or pass',
         'descriptionNonDiceRollerTurn' => '${you} may bank a resource or pass',

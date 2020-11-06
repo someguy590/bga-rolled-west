@@ -155,6 +155,11 @@ class RolledWest extends Table
         $sql = "SELECT player_id playerId, terrain_type_id terrainTypeId, space_id spaceId, claim_type claimType FROM claim WHERE claim_type IS NOT NULL";
         $result['claims'] = $this->getObjectListFromDB($sql);
 
+        $sql = "SELECT player_id, copper_shipped '0', silver_shipped '2', gold_shipped '3' FROM player";
+        $checks = $this->getCollectionFromDB($sql);
+        $shipments = ['checks' => $checks];
+        $result['shipments'] = $shipments;
+
         return $result;
     }
 
@@ -381,6 +386,87 @@ class RolledWest extends Table
                 'spentRolledResources' => $spent_rolled_resources,
                 'spentBankedResources' => $spent_banked_resources,
                 'officeId' => $officeId
+            ]
+        );
+    }
+
+    function ship($resourceTypeId, $targetSpaceId)
+    {
+        $this->checkAction('ship');
+        $player_id = $this->getCurrentPlayerId();
+        if ($player_id != $this->getGameStateValue('diceRollerId'))
+            throw new BgaUserException($this->_('You cannot ship in between your turns'));
+
+        // get ship resource requirements
+        if ($resourceTypeId == 0)
+            $resource_shipped = 'copper_shipped';
+        else if ($resourceTypeId == 2)
+            $resource_shipped = 'silver_shipped';
+        else
+            $resource_shipped = 'gold_shipped';
+
+        $sql = "SELECT $resource_shipped FROM player WHERE player_id=$player_id";
+        $last_shipment_space_id = $this->getUniqueValueFromDB($sql) - 1;
+        $amount_needed = $targetSpaceId - $last_shipment_space_id;
+
+        $resources_needed = [$resourceTypeId => $amount_needed];
+        $resources_available = $this->getAvailableDice();
+        [$spent_rolled_resources, $spent_banked_resources] = $this->spendResources($player_id, $resources_available, $resources_needed);
+
+        $sql = "UPDATE player SET $resource_shipped=$resource_shipped+$amount_needed WHERE player_id=$player_id";
+        $this->DbQuery($sql);
+
+        $points = 0;
+        $isFirstToBonus = false;
+        $spaces_shipped = [];
+        for ($space_id = $last_shipment_space_id + 1; $space_id <= $targetSpaceId; $space_id++) {
+            $space = $this->shipments[$resourceTypeId]['spaces'][$space_id];
+
+            if ($space['has2Numbers']) {
+                $exclusive_id = $space['exclusiveId'];
+                $sql = "SELECT marked_by_player FROM exclusive WHERE exclusive_id=$exclusive_id AND exclusive_type='shipment'";
+                $is_bonus_available = is_null($this->getUniqueValueFromDB($sql));
+
+                if ($is_bonus_available) {
+                    $isFirstToBonus = true;
+                    $sql = "UPDATE exclusive SET marked_by_player=$player_id WHERE exclusive_id=$exclusive_id AND exclusive_type='shipment'";
+                    $this->DbQuery($sql);
+                    $points += $space['points'][0];
+                    $spaces_shipped[$space_id] = ['has2Numbers' => true, 'isFirstToBonus' => true];
+                } 
+                else {
+                    $points += $space['points'][1];
+                    $spaces_shipped[$space_id] = ['has2Numbers' => true, 'isFirstToBonus' => false];
+                }
+            } 
+            else {
+                $points += $space['points'];
+                $spaces_shipped[$space_id] = ['has2Numbers' => false];
+            }
+        }
+
+        $notification_msg = clienttranslate('${player_name} shipped ${n} ${metal}');
+        if ($points > 0) {
+            $notification_msg = clienttranslate('${player_name} shipped ${n} ${metal} and earns ${points} points');
+
+            if ($isFirstToBonus)
+                $notification_msg = clienttranslate('${player_name} is the first to reach a 2 number bonus space! ${player_name} shipped ${n} ${metal} and earns ${points} points');
+        }
+
+        // notify metals shipped and if rolled dice and/or banked resources were used
+        $this->notifyAllPlayers(
+            'ship',
+            $notification_msg,
+            [
+                'playerId' => $player_id,
+                'player_name' => $this->getCurrentPlayerName(),
+                'n' => $amount_needed,
+                'metal' => $this->shipments[$resourceTypeId]['name'],
+                'spentRolledResources' => $spent_rolled_resources,
+                'spentBankedResources' => $spent_banked_resources,
+                'resourceTypeId' => $resourceTypeId,
+                'spacesShipped' => $spaces_shipped,
+                'points' => $points,
             ]
         );
     }
