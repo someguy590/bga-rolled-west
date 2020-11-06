@@ -535,14 +535,14 @@ class RolledWest extends Table
         $resource_db_name = $this->dice_types[$resource]['dbName'];
         if ($player_id == $dice_roller_id) {
             $sql = "UPDATE player SET $resource_db_name=$resource_db_name + 1, is_banking_during_turn=true WHERE player_id=$player_id";
+            $this->DbQuery($sql);
             $this->removeAvailableDie($resource);
             $this->setSpentOrBankedDie($resource);
         } else {
             $sql = "UPDATE player SET $resource_db_name=$resource_db_name + 1, is_banking_in_between_turn=true WHERE player_id=$player_id";
+            $this->DbQuery($sql);
             $this->gamestate->setPlayerNonMultiactive($player_id, 'rollDice');
         }
-        $this->DbQuery($sql);
-
 
         $resource_name = $this->dice_types[$resource]['name'];
         $this->notifyAllPlayers('bank', clienttranslate('${player_name} banked ${resource_name}'), [
