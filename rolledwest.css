@@ -145,9 +145,15 @@
     -webkit-border-radius: 50%;
 }
 
+.mark_circle_small_number {
+    height: 18px;
+    width: 18px;
+}
+
 .mark_x {
     position: absolute;
     font-size: 50px;
+    line-height: 0%;
 }
 
 .mark_x::before {
@@ -160,7 +166,9 @@
 }
 
 .mark_check::before {
-    /* code for checkmark character */
-    content: "\2713";
+    /* code for thick checkmark character */
+    content: "\2714";
     position: relative;
+    font-size: 150%;
+    line-height: 0%;
 }

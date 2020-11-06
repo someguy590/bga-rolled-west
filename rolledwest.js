@@ -311,7 +311,13 @@ define([
                         }), 'marks');
 
                         this.placeOnObject(markId, 'overall_player_board_' + this.player_id);
-                        this.slideToObject(markId, `shipment_${resourceTypeId}_${spaceId}`).play();
+                        if (spaceId != 0) {
+                            let [checkXPos, checkYPos] = this.getShipmentCheckOffsets(spaceId);
+                            this.slideToObjectPos(markId, `shipment_${resourceTypeId}_${spaceId}`, checkXPos, checkYPos).play();
+                        }
+                        else {
+                            this.slideToObject(markId, `shipment_${resourceTypeId}_${spaceId}`).play();
+                        }
                     }
                 }
 
@@ -332,7 +338,7 @@ define([
                         }), 'marks');
 
                         this.placeOnObject(markId, 'overall_player_board_' + this.player_id);
-                        this.slideToObject(markId, `shipment_${resourceTypeId}_${spaceId}`).play();
+                        this.slideToObjectPos(markId, `shipment_${resourceTypeId}_${spaceId}`, this.higherPoint2NumberBoxX, this.higherPoint2NumberBoxY).play();
 
                         if (markedByPlayer != this.player_id) {
                             let checkCount = shipmentChecks[this.player_id][resourceTypeId];
@@ -340,7 +346,7 @@ define([
 
                             if (isSpaceDeliveredTo) {
                                 markId = `shipment_mark_circle_${resourceTypeId}_${spaceId}`;
-                                classes = 'mark_circle';
+                                classes = 'mark_circle mark_circle_small_number';
                                 dojo.place(this.format_block('jstpl_mark', {
                                     markId: markId,
                                     classes: classes
@@ -352,6 +358,13 @@ define([
                         }
                     }
                 }
+            },
+
+            getShipmentCheckOffsets: function (spaceId) {
+                if (spaceId == 1 || spaceId == 3)
+                    return [14, 17];
+                else
+                    return [23, 13];
             },
 
             ///////////////////////////////////////////////////
@@ -592,7 +605,13 @@ define([
                         }), 'marks');
 
                         this.placeOnObject(markId, 'overall_player_board_' + this.player_id);
-                        this.slideToObject(markId, `shipment_${resourceTypeId}_${spaceId}`).play();
+                        if (spaceId != 0) {
+                            let [checkXPos, checkYPos] = this.getShipmentCheckOffsets(spaceId);
+                            this.slideToObjectPos(markId, `shipment_${resourceTypeId}_${spaceId}`, checkXPos, checkYPos).play();
+                        }
+                        else {
+                            this.slideToObject(markId, `shipment_${resourceTypeId}_${spaceId}`).play();
+                        }
 
                         if (space.has2Numbers) {
                             let classes = 'mark_circle';
@@ -621,7 +640,7 @@ define([
                         }), 'marks');
 
                         this.placeOnObject(markId, 'overall_player_board_' + this.player_id);
-                        this.slideToObject(markId, `shipment_${resourceTypeId}_${spaceId}`).play();
+                        this.slideToObjectPos(markId, `shipment_${resourceTypeId}_${spaceId}`, this.higherPoint2NumberBoxX, this.higherPoint2NumberBoxY).play();
                     }
                 }
 
