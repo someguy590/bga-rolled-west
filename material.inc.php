@@ -89,7 +89,8 @@ $this->shipments = [
       [
         'points' => [6, 3],
         'isStarred' => true,
-        'has2Numbers' => true
+        'has2Numbers' => true,
+        'exclusiveId' => 0
       ],
       [
         'points' => 0,
@@ -99,11 +100,12 @@ $this->shipments = [
       [
         'points' => [6, 3],
         'isStarred' => true,
-        'has2Numbers' => true
+        'has2Numbers' => true,
+        'exclusiveId' => 1
       ]
     ]
   ],
-  1 => [
+  2 => [
     'name' => clienttranslate($this->gameConstants['SILVER_RESOURCE_NAME']),
     'spaces' => [
       [
@@ -119,7 +121,8 @@ $this->shipments = [
       [
         'points' => [7, 4],
         'isStarred' => true,
-        'has2Numbers' => true
+        'has2Numbers' => true,
+        'exclusiveId' => 2
       ],
       [
         'points' => 0,
@@ -129,11 +132,12 @@ $this->shipments = [
       [
         'points' => [7, 4],
         'isStarred' => true,
-        'has2Numbers' => true
+        'has2Numbers' => true,
+        'exclusiveId' => 3
       ]
     ]
   ],
-  2 => [
+  3 => [
     'name' => clienttranslate($this->gameConstants['GOLD_RESOURCE_NAME']),
     'spaces' => [
       [
@@ -149,7 +153,8 @@ $this->shipments = [
       [
         'points' => [8, 5],
         'isStarred' => true,
-        'has2Numbers' => true
+        'has2Numbers' => true,
+        'exclusiveId' => 4
       ],
       [
         'points' => 0,
@@ -159,7 +164,8 @@ $this->shipments = [
       [
         'points' => [8, 5],
         'isStarred' => true,
-        'has2Numbers' => true
+        'has2Numbers' => true,
+        'exclusiveId' => 5
       ]
     ]
   ]
