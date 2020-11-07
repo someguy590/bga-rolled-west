@@ -448,7 +448,9 @@ class RolledWest extends Table
         $notification_msg = clienttranslate('${player_name} shipped ${n} ${metal}');
         if ($points > 0) {
             $notification_msg = clienttranslate('${player_name} shipped ${n} ${metal} and earns ${points} points');
-
+            $sql = "UPDATE player SET player_score=player_score+$points WHERE player_id=$player_id";
+            $this->DbQuery($sql);
+            
             if ($isFirstToBonus)
                 $notification_msg = clienttranslate('${player_name} is the first to reach a 2 number bonus space! ${player_name} shipped ${n} ${metal} and earns ${points} points');
         }
