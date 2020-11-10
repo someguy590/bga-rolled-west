@@ -54,6 +54,7 @@ if (!defined('STATE_END_GAME')) { // ensure this block is only invoked once, sin
     define('STATE_ROLL_DICE', 2);
     define('STATE_CHOOSE_TERRAIN', 3);
     define('STATE_SPEND_OR_BANK', 4);
+    define('STATE_SCORE', 5);
     define('STATE_END_GAME', 99);
 }
 
@@ -73,7 +74,7 @@ $machinestates = array(
         'name' => 'rollDice',
         'type' => 'game',
         'action' => 'stRollDice',
-        'transitions' => ['chooseTerrain' => STATE_CHOOSE_TERRAIN]
+        'transitions' => ['chooseTerrain' => STATE_CHOOSE_TERRAIN, 'score' => STATE_SCORE]
     ],
 
     STATE_CHOOSE_TERRAIN => [
@@ -96,6 +97,14 @@ $machinestates = array(
         'transitions' => ['rollDice' => STATE_ROLL_DICE],
         'descriptionDiceRollerTurn' => '${you} may play your turn or pass',
         'descriptionNonDiceRollerTurn' => '${you} may bank a resource or pass',
+    ],
+
+    STATE_SCORE => [
+        'name' => 'score',
+        'type' => 'game',
+        'description' => '',
+        'action' => 'stScore',
+        'transitions' => ['gameEnd' => STATE_END_GAME]
     ],
 
     // Final state.

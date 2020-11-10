@@ -43,6 +43,7 @@ class RolledWest extends Table
             'spentOrBankedDie2' => 16,
             'diceRollerId' => 17,
             'chosenTerrain' => 18,
+            'round' => 19
         ));
     }
 
@@ -92,6 +93,7 @@ class RolledWest extends Table
         $this->setGameStateInitialValue('spentOrBankedDie2', -1);
         $this->setGameStateInitialValue('diceRollerId', -1);
         $this->setGameStateInitialValue('chosenTerrain', -1);
+        $this->setGameStateInitialValue('round', 0);
 
         // Init game statistics
         // (note: statistics used in this file must be defined in your stats.inc.php file)
@@ -448,7 +450,9 @@ class RolledWest extends Table
         $notification_msg = clienttranslate('${player_name} shipped ${n} ${metal}');
         if ($points > 0) {
             $notification_msg = clienttranslate('${player_name} shipped ${n} ${metal} and earns ${points} points');
-
+            $sql = "UPDATE player SET player_score=player_score+$points WHERE player_id=$player_id";
+            $this->DbQuery($sql);
+            
             if ($isFirstToBonus)
                 $notification_msg = clienttranslate('${player_name} is the first to reach a 2 number bonus space! ${player_name} shipped ${n} ${metal} and earns ${points} points');
         }
@@ -686,6 +690,17 @@ class RolledWest extends Table
     function stRollDice()
     {
         $player_id = $this->activeNextPlayer();
+        $roundStarterId = $this->getNextPlayerTable()[0];
+
+        if ($player_id == $roundStarterId) {
+            $round = $this->getGameStateValue('round') + 1;
+            if ($round == 3) {
+                $this->gamestate->nextState('score');
+                return;
+            }
+            $this->setGameStateValue('round', $round);
+        }
+
         $this->giveExtraTime($player_id);
         $this->setGameStateValue('diceRollerId', $player_id);
         $sql = "UPDATE player SET is_banking_during_turn=false, is_banking_in_between_turn=false, is_purchasing_office=false, is_purchasing_contract=false, is_building_claim=false WHERE player_id=$player_id";
@@ -711,6 +726,250 @@ class RolledWest extends Table
         $sql = "SELECT player_id FROM player WHERE is_banking_in_between_turn=false";
         $active_players = $this->getObjectListFromDB($sql, true);
         $this->gamestate->setPlayersMultiactive($active_players, 'rollDice');
+    }
+
+    function stScore()
+    {
+        // determine claim majorities
+        $sql = "SELECT player_id, terrain_type_id, claim_type, COUNT(claim_type) AS amount FROM claim WHERE claim_type IS NOT NULL GROUP BY player_id, terrain_type_id, claim_type";
+        $claim_counts = $this->getObjectListFromDB($sql);
+
+        $claims_by_player = [
+            /**
+            player1 => [
+                1 => ['camps' => 1, 'settlements' => 1, total => 2],
+                0 => ['camps' => 3, 'settlements' => 1, total => 4]
+                ]
+            */
+        ];
+        foreach ($claim_counts as $i => $claim_count) {
+            extract($claim_count);
+            $claims_by_player[$player_id][$terrain_type_id][$claim_type] = $amount;
+            if (!isset($claims_by_player[$player_id][$terrain_type_id]['total']))
+                $claims_by_player[$player_id][$terrain_type_id]['total'] = 0;
+            $claims_by_player[$player_id][$terrain_type_id]['total'] += $amount;
+        }
+
+
+        $claim_majority_counts = [];
+        foreach ($this->loadPlayersBasicInfos() as $player_id => $player_info)
+            $claim_majority_counts[$player_id] = 0;
+        foreach ($this->claims as $terrain_type_id => $terrain) {
+            // assuming player must have at least 1 claim to win a majority claim score
+            $claim_count_first_highest_total = 1;
+            $claim_count_first_highest_settlements = 0;
+            $claim_majority_bigger_winners = [];
+
+            $claim_count_second_highest_total = 1;
+            $claim_count_second_highest_settlements = 0;
+            $claim_majority_smaller_winners = [];
+
+            foreach ($claims_by_player as $player_id => $player_claims) {
+                if (!isset($player_claims[$terrain_type_id]['total']))
+                    continue;
+                    
+                $player_claim_count = $player_claims[$terrain_type_id]['total'];
+                $player_settlement_count = 0;
+                if (isset($player_claims[$terrain_type_id]['settlement']))
+                    $player_settlement_count = $player_claims[$terrain_type_id]['settlement'];
+
+                if ($player_claim_count > $claim_count_first_highest_total) {
+                    $claim_count_second_highest_total = $claim_count_first_highest_total;
+                    $claim_count_second_highest_settlements = $claim_count_first_highest_settlements;
+                    $claim_majority_smaller_winners = $claim_majority_bigger_winners;
+                    
+                    $claim_count_first_highest_total = $player_claim_count;
+                    $claim_count_first_highest_settlements = $player_settlement_count;
+                    $claim_majority_bigger_winners = [$player_id];
+                    continue;
+                } else if ($player_claim_count == $claim_count_first_highest_total) {
+                    if ($player_settlement_count > $claim_count_first_highest_settlements) {
+                        $claim_count_second_highest_total = $claim_count_first_highest_total;
+                        $claim_count_second_highest_settlements = $claim_count_first_highest_settlements;
+                        $claim_majority_smaller_winners = $claim_majority_bigger_winners;
+                        
+                        $claim_count_first_highest_settlements = $player_settlement_count;
+                        $claim_majority_bigger_winners = [$player_id];
+                        continue;
+                    } else if ($player_settlement_count == $claim_count_first_highest_settlements) {
+                        $claim_majority_bigger_winners[] = $player_id;
+                        continue;
+                    }
+                }
+
+                if ($player_claim_count > $claim_count_second_highest_total) {
+                    $claim_count_second_highest_total = $player_claim_count;
+                    $claim_count_second_highest_settlements = $player_settlement_count;
+                    $claim_majority_smaller_winners = [$player_id];
+                } else if ($player_claim_count == $claim_count_second_highest_total) {
+                    if ($player_settlement_count > $claim_count_second_highest_settlements) {
+                        $claim_count_second_highest_settlements = $player_settlement_count;
+                        $claim_majority_smaller_winners = [$player_id];
+                    } else if ($player_settlement_count == $claim_count_second_highest_settlements)
+                        $claim_majority_smaller_winners[] = $player_id;
+                }
+            }
+
+            foreach ($claim_majority_bigger_winners as $player_id)
+                $claim_majority_counts[$player_id]++;
+            foreach ($claim_majority_smaller_winners as $player_id)
+                $claim_majority_counts[$player_id]++;
+
+            if (count($claim_majority_bigger_winners) > 0) {
+                $bigger_points = $this->claims[$terrain_type_id]['claimMajorityPoints'][0];
+                $sql = "UPDATE player SET player_score=player_score+$bigger_points WHERE ";
+                $values = [];
+                foreach ($claim_majority_bigger_winners as $player_id) {
+                    $values[] = "player_id=$player_id";
+                }
+                $sql .= implode(' OR ', $values);
+                $this->DbQuery($sql);
+
+                $msg = clienttranslate('${player_name} ties for the bigger point majority claim and earns ${points} point(s)');
+                if (count($claim_majority_bigger_winners) == 1)
+                    $msg = clienttranslate('${player_name} win the bigger point majority claim and earns ${points} point(s)');
+                foreach ($claim_majority_bigger_winners as $winner_id) {
+                    $winner_name = $this->loadPlayersBasicInfos()[$winner_id]['player_name'];
+                    $this->notifyAllPlayers(
+                        'endGameScoreClaims',
+                        $msg,
+                        [
+                            'player_name' => $winner_name,
+                            'playerId' => $winner_id,
+                            'points' => $bigger_points
+                        ]
+                    );
+                }
+            }
+
+            if (count($claim_majority_smaller_winners) > 0) {
+                $smaller_points = $this->claims[$terrain_type_id]['claimMajorityPoints'][1];
+                $sql = "UPDATE player SET player_score=player_score+$smaller_points WHERE ";
+                $values = [];
+                foreach ($claim_majority_smaller_winners as $player_id) {
+                    $values[] = "player_id=$player_id";
+                }
+                $sql .= implode(' OR ', $values);
+                $this->DbQuery($sql);
+
+                $msg = clienttranslate('${player_name} ties for the smaller point majority claim and earns ${points} point(s)');
+                if (count($claim_majority_smaller_winners) == 1)
+                    $msg = clienttranslate('${player_name} win the smaller point majority claim and earns ${points} point(s)');
+                foreach ($claim_majority_smaller_winners as $winner_id) {
+                    $winner_name = $this->loadPlayersBasicInfos()[$winner_id]['player_name'];
+                    $this->notifyAllPlayers(
+                        'endGameScore',
+                        $msg,
+                        [
+                            'player_name' => $winner_name,
+                            'playerId' => $winner_id,
+                            'points' => $smaller_points
+                        ]
+                    );
+                }
+            }
+        }
+
+        $sql = "SELECT exclusive_id, marked_by_player FROM exclusive WHERE marked_by_player IS NOT NULL AND exclusive_type='office'";
+        $exclusives = $this->getObjectListFromDB($sql);
+        foreach ($exclusives as $n => $exclusive) {
+            $office_id = $exclusive['exclusive_id'];
+            $marked_by_player = $exclusive['marked_by_player'];
+            $points = 0;
+            $msg = clienttranslate('${player_name} earns ${office_description} for a total of ${points} point(s)');
+
+            if ($office_id == 0) {
+                // 1 point per Boomtown office + 1 point per completed contract
+                $sql = "SELECT COUNT(marked_by_player) FROM exclusive WHERE marked_by_player=$marked_by_player AND (exclusive_type='office' OR exclusive_type='contract')";
+                $points += $this->getUniqueValueFromDB($sql);
+            } else if ($office_id == 1) {
+                // 1 point per Boomtown office + 1 point claim majority
+                $sql = "SELECT COUNT(marked_by_player) FROM exclusive WHERE marked_by_player=$marked_by_player AND exclusive_type='office'";
+                $points += $this->getUniqueValueFromDB($sql);
+                $points += $claim_majority_counts[$marked_by_player];
+            } else if ($office_id == 2) {
+                // 3 points per completed shipping row
+                $sql = "SELECT copper_shipped copper, silver_shipped silver, gold_shipped gold FROM player WHERE player_id=$marked_by_player";
+                $resource_shipped = $this->getNonEmptyObjectFromDB($sql);
+                foreach ($resource_shipped as $resource => $amount) {
+                    if ($amount == 5)
+                        $points += 3;
+                }
+            } else if ($office_id == 3) {
+                // 2 points per settlement
+                $sql = "SELECT COUNT(claim_type) FROM claim WHERE claim_type='settlement' AND player_id=$marked_by_player";
+                $points += $this->getUniqueValueFromDB($sql) * 2;
+            } else if ($office_id == 4) {
+                // 6 points
+                $points = 6;
+            } else if ($office_id == 5) {
+                // 1 point per Copper shipped + 1 point per Copper in contracts
+                $sql = "SELECT copper_shipped FROM player WHERE player_id=$marked_by_player";
+                $points += $this->getUniqueValueFromDB($sql);
+
+                $sql = "SELECT exclusive_id FROM exclusive WHERE marked_by_player=$marked_by_player AND exclusive_type='contract'";
+                $contract_ids = $this->getObjectListFromDB($sql, true);
+
+                foreach ($contract_ids as $contract_id)
+                    $points += $this->contracts[$contract_id]['resourcesNeeded'][0];
+            } else if ($office_id == 6) {
+                // 1 point per checked off star in shipping + 1 point per star in claims built
+                $sql = "SELECT copper_shipped '0', silver_shipped '2', gold_shipped '3' FROM player WHERE player_id=$marked_by_player";
+                $resource_shipped = $this->getNonEmptyObjectFromDB($sql);
+
+                for ($resource_type_id = 0; $resource_type_id < 4; $resource_type_id++) {
+                    if ($resource_type_id == 1)
+                        continue;
+
+                    for ($spaceId = 0; $spaceId < $resource_shipped[$resource_type_id]; $spaceId++) {
+                        if ($this->shipments[$resource_type_id]['spaces'][$spaceId]['isStarred'])
+                            $points++;
+                    }
+                }
+
+                $sql = "SELECT terrain_type_id, space_id FROM claim WHERE player_id=$marked_by_player AND claim_type IS NOT NULL";
+                $starred_spaces = $this->getObjectListFromDB($sql);
+                foreach ($starred_spaces as $i => $starred_space) {
+                    extract($starred_space);
+                    if ($this->claims[$terrain_type_id]['spaces'][$space_id]['isStarred'])
+                        $points++;
+                }
+            } else if ($office_id == 7) {
+                // 2 points per Boomtown office + 2 points per completed shipping row
+                $sql = "SELECT COUNT(marked_by_player) FROM exclusive WHERE marked_by_player=$marked_by_player AND exclusive_type='office'";
+                $points += 2 * $this->getUniqueValueFromDB($sql);
+                $sql = "SELECT copper_shipped copper, silver_shipped silver, gold_shipped gold FROM player WHERE player_id=$marked_by_player";
+                $resource_shipped = $this->getNonEmptyObjectFromDB($sql);
+                foreach ($resource_shipped as $resource => $amount) {
+                    if ($amount == 5)
+                        $points += 2;
+                }
+            } else {
+                // 3 points per completed contract
+                $sql = "SELECT COUNT(marked_by_player) FROM exclusive WHERE marked_by_player=$marked_by_player AND exclusive_type='contract'";
+                $points = $this->getUniqueValueFromDB($sql) * 3;
+                if ($points == 0)
+                    $msg = clienttranslate('${player_name} would earn ${office_description} but did not complete any contract');
+            }
+
+            if ($points > 0) {
+                $sql = "UPDATE player SET player_score=player_score+$points WHERE player_id=$marked_by_player";
+                $this->DbQuery($sql);
+            }
+
+            $this->notifyAllPlayers(
+                'endGameScore',
+                $msg,
+                [
+                    'player_name' => $this->loadPlayersBasicInfos()[$marked_by_player]['player_name'],
+                    'office_description' => $this->offices[$office_id]['description'],
+                    'playerId' => $marked_by_player,
+                    'points' => $points
+                ]
+            );
+        }
+
+        $this->gamestate->nextState('gameEnd');
     }
 
     //////////////////////////////////////////////////////////////////////////////

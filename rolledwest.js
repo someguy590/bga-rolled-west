@@ -526,6 +526,8 @@ define([
                 dojo.subscribe('completeContract', this, "notif_completeContract");
                 dojo.subscribe('bank', this, "notif_bank");
                 dojo.subscribe('buildClaim', this, 'notif_buildClaim');
+                dojo.subscribe('endGameScore', this, 'notif_endGameScore');
+                this.notifqueue.setSynchronous('endGameScore', 1000);
 
                 // Example 1: standard notification handling
                 // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
@@ -721,6 +723,11 @@ define([
                     this.spentOrBankedResources.addToStock(resourceType, 'rolled_dice');
                     this.playerResources.removeFromStock(resourceType);
                 }
+            },
+
+            notif_endGameScore: function (notif) {
+                if (notif.args.points > 0)
+                    this.scoreCtrl[notif.args.playerId].incValue(notif.args.points);
             }
         });
     });
