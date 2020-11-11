@@ -310,6 +310,91 @@ class RolledWest extends Table
         return [$spent_rolled_resources, $spent_banked_resources];
     }
 
+    function getPossibleBuys()
+    {
+        // get total resources player has from rolled dice and bank
+        $dice_roller_id = $this->getGameStateValue('diceRollerId');
+        $rolled_resources = $this->getAvailableDice();
+        $sql = "SELECT copper '0', wood '1', silver '2', gold '3' FROM player WHERE player_id=$dice_roller_id";
+        $banked_resources = $this->getNonEmptyObjectFromDB($sql);
+
+        $available_resources = [0 => 0, 1 => 0, 2 => 0, 3 => 0];
+        foreach ($rolled_resources as $rolled_resource)
+            $available_resources[$rolled_resource]++;
+        foreach ($banked_resources as $resource_type_id => $amount)
+            $available_resources[$resource_type_id] += $amount;
+
+        // check offices or contracts player can mark
+        $sql = "SELECT exclusive_id id, exclusive_type type FROM exclusive WHERE marked_by_player IS NULL AND (exclusive_type='office' OR exclusive_type='contract')";
+        $exclusives = $this->getObjectListFromDB($sql);
+
+        $offices = [];
+        $contracts = [];
+        foreach ($exclusives as $i => $exclusive) {
+            if ($exclusive['type'] == 'office') {
+                $office_id = $exclusive['id'];
+                $resources_needed = $this->offices[$office_id]['resourcesNeeded'];
+                $isPurchasable = true;
+                foreach ($resources_needed as $resource_type_id => $amount_needed) {
+                    if ($available_resources[$resource_type_id] < $amount_needed) {
+                        $isPurchasable = false;
+                        break;
+                    }
+                }
+                if ($isPurchasable)
+                    $offices[] = 'office_' . $office_id;
+            } else if ($exclusive['type'] == 'contract') {
+                $contract_id = $exclusive['id'];
+                $resources_needed = $this->contracts[$contract_id]['resourcesNeeded'];
+                $isPurchasable = true;
+                foreach ($resources_needed as $resource_type_id => $amount_needed) {
+                    if ($available_resources[$resource_type_id] < $amount_needed) {
+                        $isPurchasable = false;
+                        break;
+                    }
+                }
+                if ($isPurchasable)
+                    $contracts[] = 'contract_' . $contract_id;
+            }
+        }
+
+        // check possible shipments
+        $sql = "SELECT copper_shipped '0', silver_shipped '2', gold_shipped '3' FROM player WHERE player_id=$dice_roller_id";
+        $shipped_resources = $this->getNonEmptyObjectFromDB($sql);
+
+        $shipments = [];
+        for ($resource_type_id = 0; $resource_type_id < 4; $resource_type_id++) {
+            if ($resource_type_id == 1)
+                continue;
+
+            $space_id = $shipped_resources[$resource_type_id];
+            for ($i = 0; $i < $available_resources[$resource_type_id] && $space_id < 5; $space_id++, $i++)
+                $shipments[] = 'shipment_' . $resource_type_id . '_' . $space_id;
+        }
+
+        // check possible claims
+        $chosen_terrain = $this->getGameStateValue('chosenTerrain');
+        $sql = "SELECT MAX(space_id) FROM claim WHERE player_id=$dice_roller_id AND terrain_type_id=$chosen_terrain AND claim_type IS NOT NULL";
+        $last_claimed_space_id = $this->getUniqueValueFromDB($sql);
+        if (is_null($last_claimed_space_id))
+            $last_claimed_space_id = - 1;
+
+        $claims = [];
+        if ($available_resources[1] > 0)
+            $claims[] = 'claim_' . $chosen_terrain . '_' . ($last_claimed_space_id + 1);
+        if ($available_resources[1] > 1)
+            $claims[] = 'claim_' . $chosen_terrain . '_' . ($last_claimed_space_id + 2);
+
+        return [
+            'diceRollerId' => $dice_roller_id,
+            'chosenTerrain' => $chosen_terrain,
+            'offices' => $offices,
+            'contracts' => $contracts,
+            'shipments' => $shipments,
+            'claims' => $claims
+        ];
+    }
+
     //////////////////////////////////////////////////////////////////////////////
     //////////// Player actions
     //////////// 
@@ -656,87 +741,7 @@ class RolledWest extends Table
 
     function argSpendOrBank()
     {
-        // get total resources player has from rolled dice and bank
-        $dice_roller_id = $this->getGameStateValue('diceRollerId');
-        $rolled_resources = $this->getAvailableDice();
-        $sql = "SELECT copper '0', wood '1', silver '2', gold '3' FROM player WHERE player_id=$dice_roller_id";
-        $banked_resources = $this->getNonEmptyObjectFromDB($sql);
-
-        $available_resources = [0 => 0, 1 => 0, 2 => 0, 3 => 0];
-        foreach ($rolled_resources as $rolled_resource)
-            $available_resources[$rolled_resource]++;
-        foreach ($banked_resources as $resource_type_id => $amount)
-            $available_resources[$resource_type_id] += $amount;
-
-        // check offices or contracts player can mark
-        $sql = "SELECT exclusive_id id, exclusive_type type FROM exclusive WHERE marked_by_player IS NULL AND (exclusive_type='office' OR exclusive_type='contract')";
-        $exclusives = $this->getObjectListFromDB($sql);
-
-        $offices = [];
-        $contracts = [];
-        foreach ($exclusives as $i => $exclusive) {
-            if ($exclusive['type'] == 'office') {
-                $office_id = $exclusive['id'];
-                $resources_needed = $this->offices[$office_id]['resourcesNeeded'];
-                $isPurchasable = true;
-                foreach ($resources_needed as $resource_type_id => $amount_needed) {
-                    if ($available_resources[$resource_type_id] < $amount_needed) {
-                        $isPurchasable = false;
-                        break;
-                    }
-                }
-                if ($isPurchasable)
-                    $offices[] = 'office_' . $office_id;
-            } else if ($exclusive['type'] == 'contract') {
-                $contract_id = $exclusive['id'];
-                $resources_needed = $this->contracts[$contract_id]['resourcesNeeded'];
-                $isPurchasable = true;
-                foreach ($resources_needed as $resource_type_id => $amount_needed) {
-                    if ($available_resources[$resource_type_id] < $amount_needed) {
-                        $isPurchasable = false;
-                        break;
-                    }
-                }
-                if ($isPurchasable)
-                    $contracts[] = 'contract_' . $contract_id;
-            }
-        }
-
-        // check possible shipments
-        $sql = "SELECT copper_shipped '0', silver_shipped '2', gold_shipped '3' FROM player WHERE player_id=$dice_roller_id";
-        $shipped_resources = $this->getNonEmptyObjectFromDB($sql);
-
-        $shipments = [];
-        for ($resource_type_id = 0; $resource_type_id < 4; $resource_type_id++) {
-            if ($resource_type_id == 1)
-                continue;
-
-            $space_id = $shipped_resources[$resource_type_id];
-            for ($i = 0; $i < $available_resources[$resource_type_id] && $space_id < 5; $space_id++, $i++)
-                $shipments[] = 'shipment_' . $resource_type_id . '_' . $space_id;
-        }
-
-        // check possible claims
-        $chosen_terrain = $this->getGameStateValue('chosenTerrain');
-        $sql = "SELECT MAX(space_id) FROM claim WHERE player_id=$dice_roller_id AND terrain_type_id=$chosen_terrain AND claim_type IS NOT NULL";
-        $last_claimed_space_id = $this->getUniqueValueFromDB($sql);
-        if (is_null($last_claimed_space_id))
-            $last_claimed_space_id = - 1;
-
-        $claims = [];
-        if ($available_resources[1] > 0)
-            $claims[] = 'claim_' . $chosen_terrain . '_' . ($last_claimed_space_id + 1);
-        if ($available_resources[1] > 1)
-            $claims[] = 'claim_' . $chosen_terrain . '_' . ($last_claimed_space_id + 2);
-
-        return [
-            'diceRollerId' => $dice_roller_id,
-            'chosenTerrain' => $chosen_terrain,
-            'offices' => $offices,
-            'contracts' => $contracts,
-            'shipments' => $shipments,
-            'claims' => $claims
-        ];
+        return $this->getPossibleBuys();
     }
 
     /*
