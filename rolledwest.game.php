@@ -1008,8 +1008,11 @@ class RolledWest extends Table
                 $sql = "SELECT exclusive_id FROM exclusive WHERE marked_by_player=$marked_by_player AND exclusive_type='contract'";
                 $contract_ids = $this->getObjectListFromDB($sql, true);
 
-                foreach ($contract_ids as $contract_id)
+                foreach ($contract_ids as $contract_id) {
+                    if (!isset($this->contracts[$contract_id]['resourcesNeeded'][0]))
+                        continue;
                     $points += $this->contracts[$contract_id]['resourcesNeeded'][0];
+                }
             } else if ($office_id == 6) {
                 // 1 point per checked off star in shipping + 1 point per star in claims built
                 $sql = "SELECT copper_shipped '0', silver_shipped '2', gold_shipped '3' FROM player WHERE player_id=$marked_by_player";
