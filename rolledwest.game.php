@@ -395,7 +395,6 @@ class RolledWest extends Table
 
         return [
             'diceRollerId' => $dice_roller_id,
-            'chosenTerrain' => $chosen_terrain,
             'offices' => $offices,
             'contracts' => $contracts,
             'shipments' => $shipments,
