@@ -118,12 +118,13 @@ define([
                 switch (stateName) {
 
                     case 'spendOrBank':
-                        if (args.args.diceRollerId == this.player_id)
+                        if (args.args.diceRollerId == this.player_id) {
                             this.gamedatas.gamestate.descriptionmyturn = this.gamedatas.gamestate.descriptionDiceRollerTurn;
+                            this.updatePossibleBuys(args.args.offices, args.args.shipments, args.args.contracts, args.args.claims);
+                        }
                         else
                             this.gamedatas.gamestate.descriptionmyturn = this.gamedatas.gamestate.descriptionNonDiceRollerTurn;
 
-                        this.updatePossibleBuys(args.args.offices, args.args.shipments, args.args.contracts, args.args.claims);
                         this.updatePageTitle();
                         break;
 
@@ -756,7 +757,8 @@ define([
             },
 
             notif_updatePossibleBuys: function (notif) {
-                this.updatePossibleBuys(notif.args.offices, notif.args.shipments, notif.args.contracts, notif.args.claims);
+                if (notif.args.diceRollerId == this.player_id)
+                    this.updatePossibleBuys(notif.args.offices, notif.args.shipments, notif.args.contracts, notif.args.claims);
             },
 
             notif_bank: function (notif) {
