@@ -95,7 +95,7 @@
     border-radius: 50%;
 }
 
-.office:hover, .shipment:hover, .contract:hover, .claim:hover {
+.buyable {
     cursor: pointer;
     box-shadow: 0 0 0 3px rebeccapurple;
 }

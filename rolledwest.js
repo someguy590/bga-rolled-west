@@ -95,10 +95,6 @@ define([
                 this.displayShipmentMarks(this.gamedatas.shipments, this.gamedatas.marks);
                 dojo.connect(this.playerResources, 'onChangeSelection', this, 'onDiceSelected');
                 dojo.connect(this.spentOrBankedResources, 'onChangeSelection', this, 'onDiceSelected');
-                dojo.query('[id*=office]:not([id*=mark])').connect('onclick', this, 'onPurchaseOffice');
-                dojo.query('[id*=shipment]:not([id*=mark])').connect('onclick', this, 'onShip');
-                dojo.query('[id*=contract]:not([id*=mark])').connect('onclick', this, 'onCompleteContract');
-                dojo.query('[id*=claim]:not([id*=mark])').connect('onclick', this, 'onBuildClaim');
 
                 // Setup game notifications to handle (see "setupNotifications" method below)
                 this.setupNotifications();
@@ -123,6 +119,31 @@ define([
                             this.gamedatas.gamestate.descriptionmyturn = this.gamedatas.gamestate.descriptionDiceRollerTurn;
                         else
                             this.gamedatas.gamestate.descriptionmyturn = this.gamedatas.gamestate.descriptionNonDiceRollerTurn;
+
+                        let officeNodes = dojo.NodeList();
+                        for (let officeDivId of args.args.offices)
+                            officeNodes.push(dojo.byId(officeDivId));
+                        officeNodes.connect('onclick', this, 'onPurchaseOffice');
+                        officeNodes.addClass('buyable');
+
+                        let shipmentNodes = dojo.NodeList();
+                        for (let shipmentDivId of args.args.shipments)
+                            shipmentNodes.push(dojo.byId(shipmentDivId));
+                        shipmentNodes.connect('onclick', this, 'onShip');
+                        shipmentNodes.addClass('buyable');
+                        
+                        let contractNodes = dojo.NodeList();
+                        for (let contractDivId of args.args.contracts)
+                        contractNodes.push(dojo.byId(contractDivId));
+                        contractNodes.connect('onclick', this, 'onCompleteContract');
+                        contractNodes.addClass('buyable');
+
+                        let claimNodes = dojo.NodeList();
+                        for (let claimDivId of args.args.claims)
+                            claimNodes.push(dojo.byId(claimDivId));
+                        claimNodes.connect('onclick', this, 'onBuildClaim');
+                        claimNodes.addClass('buyable');
+
                         this.updatePageTitle();
                         break;
 
