@@ -44,6 +44,9 @@ define([
                 this.higherPoint2NumberBoxY = 25;
                 this.lowerPoint2NumberBoxX = 37;
                 this.lowerPoint2NumberBoxY = 30;
+
+                // event connections
+                this.eventConnections = [];
             },
 
             /*
@@ -120,30 +123,7 @@ define([
                         else
                             this.gamedatas.gamestate.descriptionmyturn = this.gamedatas.gamestate.descriptionNonDiceRollerTurn;
 
-                        let officeNodes = dojo.NodeList();
-                        for (let officeDivId of args.args.offices)
-                            officeNodes.push(dojo.byId(officeDivId));
-                        officeNodes.connect('onclick', this, 'onPurchaseOffice');
-                        officeNodes.addClass('buyable');
-
-                        let shipmentNodes = dojo.NodeList();
-                        for (let shipmentDivId of args.args.shipments)
-                            shipmentNodes.push(dojo.byId(shipmentDivId));
-                        shipmentNodes.connect('onclick', this, 'onShip');
-                        shipmentNodes.addClass('buyable');
-                        
-                        let contractNodes = dojo.NodeList();
-                        for (let contractDivId of args.args.contracts)
-                        contractNodes.push(dojo.byId(contractDivId));
-                        contractNodes.connect('onclick', this, 'onCompleteContract');
-                        contractNodes.addClass('buyable');
-
-                        let claimNodes = dojo.NodeList();
-                        for (let claimDivId of args.args.claims)
-                            claimNodes.push(dojo.byId(claimDivId));
-                        claimNodes.connect('onclick', this, 'onBuildClaim');
-                        claimNodes.addClass('buyable');
-
+                        this.updatePossibleBuys(args.args.offices, args.args.shipments, args.args.contracts, args.args.claims);
                         this.updatePageTitle();
                         break;
 
@@ -159,6 +139,11 @@ define([
                 console.log('Leaving state: ' + stateName);
 
                 switch (stateName) {
+                    case 'spendOrBank':
+                        dojo.forEach(this.eventConnections, dojo.disconnect);
+                        this.eventConnections = [];
+                        dojo.query('.buyable').removeClass('buyable');
+                        break;
 
                     /* Example:
                     
@@ -388,6 +373,31 @@ define([
                     return [23, 13];
             },
 
+            updatePossibleBuys: function (officeIds, shipmentIds, contractIds, claimIds) {
+                dojo.forEach(this.eventConnections, dojo.disconnect);
+                this.eventConnections = [];
+
+                for (let officeDivId of officeIds) {
+                    this.eventConnections.push(dojo.connect($(officeDivId), 'onclick', this, 'onPurchaseOffice'));
+                    dojo.addClass(officeDivId, 'buyable');
+                }
+
+                for (let shipmentDivId of shipmentIds) {
+                    this.eventConnections.push(dojo.connect($(shipmentDivId), 'onclick', this, 'onShip'));
+                    dojo.addClass(shipmentDivId, 'buyable');
+                }
+
+                for (let contractDivId of contractIds) {
+                    this.eventConnections.push(dojo.connect($(contractDivId), 'onclick', this, 'onCompleteContract'));
+                    dojo.addClass(contractDivId, 'buyable');
+                }
+
+                for (let claimDivId of claimIds) {
+                    this.eventConnections.push(dojo.connect($(claimDivId), 'onclick', this, 'onBuildClaim'));
+                    dojo.addClass(claimDivId, 'buyable');
+                }
+            },
+
             ///////////////////////////////////////////////////
             //// Player's action
 
@@ -550,6 +560,8 @@ define([
                 dojo.subscribe('endGameScore', this, 'notif_endGameScore');
                 this.notifqueue.setSynchronous('endGameScore', 1000);
 
+                dojo.subscribe('updatePossibleBuys', this, 'notif_updatePossibleBuys');
+
                 // Example 1: standard notification handling
                 // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
 
@@ -576,6 +588,8 @@ define([
             },
 
             notif_purchaseOffice: function (notif) {
+                dojo.query('.buyable').removeClass('buyable');
+
                 let playerId = notif.args.playerId;
                 let officeId = notif.args.officeId;
 
@@ -606,6 +620,8 @@ define([
             },
 
             notif_ship: function (notif) {
+                dojo.query('.buyable').removeClass('buyable');
+
                 let playerId = notif.args.playerId;
                 let resourceTypeId = notif.args.resourceTypeId;
                 let points = notif.args.points;
@@ -671,6 +687,8 @@ define([
             },
 
             notif_completeContract: function (notif) {
+                dojo.query('.buyable').removeClass('buyable');
+
                 let playerId = notif.args.playerId;
                 let contractId = notif.args.contractId;
 
@@ -701,6 +719,8 @@ define([
             },
 
             notif_buildClaim: function (notif) {
+                dojo.query('.buyable').removeClass('buyable');
+
                 let playerId = notif.args.playerId;
                 let terrainTypeId = notif.args.terrainTypeId;
                 let claimsBuilt = notif.args.claimsBuilt;
@@ -733,6 +753,10 @@ define([
 
                 if (notif.args.points > 0)
                     this.scoreCtrl[notif.args.playerId].incValue(notif.args.points);
+            },
+
+            notif_updatePossibleBuys: function (notif) {
+                this.updatePossibleBuys(notif.args.offices, notif.args.shipments, notif.args.contracts, notif.args.claims);
             },
 
             notif_bank: function (notif) {

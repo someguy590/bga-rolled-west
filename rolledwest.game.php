@@ -475,6 +475,8 @@ class RolledWest extends Table
                 'officeId' => $officeId
             ]
         );
+
+        $this->notifyAllPlayers('updatePossibleBuys', '', $this->getPossibleBuys());
     }
 
     function ship($resourceTypeId, $targetSpaceId)
@@ -558,6 +560,8 @@ class RolledWest extends Table
                 'points' => $points,
             ]
         );
+
+        $this->notifyAllPlayers('updatePossibleBuys', '', $this->getPossibleBuys());
     }
 
     function completeContract($contractId)
@@ -604,6 +608,8 @@ class RolledWest extends Table
                 'points' => $points
             ]
         );
+
+        $this->notifyAllPlayers('updatePossibleBuys', '', $this->getPossibleBuys());
     }
 
     function buildClaim($terrainTypeId, $targetSpaceId)
@@ -681,6 +687,8 @@ class RolledWest extends Table
                 'chosenTerrain' => $this->getGameStateValue('chosenTerrain')
             ]
         );
+        
+        $this->notifyAllPlayers('updatePossibleBuys', '', $this->getPossibleBuys());
     }
 
     function bank($resource, $isResourceSpent)
