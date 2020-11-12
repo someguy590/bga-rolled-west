@@ -191,10 +191,10 @@ class RolledWest extends Table
         In this space, you can put any utility methods useful for your game logic
     */
 
-    function rollDice()
+    function rollDice($dice_amount = 4)
     {
         $dice = [];
-        for ($i = 0; $i < 4; $i++) {
+        for ($i = 0; $i < $dice_amount; $i++) {
             $roll = bga_rand(1, 12);
             $dice[] = $this->getDiceType($roll);
         }
@@ -756,7 +756,11 @@ class RolledWest extends Table
 
     function argSpendOrBank()
     {
-        return $this->getPossibleBuys();
+        $dice_roller_id = $this->getGameStateValue('diceRollerId');
+        if ($dice_roller_id == -1)
+            return ['diceRollerId' => $dice_roller_id];
+        else
+            return $this->getPossibleBuys();
     }
 
     /*
@@ -787,11 +791,42 @@ class RolledWest extends Table
 
     function stRollDice()
     {
+        $round = $this->getGameStateValue('round');
+        $prev_dice_roller_id = $this->getGameStateValue('diceRollerId');
+
+        // ghost round
+        if (count($this->loadPlayersBasicInfos()) == 2 && $round >= 1 && $round <= 5) {
+            if ($prev_dice_roller_id == -1)
+                $is_prev_dice_roller_last_player = false;
+            else
+                $is_prev_dice_roller_last_player = $this->loadPlayersBasicInfos()[$prev_dice_roller_id]['player_no'] == 2;
+
+            if ($is_prev_dice_roller_last_player) {
+                $dice = $this->rollDice(3);
+                foreach ($dice as $i => $value)
+                    $this->setGameStateValue('die' . $i, $value);
+                $this->setGameStateValue('die3', -1);
+
+                for ($i = 0; $i < 3; $i++)
+                    $this->setGameStateValue('spentOrBankedDie' . $i, -1);
+
+                $this->notifyAllPlayers('diceRolled', clienttranslate('Ghost rolls dice'), [
+                    'dice' => $dice
+                ]);
+
+                $this->setGameStateValue('diceRollerId', -1);
+                $this->gamestate->nextState('ghostRoll');
+                return;
+            }
+        }
+
         $player_id = $this->activeNextPlayer();
         $roundStarterId = $this->getNextPlayerTable()[0];
 
         if ($player_id == $roundStarterId) {
-            $round = $this->getGameStateValue('round') + 1;
+            $round++;
+
+            // game end
             if ($round == 3) {
                 $this->gamestate->nextState('score');
                 return;

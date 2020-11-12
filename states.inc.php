@@ -74,7 +74,7 @@ $machinestates = array(
         'name' => 'rollDice',
         'type' => 'game',
         'action' => 'stRollDice',
-        'transitions' => ['chooseTerrain' => STATE_CHOOSE_TERRAIN, 'score' => STATE_SCORE]
+        'transitions' => ['chooseTerrain' => STATE_CHOOSE_TERRAIN, 'ghostRoll' => STATE_SPEND_OR_BANK, 'score' => STATE_SCORE]
     ],
 
     STATE_CHOOSE_TERRAIN => [
