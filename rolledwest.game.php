@@ -754,6 +754,13 @@ class RolledWest extends Table
         game state.
     */
 
+    function argChooseTerrain()
+    {
+        return [
+            'roundNbr' => $this->getGameStateValue('round')
+        ];
+    }
+
     function argSpendOrBank()
     {
         $dice_roller_id = $this->getGameStateValue('diceRollerId');

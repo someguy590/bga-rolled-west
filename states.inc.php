@@ -79,9 +79,10 @@ $machinestates = array(
 
     STATE_CHOOSE_TERRAIN => [
         'name' => 'chooseTerrain',
-        'description' => clienttranslate('${actplayer} must choose 1 die to represent the terrain for the turn'),
-        'descriptionmyturn' => clienttranslate('${you} must choose 1 die to represent the terrain for the turn'),
+        'description' => clienttranslate('Round ${roundNbr}: ${actplayer} must choose 1 die to represent the terrain for the turn'),
+        'descriptionmyturn' => clienttranslate('Round ${roundNbr}: ${you} must choose 1 die to represent the terrain for the turn'),
         'type' => 'activeplayer',
+        'args' => 'argChooseTerrain',
         'possibleactions' => ['chooseTerrain'],
         'transitions' => ['spendOrBank' => STATE_SPEND_OR_BANK]
     ],
