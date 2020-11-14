@@ -313,6 +313,20 @@ class RolledWest extends Table
     function getPossibleBuys()
     {
         $dice_roller_id = $this->getGameStateValue('diceRollerId');
+        $offices = [];
+        $contracts = [];
+        $shipments = [];
+        $claims = [];
+        $result = [
+            'diceRollerId' => $dice_roller_id,
+            'offices' => $offices,
+            'contracts' => $contracts,
+            'shipments' => $shipments,
+            'claims' => $claims
+        ];
+        if ($dice_roller_id == -1) {
+            return $result;
+        }
 
         // check if player has actions available
         $sql = "SELECT is_purchasing_office, is_purchasing_contract, is_building_claim FROM player WHERE player_id=$dice_roller_id";
@@ -333,8 +347,6 @@ class RolledWest extends Table
         $sql = "SELECT exclusive_id id, exclusive_type type FROM exclusive WHERE marked_by_player IS NULL AND (exclusive_type='office' OR exclusive_type='contract')";
         $exclusives = $this->getObjectListFromDB($sql);
 
-        $offices = [];
-        $contracts = [];
         foreach ($exclusives as $i => $exclusive) {
             if ($possible_actions['is_purchasing_office'] == 0 && $exclusive['type'] == 'office') {
                 $office_id = $exclusive['id'];
@@ -348,8 +360,7 @@ class RolledWest extends Table
                 }
                 if ($isPurchasable)
                     $offices[] = 'office_' . $office_id;
-            } 
-            else if ($possible_actions['is_purchasing_contract'] == 0 && $exclusive['type'] == 'contract') {
+            } else if ($possible_actions['is_purchasing_contract'] == 0 && $exclusive['type'] == 'contract') {
                 $contract_id = $exclusive['id'];
                 $resources_needed = $this->contracts[$contract_id]['resourcesNeeded'];
                 $isPurchasable = true;
@@ -368,7 +379,6 @@ class RolledWest extends Table
         $sql = "SELECT copper_shipped '0', silver_shipped '2', gold_shipped '3' FROM player WHERE player_id=$dice_roller_id";
         $shipped_resources = $this->getNonEmptyObjectFromDB($sql);
 
-        $shipments = [];
         for ($resource_type_id = 0; $resource_type_id < 4; $resource_type_id++) {
             if ($resource_type_id == 1)
                 continue;
@@ -379,7 +389,6 @@ class RolledWest extends Table
         }
 
         // check possible claims
-        $claims = [];
         if ($possible_actions['is_building_claim'] == 0) {
             $chosen_terrain = $this->getGameStateValue('chosenTerrain');
             $sql = "SELECT MAX(space_id) FROM claim WHERE player_id=$dice_roller_id AND terrain_type_id=$chosen_terrain AND claim_type IS NOT NULL";
@@ -393,13 +402,7 @@ class RolledWest extends Table
                 $claims[] = 'claim_' . $chosen_terrain . '_' . ($last_claimed_space_id + 2);
         }
 
-        return [
-            'diceRollerId' => $dice_roller_id,
-            'offices' => $offices,
-            'contracts' => $contracts,
-            'shipments' => $shipments,
-            'claims' => $claims
-        ];
+        return $result;
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -754,13 +757,18 @@ class RolledWest extends Table
         game state.
     */
 
+    function argChooseTerrain()
+    {
+        return [
+            'roundNbr' => $this->getGameStateValue('round')
+        ];
+    }
+
     function argSpendOrBank()
     {
-        $dice_roller_id = $this->getGameStateValue('diceRollerId');
-        if ($dice_roller_id == -1)
-            return ['diceRollerId' => $dice_roller_id];
-        else
-            return $this->getPossibleBuys();
+        $result = $this->getPossibleBuys();
+        $result['roundNbr'] = $this->getGameStateValue('round');
+        return $result;
     }
 
     /*
