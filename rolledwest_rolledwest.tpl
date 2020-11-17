@@ -17,12 +17,27 @@
     <h3>{SPENT_OR_BANKED_DICE}</h3>
     <div id="spent_or_banked_dice" class="dice"></div>
 </div>
-<div id="board">
-    <!-- BEGIN square -->
-    <div id="{SQUARE_ID}" class="{CLASSES}" style="left: {LEFT}px; top: {TOP}px;"></div>
-    <!-- END square -->
+<div id="personal_board" class="board">
+    <!-- BEGIN personal_square -->
+    <div id="{SQUARE_ID}_{PLAYER_ID}" class="{CLASSES}" style="left: {LEFT}px; top: {TOP}px;"></div>
+    <div id="marks_{PLAYER_ID}"></div>
+    <!-- END personal_square -->
 
-    <div id="marks"></div>
+</div>
+
+<div id="other_players_board">
+    <!-- BEGIN board -->
+    <div class="whiteblock" >
+        <h3 style="color:#{PLAYER_COLOR}">{PLAYER_NAME}</h3>
+        <div id="board_{PLAYER_ID}" class="board">
+            <!-- BEGIN other_player_square -->
+            <div id="{SQUARE_ID}_{PLAYER_ID}" class="{CLASSES}" style="left: {LEFT}px; top: {TOP}px;"></div>
+            <div id="marks_{PLAYER_ID}"></div>
+            <!-- END other_player_square -->
+
+        </div>
+    </div>
+    <!-- END board -->
 </div>
 
 <script type="text/javascript">
@@ -45,7 +60,7 @@
         </svg>\
     </div>'
 
-    
+
 </script>
 
 {OVERALL_GAME_FOOTER}

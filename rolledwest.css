@@ -46,12 +46,17 @@
 
 /********* You can start writing your CSS below this line: **********/
 
-#board {
+.board {
     position: relative;
     width: 564px;
     height: 630px;
     background-image: url('img/board.jpg');
     margin: auto;
+}
+
+#other_players_board {
+    display: flex;
+    flex-direction: row;
 }
 
 #rolled_dice_row {

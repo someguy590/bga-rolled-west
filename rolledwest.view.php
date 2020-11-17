@@ -33,17 +33,9 @@ class view_rolledwest_rolledwest extends game_view
   {
     return "rolledwest";
   }
-  function build_page($viewArgs)
+
+  function build_player_board_content($square_tpl, $player_id)
   {
-    // Get players & players number
-    $players = $this->game->loadPlayersBasicInfos();
-    $players_nbr = count($players);
-
-    /*********** Place your code below:  ************/
-    $this->tpl['MY_DICE'] = $this->_('My dice');
-    $this->tpl['SPENT_OR_BANKED_DICE'] = $this->_('Spent or banked dice');
-    $this->page->begin_block($this->getGameName() . '_' . $this->getGameName(), 'square');
-
     $office_x_offset = 68;
     $office_y_offset = 52;
     $office_x_scale = 55;
@@ -67,8 +59,9 @@ class view_rolledwest_rolledwest extends game_view
       if (intdiv($n, 3) == 2)
         $y_px += $office_middle_row_offset;
 
-      $this->page->insert_block('square', [
+      $this->page->insert_block($square_tpl, [
         'SQUARE_ID' => 'office_' . $n,
+        'PLAYER_ID' => $player_id,
         'LEFT' => $x_px,
         'TOP' => $y_px,
         'CLASSES' => $classes
@@ -91,7 +84,7 @@ class view_rolledwest_rolledwest extends game_view
           $classes .= ' shipment_big';
         }
 
-        $this->page->insert_block('square', [
+        $this->page->insert_block($square_tpl, [
           'SQUARE_ID' => 'shipment_' . $shipment_type . '_' . $n,
           'LEFT' => $x_px,
           'TOP' => $y_px,
@@ -115,8 +108,9 @@ class view_rolledwest_rolledwest extends game_view
     $y_px = $contract_y_start;
     $classes = 'contract';
     foreach ($this->game->contracts as $n => $contract) {
-      $this->page->insert_block('square', [
+      $this->page->insert_block($square_tpl, [
         'SQUARE_ID' => 'contract_' . $n,
+        'PLAYER_ID' => $player_id,
         'LEFT' => $x_px,
         'TOP' => $y_px,
         'CLASSES' => $classes
@@ -136,8 +130,9 @@ class view_rolledwest_rolledwest extends game_view
     foreach ($this->game->claims as $terrain_id => $claim) {
       $x_px = $claim_x_start;
       foreach ($claim['spaces'] as $space_id => $space) {
-        $this->page->insert_block('square', [
+        $this->page->insert_block($square_tpl, [
           'SQUARE_ID' => 'claim_' . $terrain_id . '_' . $space_id,
+          'PLAYER_ID' => $player_id,
           'LEFT' => $x_px,
           'TOP' => $y_px,
           'CLASSES' => $classes
@@ -145,6 +140,39 @@ class view_rolledwest_rolledwest extends game_view
         $x_px += $claim_scale + $claim_x_offset;
       }
       $y_px += $claim_scale + $claim_y_offset;
+    }
+  }
+
+  function build_page($viewArgs)
+  {
+    // Get players & players number
+    $players = $this->game->loadPlayersBasicInfos();
+    $players_nbr = count($players);
+
+    /*********** Place your code below:  ************/
+    global $g_user;
+    $current_player_id = $g_user->get_id();
+
+    $this->tpl['MY_DICE'] = $this->_('My dice');
+    $this->tpl['SPENT_OR_BANKED_DICE'] = $this->_('Spent or banked dice');
+
+
+    $this->page->begin_block($this->getGameName() . '_' . $this->getGameName(), 'personal_square');
+    $this->build_player_board_content('personal_square', $current_player_id);
+
+    $this->page->begin_block($this->getGameName() . '_' . $this->getGameName(), 'other_player_square');
+    $this->page->begin_block($this->getGameName() . '_' . $this->getGameName(), 'board');
+
+    $next_player_id = $this->game->getPlayerAfter($current_player_id);
+    while ($next_player_id != $current_player_id) {
+      $this->page->reset_subblocks('other_player_square');
+      $this->build_player_board_content('other_player_square', $next_player_id);
+      $this->page->insert_block('board', [
+        'PLAYER_ID' => $next_player_id,
+        'PLAYER_NAME' => $players[$next_player_id]['player_name'],
+        'PLAYER_COLOR' => $players[$next_player_id]['player_color'] 
+      ]);
+      $next_player_id = $this->game->getPlayerAfter($next_player_id);
     }
     /*********** Do not change anything below this line  ************/
   }
