@@ -232,29 +232,28 @@ define([
                     if (type == 'shipment')
                         continue;
 
-                    if (type == 'office' || type == 'contract') {
-                        // if marked by player is same player viewing in browser, display owning mark
-                        if (markedByPlayer == this.player_id)
-                            classes = 'mark_circle';
-                        else
-                            classes = 'mark_x';
+                    for (let [nextPlayerIdToMark, player] of Object.entries(this.gamedatas.players)) {
+                        if (type == 'office' || type == 'contract') {
+                            // if marked by player is same player viewing in browser, display owning mark
+                            if (markedByPlayer == nextPlayerIdToMark)
+                                classes = 'mark_circle';
+                            else
+                                classes = 'mark_x';
+                        }
+
+                        let markDivId = `${type}_mark_${id}_${nextPlayerIdToMark}`;
+                        dojo.place(this.format_block('jstpl_mark', {
+                            markId: markDivId,
+                            classes: classes
+                        }), 'marks_' + nextPlayerIdToMark);
+
+                        this.placeOnObject(markDivId, 'overall_player_board_' + nextPlayerIdToMark);
+                        this.slideToObject(markDivId, `${type}_${id}_${nextPlayerIdToMark}`).play();
                     }
-
-                    let markDivId = `${type}_mark_${id}`;
-                    dojo.place(this.format_block('jstpl_mark', {
-                        markId: markDivId,
-                        classes: classes
-                    }), 'marks');
-
-                    this.placeOnObject(markDivId, 'overall_player_board_' + this.player_id);
-                    this.slideToObject(markDivId, `${type}_${id}`).play();
                 }
 
                 for (let { playerId, terrainTypeId, spaceId, claimType } of claims) {
-                    if (playerId != this.player_id)
-                        continue;
-
-                    let markId = `claim_mark_${terrainTypeId}_${spaceId}`;
+                    let markId = `claim_mark_${terrainTypeId}_${spaceId}_${playerId}`;
                     let classes = 'claim';
                     let jstpl = 'jstpl_mark_triangle';
                     if (claimType == 'settlement') {
@@ -264,9 +263,9 @@ define([
                     dojo.place(this.format_block(jstpl, {
                         markId: markId,
                         classes: classes
-                    }), 'marks');
-                    this.placeOnObject(markId, 'overall_player_board_' + this.player_id);
-                    this.slideToObject(markId, `claim_${terrainTypeId}_${spaceId}`).play();
+                    }), 'marks_' + playerId);
+                    this.placeOnObject(markId, 'overall_player_board_' + playerId);
+                    this.slideToObject(markId, `claim_${terrainTypeId}_${spaceId}_${playerId}`).play();
                 }
 
             },
@@ -304,63 +303,66 @@ define([
                 }
 
                 let shipmentChecks = shipmentMarks.checks;
-                for (let resourceTypeId = 0; resourceTypeId < 4; resourceTypeId++) {
-                    if (resourceTypeId == 1)
-                        continue;
+                for (let [nextPlayerIdToMark, player] of Object.entries(this.gamedatas.players)) {
 
-                    let checkCount = shipmentChecks[this.player_id][resourceTypeId];
-                    for (let spaceId = 0; spaceId < checkCount; spaceId++) {
-                        let classes = 'mark_check';
-                        let markId = `shipment_mark_check_${resourceTypeId}_${spaceId}`;
-                        dojo.place(this.format_block('jstpl_mark', {
-                            markId: markId,
-                            classes: classes
-                        }), 'marks');
+                    for (let resourceTypeId = 0; resourceTypeId < 4; resourceTypeId++) {
+                        if (resourceTypeId == 1)
+                            continue;
 
-                        this.placeOnObject(markId, 'overall_player_board_' + this.player_id);
-                        if (spaceId != 0) {
-                            let [checkXPos, checkYPos] = this.getShipmentCheckOffsets(spaceId);
-                            this.slideToObjectPos(markId, `shipment_${resourceTypeId}_${spaceId}`, checkXPos, checkYPos).play();
-                        }
-                        else {
-                            this.slideToObject(markId, `shipment_${resourceTypeId}_${spaceId}`).play();
+                        let checkCount = shipmentChecks[nextPlayerIdToMark][resourceTypeId];
+                        for (let spaceId = 0; spaceId < checkCount; spaceId++) {
+                            let classes = 'mark_check';
+                            let markId = `shipment_mark_check_${resourceTypeId}_${spaceId}_${nextPlayerIdToMark}`;
+                            dojo.place(this.format_block('jstpl_mark', {
+                                markId: markId,
+                                classes: classes
+                            }), 'marks_' + nextPlayerIdToMark);
+
+                            this.placeOnObject(markId, 'overall_player_board_' + nextPlayerIdToMark);
+                            if (spaceId != 0) {
+                                let [checkXPos, checkYPos] = this.getShipmentCheckOffsets(spaceId);
+                                this.slideToObjectPos(markId, `shipment_${resourceTypeId}_${spaceId}_${nextPlayerIdToMark}`, checkXPos, checkYPos).play();
+                            }
+                            else {
+                                this.slideToObject(markId, `shipment_${resourceTypeId}_${spaceId}_${nextPlayerIdToMark}`).play();
+                            }
                         }
                     }
-                }
 
-                for (let { id, type, markedByPlayer } of exclusiveMarks) {
-                    if (type == 'shipment') {
-                        let [resourceTypeId, spaceId] = exclusiveIdToDOMId(id);
+                    for (let { id, type, markedByPlayer } of exclusiveMarks) {
+                        if (type == 'shipment') {
+                            let [resourceTypeId, spaceId] = exclusiveIdToDOMId(id);
 
-                        let markId = `shipment_mark_x_${resourceTypeId}_${spaceId}`;
-                        let classes = 'mark_x';
-                        if (markedByPlayer == this.player_id) {
-                            markId = `shipment_mark_circle_${resourceTypeId}_${spaceId}`;
-                            classes = 'mark_circle';
-                        }
+                            let markId = `shipment_mark_x_${resourceTypeId}_${spaceId}_${nextPlayerIdToMark}`;
+                            let classes = 'mark_x';
+                            if (markedByPlayer == nextPlayerIdToMark) {
+                                markId = `shipment_mark_circle_${resourceTypeId}_${spaceId}_${nextPlayerIdToMark}`;
+                                classes = 'mark_circle';
+                            }
 
-                        dojo.place(this.format_block('jstpl_mark', {
-                            markId: markId,
-                            classes: classes
-                        }), 'marks');
+                            dojo.place(this.format_block('jstpl_mark', {
+                                markId: markId,
+                                classes: classes
+                            }), 'marks_' + nextPlayerIdToMark);
 
-                        this.placeOnObject(markId, 'overall_player_board_' + this.player_id);
-                        this.slideToObjectPos(markId, `shipment_${resourceTypeId}_${spaceId}`, this.higherPoint2NumberBoxX, this.higherPoint2NumberBoxY).play();
+                            this.placeOnObject(markId, 'overall_player_board_' + nextPlayerIdToMark);
+                            this.slideToObjectPos(markId, `shipment_${resourceTypeId}_${spaceId}_${nextPlayerIdToMark}`, this.higherPoint2NumberBoxX, this.higherPoint2NumberBoxY).play();
 
-                        if (markedByPlayer != this.player_id) {
-                            let checkCount = shipmentChecks[this.player_id][resourceTypeId];
-                            let isSpaceDeliveredTo = (checkCount - 1) >= spaceId;
+                            if (markedByPlayer != nextPlayerIdToMark) {
+                                let checkCount = shipmentChecks[this.player_id][resourceTypeId];
+                                let isSpaceDeliveredTo = (checkCount - 1) >= spaceId;
 
-                            if (isSpaceDeliveredTo) {
-                                markId = `shipment_mark_circle_${resourceTypeId}_${spaceId}`;
-                                classes = 'mark_circle mark_circle_small_number';
-                                dojo.place(this.format_block('jstpl_mark', {
-                                    markId: markId,
-                                    classes: classes
-                                }), 'marks');
+                                if (isSpaceDeliveredTo) {
+                                    markId = `shipment_mark_circle_${resourceTypeId}_${spaceId}_${nextPlayerIdToMark}`;
+                                    classes = 'mark_circle mark_circle_small_number';
+                                    dojo.place(this.format_block('jstpl_mark', {
+                                        markId: markId,
+                                        classes: classes
+                                    }), 'marks_' + nextPlayerIdToMark);
 
-                                this.placeOnObject(markId, 'overall_player_board_' + this.player_id);
-                                this.slideToObjectPos(markId, `shipment_${resourceTypeId}_${spaceId}`, this.lowerPoint2NumberBoxX, this.lowerPoint2NumberBoxY).play();
+                                    this.placeOnObject(markId, 'overall_player_board_' + nextPlayerIdToMark);
+                                    this.slideToObjectPos(markId, `shipment_${resourceTypeId}_${spaceId}_${nextPlayerIdToMark}`, this.lowerPoint2NumberBoxX, this.lowerPoint2NumberBoxY).play();
+                                }
                             }
                         }
                     }
@@ -602,22 +604,23 @@ define([
                 for (let [resourceType, resourceAmount] of Object.entries(notif.args.spentBankedResources))
                     this.addToResources(playerId, resourceType, -resourceAmount);
 
-                // if marked by player is same player viewing in browser, display owning mark
-                let classes = '';
-                if (playerId == this.player_id)
-                    classes = 'mark_circle';
-                else
-                    classes = 'mark_x';
+                for (let [nextPlayerIdToMark, player] of Object.entries(this.gamedatas.players)) {
+                    // if marked by player is same player viewing in browser, display owning mark
+                    let classes = '';
+                    if (playerId == nextPlayerIdToMark)
+                        classes = 'mark_circle';
+                    else
+                        classes = 'mark_x';
 
-                dojo.place(this.format_block('jstpl_mark', {
-                    markId: 'office_mark_' + officeId,
-                    classes: classes
-                }), 'marks');
+                    let markId = `office_mark_${officeId}_${nextPlayerIdToMark}`;
+                    dojo.place(this.format_block('jstpl_mark', {
+                        markId: markId,
+                        classes: classes
+                    }), 'marks_' + nextPlayerIdToMark);
 
-
-
-                this.placeOnObject('office_mark_' + officeId, 'overall_player_board_' + this.player_id);
-                this.slideToObject('office_mark_' + officeId, 'office_' + officeId).play();
+                    this.placeOnObject(markId, 'overall_player_board_' + nextPlayerIdToMark);
+                    this.slideToObject(markId, `office_${officeId}_${nextPlayerIdToMark}`).play();
+                }
             },
 
             notif_ship: function (notif) {
@@ -635,52 +638,54 @@ define([
                 for (let [resourceType, resourceAmount] of Object.entries(notif.args.spentBankedResources))
                     this.addToResources(playerId, resourceType, -resourceAmount);
 
-                for (let [spaceId, space] of Object.entries(notif.args.spacesShipped)) {
-                    if (playerId == this.player_id) {
-                        let classes = 'mark_check';
-                        let markId = `shipment_mark_check_${resourceTypeId}_${spaceId}`
-                        dojo.place(this.format_block('jstpl_mark', {
-                            markId: markId,
-                            classes: classes
-                        }), 'marks');
-
-                        this.placeOnObject(markId, 'overall_player_board_' + this.player_id);
-                        if (spaceId != 0) {
-                            let [checkXPos, checkYPos] = this.getShipmentCheckOffsets(spaceId);
-                            this.slideToObjectPos(markId, `shipment_${resourceTypeId}_${spaceId}`, checkXPos, checkYPos).play();
-                        }
-                        else {
-                            this.slideToObject(markId, `shipment_${resourceTypeId}_${spaceId}`).play();
-                        }
-
-                        if (space.has2Numbers) {
-                            let classes = 'mark_circle';
-                            let markId = `shipment_mark_circle_${resourceTypeId}_${spaceId}`;
-                            let xPos = this.lowerPoint2NumberBoxX;
-                            let yPos = this.lowerPoint2NumberBoxY;
-                            if (space.isFirstToBonus) {
-                                xPos = this.higherPoint2NumberBoxX;
-                                yPos = this.higherPoint2NumberBoxY;
-                            }
+                for (let [nextPlayerIdToMark, player] of Object.entries(this.gamedatas.players)) {
+                    for (let [spaceId, space] of Object.entries(notif.args.spacesShipped)) {
+                        if (playerId == nextPlayerIdToMark) {
+                            let classes = 'mark_check';
+                            let markId = `shipment_mark_check_${resourceTypeId}_${spaceId}_${nextPlayerIdToMark}`
                             dojo.place(this.format_block('jstpl_mark', {
                                 markId: markId,
                                 classes: classes
-                            }), 'marks');
+                            }), 'marks_' + nextPlayerIdToMark);
 
-                            this.placeOnObject(markId, 'overall_player_board_' + this.player_id);
-                            this.slideToObjectPos(markId, `shipment_${resourceTypeId}_${spaceId}`, xPos, yPos).play();
+                            this.placeOnObject(markId, 'overall_player_board_' + nextPlayerIdToMark);
+                            if (spaceId != 0) {
+                                let [checkXPos, checkYPos] = this.getShipmentCheckOffsets(spaceId);
+                                this.slideToObjectPos(markId, `shipment_${resourceTypeId}_${spaceId}_${nextPlayerIdToMark}`, checkXPos, checkYPos).play();
+                            }
+                            else {
+                                this.slideToObject(markId, `shipment_${resourceTypeId}_${spaceId}_${nextPlayerIdToMark}`).play();
+                            }
+
+                            if (space.has2Numbers) {
+                                let classes = 'mark_circle';
+                                let markId = `shipment_mark_circle_${resourceTypeId}_${spaceId}_${nextPlayerIdToMark}`;
+                                let xPos = this.lowerPoint2NumberBoxX;
+                                let yPos = this.lowerPoint2NumberBoxY;
+                                if (space.isFirstToBonus) {
+                                    xPos = this.higherPoint2NumberBoxX;
+                                    yPos = this.higherPoint2NumberBoxY;
+                                }
+                                dojo.place(this.format_block('jstpl_mark', {
+                                    markId: markId,
+                                    classes: classes
+                                }), 'marks_' + nextPlayerIdToMark);
+
+                                this.placeOnObject(markId, 'overall_player_board_' + nextPlayerIdToMark);
+                                this.slideToObjectPos(markId, `shipment_${resourceTypeId}_${spaceId}_${nextPlayerIdToMark}`, xPos, yPos).play();
+                            }
                         }
-                    }
-                    else if (space.has2Numbers && space.isFirstToBonus) {
-                        let classes = 'mark_x';
-                        let markId = `shipment_mark_x_${resourceTypeId}_${spaceId}`
-                        dojo.place(this.format_block('jstpl_mark', {
-                            markId: markId,
-                            classes: classes
-                        }), 'marks');
+                        else if (space.has2Numbers && space.isFirstToBonus) {
+                            let classes = 'mark_x';
+                            let markId = `shipment_mark_x_${resourceTypeId}_${spaceId}_${nextPlayerIdToMark}`
+                            dojo.place(this.format_block('jstpl_mark', {
+                                markId: markId,
+                                classes: classes
+                            }), 'marks_' + nextPlayerIdToMark);
 
-                        this.placeOnObject(markId, 'overall_player_board_' + this.player_id);
-                        this.slideToObjectPos(markId, `shipment_${resourceTypeId}_${spaceId}`, this.higherPoint2NumberBoxX, this.higherPoint2NumberBoxY).play();
+                            this.placeOnObject(markId, 'overall_player_board_' + nextPlayerIdToMark);
+                            this.slideToObjectPos(markId, `shipment_${resourceTypeId}_${spaceId}_${nextPlayerIdToMark}`, this.higherPoint2NumberBoxX, this.higherPoint2NumberBoxY).play();
+                        }
                     }
                 }
 
@@ -701,20 +706,23 @@ define([
                 for (let [resourceType, resourceAmount] of Object.entries(notif.args.spentBankedResources))
                     this.addToResources(playerId, resourceType, -resourceAmount);
 
-                // if marked by player is same player viewing in browser, display owning mark
-                let classes = '';
-                if (playerId == this.player_id)
-                    classes = 'mark_circle';
-                else
-                    classes = 'mark_x';
+                for (let [nextPlayerIdToMark, player] of Object.entries(this.gamedatas.players)) {
+                    // if marked by player is same player viewing in browser, display owning mark
+                    let classes = '';
+                    if (playerId == nextPlayerIdToMark)
+                        classes = 'mark_circle';
+                    else
+                        classes = 'mark_x';
 
-                dojo.place(this.format_block('jstpl_mark', {
-                    markId: 'contract_mark_' + contractId,
-                    classes: classes
-                }), 'marks');
+                    let markId = `contract_mark_${contractId}_${nextPlayerIdToMark}`;
+                    dojo.place(this.format_block('jstpl_mark', {
+                        markId: markId,
+                        classes: classes
+                    }), 'marks_' + nextPlayerIdToMark);
 
-                this.placeOnObject('contract_mark_' + contractId, 'overall_player_board_' + this.player_id);
-                this.slideToObject('contract_mark_' + contractId, 'contract_' + contractId).play();
+                    this.placeOnObject(markId, 'overall_player_board_' + nextPlayerIdToMark);
+                    this.slideToObject(markId, `contract_${contractId}_${nextPlayerIdToMark}`).play();
+                }
 
                 this.scoreCtrl[playerId].incValue(notif.args.points);
             },
@@ -734,22 +742,20 @@ define([
                 for (let [resourceType, resourceAmount] of Object.entries(notif.args.spentBankedResources))
                     this.addToResources(playerId, resourceType, -resourceAmount);
 
-                if (playerId == this.player_id) {
-                    for (let [spaceId, claimType] of Object.entries(claimsBuilt)) {
-                        let markId = `claim_mark_${terrainTypeId}_${spaceId}`;
-                        let classes = 'claim';
-                        let jstpl = 'jstpl_mark_triangle';
-                        if (claimType == 'settlement') {
-                            classes += ' settlement';
-                            jstpl = 'jstpl_mark';
-                        }
-                        dojo.place(this.format_block(jstpl, {
-                            markId: markId,
-                            classes: classes
-                        }), 'marks');
-                        this.placeOnObject(markId, 'overall_player_board_' + this.player_id);
-                        this.slideToObject(markId, `claim_${terrainTypeId}_${spaceId}`).play();
+                for (let [spaceId, claimType] of Object.entries(claimsBuilt)) {
+                    let markId = `claim_mark_${terrainTypeId}_${spaceId}_${playerId}`;
+                    let classes = 'claim';
+                    let jstpl = 'jstpl_mark_triangle';
+                    if (claimType == 'settlement') {
+                        classes += ' settlement';
+                        jstpl = 'jstpl_mark';
                     }
+                    dojo.place(this.format_block(jstpl, {
+                        markId: markId,
+                        classes: classes
+                    }), 'marks_' + playerId);
+                    this.placeOnObject(markId, 'overall_player_board_' + playerId);
+                    this.slideToObject(markId, `claim_${terrainTypeId}_${spaceId}_${playerId}`).play();
                 }
 
                 if (notif.args.points > 0)

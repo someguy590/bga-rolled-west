@@ -317,15 +317,14 @@ class RolledWest extends Table
         $contracts = [];
         $shipments = [];
         $claims = [];
-        $result = [
-            'diceRollerId' => $dice_roller_id,
-            'offices' => $offices,
-            'contracts' => $contracts,
-            'shipments' => $shipments,
-            'claims' => $claims
-        ];
         if ($dice_roller_id == -1) {
-            return $result;
+            return [
+                'diceRollerId' => $dice_roller_id,
+                'offices' => $offices,
+                'contracts' => $contracts,
+                'shipments' => $shipments,
+                'claims' => $claims
+            ];
         }
 
         // check if player has actions available
@@ -359,7 +358,7 @@ class RolledWest extends Table
                     }
                 }
                 if ($isPurchasable)
-                    $offices[] = 'office_' . $office_id;
+                    $offices[] = 'office_' . $office_id . '_' . $dice_roller_id;
             } else if ($possible_actions['is_purchasing_contract'] == 0 && $exclusive['type'] == 'contract') {
                 $contract_id = $exclusive['id'];
                 $resources_needed = $this->contracts[$contract_id]['resourcesNeeded'];
@@ -371,7 +370,7 @@ class RolledWest extends Table
                     }
                 }
                 if ($isPurchasable)
-                    $contracts[] = 'contract_' . $contract_id;
+                    $contracts[] = 'contract_' . $contract_id . '_' . $dice_roller_id;
             }
         }
 
@@ -385,7 +384,7 @@ class RolledWest extends Table
 
             $space_id = $shipped_resources[$resource_type_id];
             for ($i = 0; $i < $available_resources[$resource_type_id] && $space_id < 5; $space_id++, $i++)
-                $shipments[] = 'shipment_' . $resource_type_id . '_' . $space_id;
+                $shipments[] = 'shipment_' . $resource_type_id . '_' . $space_id . '_' . $dice_roller_id;
         }
 
         // check possible claims
@@ -397,12 +396,18 @@ class RolledWest extends Table
                 $last_claimed_space_id = -1;
 
             if ($available_resources[1] > 0)
-                $claims[] = 'claim_' . $chosen_terrain . '_' . ($last_claimed_space_id + 1);
+                $claims[] = 'claim_' . $chosen_terrain . '_' . ($last_claimed_space_id + 1) . '_' . $dice_roller_id;
             if ($available_resources[1] > 1)
-                $claims[] = 'claim_' . $chosen_terrain . '_' . ($last_claimed_space_id + 2);
+                $claims[] = 'claim_' . $chosen_terrain . '_' . ($last_claimed_space_id + 2) . '_' . $dice_roller_id;
         }
 
-        return $result;
+        return [
+            'diceRollerId' => $dice_roller_id,
+            'offices' => $offices,
+            'contracts' => $contracts,
+            'shipments' => $shipments,
+            'claims' => $claims
+        ];
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -768,6 +773,8 @@ class RolledWest extends Table
     {
         $result = $this->getPossibleBuys();
         $result['roundNbr'] = $this->getGameStateValue('round');
+        $result = array_merge($result, $this->loadPlayersBasicInfos());
+        $this->dump('arg spend or bank result', $result);
         return $result;
     }
 
