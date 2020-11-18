@@ -42,8 +42,8 @@ define([
                 // 2 number shipment spaces offsets
                 this.higherPoint2NumberBoxX = 9;
                 this.higherPoint2NumberBoxY = 25;
-                this.lowerPoint2NumberBoxX = 37;
-                this.lowerPoint2NumberBoxY = 30;
+                this.lowerPoint2NumberBoxX = 34;
+                this.lowerPoint2NumberBoxY = 26;
 
                 // event connections
                 this.eventConnections = [];
@@ -665,6 +665,9 @@ define([
                                 if (space.isFirstToBonus) {
                                     xPos = this.higherPoint2NumberBoxX;
                                     yPos = this.higherPoint2NumberBoxY;
+                                }
+                                else {
+                                    classes += ' mark_circle_small_number';
                                 }
                                 dojo.place(this.format_block('jstpl_mark', {
                                     markId: markId,
