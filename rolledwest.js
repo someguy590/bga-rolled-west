@@ -52,6 +52,12 @@ define([
                 this.shipGoldXMarkXOffset = 11;
                 this.shipGoldXMarkYOffset = 34;
 
+                // contract mark offsets
+                this.contractCircleMarkXOffset = 10;
+                this.contractCircleMarkYOffset = 67;
+                this.contractXMarkXOffset = 13;
+                this.contractXMarkYOffset = 78;
+
                 // event connections
                 this.eventConnections = [];
             },
@@ -260,7 +266,24 @@ define([
                         }), 'marks_' + nextPlayerIdToMark);
 
                         this.placeOnObject(markDivId, 'overall_player_board_' + nextPlayerIdToMark);
-                        this.slideToObject(markDivId, `${type}_${id}_${nextPlayerIdToMark}`).play();
+
+                        if (type == 'office') {
+                            this.slideToObject(markDivId, `${type}_${id}_${nextPlayerIdToMark}`).play();
+                        }
+                        else if (type == 'contract') {
+                            let xPos, yPos;
+                            if (markedByPlayer == nextPlayerIdToMark) {
+                                xPos = this.contractCircleMarkXOffset;
+                                yPos = this.contractCircleMarkYOffset;
+
+                            }
+                            else {
+                                xPos = this.contractXMarkXOffset;
+                                yPos = this.contractXMarkYOffset;
+                            }
+
+                            this.slideToObjectPos(markDivId, `${type}_${id}_${nextPlayerIdToMark}`, xPos, yPos).play();
+                        }
                     }
                 }
 
@@ -749,7 +772,16 @@ define([
                     }), 'marks_' + nextPlayerIdToMark);
 
                     this.placeOnObject(markId, 'overall_player_board_' + nextPlayerIdToMark);
-                    this.slideToObject(markId, `contract_${contractId}_${nextPlayerIdToMark}`).play();
+                    let xPos, yPos;
+                    if (playerId == nextPlayerIdToMark) {
+                        xPos = this.contractCircleMarkXOffset;
+                        yPos = this.contractCircleMarkYOffset;
+                    }
+                    else {
+                        xPos = this.contractXMarkXOffset;
+                        yPos = this.contractXMarkYOffset;
+                    }
+                    this.slideToObjectPos(markId, `contract_${contractId}_${nextPlayerIdToMark}`, xPos, yPos).play();
                 }
 
                 this.scoreCtrl[playerId].incValue(notif.args.points);
