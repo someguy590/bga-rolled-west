@@ -41,9 +41,22 @@ define([
 
                 // 2 number shipment spaces offsets
                 this.higherPoint2NumberBoxX = 9;
-                this.higherPoint2NumberBoxY = 25;
-                this.lowerPoint2NumberBoxX = 37;
-                this.lowerPoint2NumberBoxY = 30;
+                this.higherPoint2NumberBoxY = 24;
+                this.lowerPoint2NumberBoxX = 34;
+                this.lowerPoint2NumberBoxY = 26;
+
+                this.shipCopperXMarkXOffset = 10;
+                this.shipCopperXMarkYOffset = 36;
+                this.shipSilverXMarkXOffset = 10;
+                this.shipSilverXMarkYOffset = 35;
+                this.shipGoldXMarkXOffset = 11;
+                this.shipGoldXMarkYOffset = 34;
+
+                // contract mark offsets
+                this.contractCircleMarkXOffset = 10;
+                this.contractCircleMarkYOffset = 67;
+                this.contractXMarkXOffset = 13;
+                this.contractXMarkYOffset = 78;
 
                 // event connections
                 this.eventConnections = [];
@@ -233,8 +246,13 @@ define([
                         continue;
 
                     for (let [nextPlayerIdToMark, player] of Object.entries(this.gamedatas.players)) {
-                        if (type == 'office' || type == 'contract') {
-                            // if marked by player is same player viewing in browser, display owning mark
+                        if (type == 'office') {
+                            if (markedByPlayer == nextPlayerIdToMark)
+                                classes = 'mark_circle mark_circle_office';
+                            else
+                                classes = 'mark_x mark_x_office';
+                        }
+                        else if (type == 'contract') {
                             if (markedByPlayer == nextPlayerIdToMark)
                                 classes = 'mark_circle';
                             else
@@ -248,7 +266,24 @@ define([
                         }), 'marks_' + nextPlayerIdToMark);
 
                         this.placeOnObject(markDivId, 'overall_player_board_' + nextPlayerIdToMark);
-                        this.slideToObject(markDivId, `${type}_${id}_${nextPlayerIdToMark}`).play();
+
+                        if (type == 'office') {
+                            this.slideToObject(markDivId, `${type}_${id}_${nextPlayerIdToMark}`).play();
+                        }
+                        else if (type == 'contract') {
+                            let xPos, yPos;
+                            if (markedByPlayer == nextPlayerIdToMark) {
+                                xPos = this.contractCircleMarkXOffset;
+                                yPos = this.contractCircleMarkYOffset;
+
+                            }
+                            else {
+                                xPos = this.contractXMarkXOffset;
+                                yPos = this.contractXMarkYOffset;
+                            }
+
+                            this.slideToObjectPos(markDivId, `${type}_${id}_${nextPlayerIdToMark}`, xPos, yPos).play();
+                        }
                     }
                 }
 
@@ -335,9 +370,12 @@ define([
 
                             let markId = `shipment_mark_x_${resourceTypeId}_${spaceId}_${nextPlayerIdToMark}`;
                             let classes = 'mark_x';
+                            let [markXPos, markYPos] = this.getShipXMarkOffset(resourceTypeId);
                             if (markedByPlayer == nextPlayerIdToMark) {
                                 markId = `shipment_mark_circle_${resourceTypeId}_${spaceId}_${nextPlayerIdToMark}`;
                                 classes = 'mark_circle';
+                                markXPos = this.higherPoint2NumberBoxX;
+                                markYPos = this.higherPoint2NumberBoxY;
                             }
 
                             dojo.place(this.format_block('jstpl_mark', {
@@ -346,7 +384,7 @@ define([
                             }), 'marks_' + nextPlayerIdToMark);
 
                             this.placeOnObject(markId, 'overall_player_board_' + nextPlayerIdToMark);
-                            this.slideToObjectPos(markId, `shipment_${resourceTypeId}_${spaceId}_${nextPlayerIdToMark}`, this.higherPoint2NumberBoxX, this.higherPoint2NumberBoxY).play();
+                            this.slideToObjectPos(markId, `shipment_${resourceTypeId}_${spaceId}_${nextPlayerIdToMark}`, markXPos, markYPos).play();
 
                             if (markedByPlayer != nextPlayerIdToMark) {
                                 let checkCount = shipmentChecks[this.player_id][resourceTypeId];
@@ -399,6 +437,15 @@ define([
                     this.eventConnections.push(dojo.connect($(claimDivId), 'onclick', this, 'onBuildClaim'));
                     dojo.addClass(claimDivId, 'buyable');
                 }
+            },
+
+            getShipXMarkOffset: function (resourceTypeId) {
+                if (resourceTypeId == 0)
+                    return [this.shipCopperXMarkXOffset, this.shipCopperXMarkYOffset];
+                else if (resourceTypeId == 2)
+                    return [this.shipSilverXMarkXOffset, this.shipSilverXMarkYOffset];
+                else if (resourceTypeId == 3)
+                    return [this.shipGoldXMarkXOffset, this.shipGoldXMarkYOffset];
             },
 
             ///////////////////////////////////////////////////
@@ -608,9 +655,9 @@ define([
                     // if marked by player is same player viewing in browser, display owning mark
                     let classes = '';
                     if (playerId == nextPlayerIdToMark)
-                        classes = 'mark_circle';
+                        classes = 'mark_circle mark_circle_office';
                     else
-                        classes = 'mark_x';
+                        classes = 'mark_x mark_x_office';
 
                     let markId = `office_mark_${officeId}_${nextPlayerIdToMark}`;
                     dojo.place(this.format_block('jstpl_mark', {
@@ -666,6 +713,9 @@ define([
                                     xPos = this.higherPoint2NumberBoxX;
                                     yPos = this.higherPoint2NumberBoxY;
                                 }
+                                else {
+                                    classes += ' mark_circle_small_number';
+                                }
                                 dojo.place(this.format_block('jstpl_mark', {
                                     markId: markId,
                                     classes: classes
@@ -677,14 +727,15 @@ define([
                         }
                         else if (space.has2Numbers && space.isFirstToBonus) {
                             let classes = 'mark_x';
-                            let markId = `shipment_mark_x_${resourceTypeId}_${spaceId}_${nextPlayerIdToMark}`
+                            let markId = `shipment_mark_x_${resourceTypeId}_${spaceId}_${nextPlayerIdToMark}`;
+                            let [markXPos, markYPos] = this.getShipXMarkOffset(resourceTypeId);
                             dojo.place(this.format_block('jstpl_mark', {
                                 markId: markId,
                                 classes: classes
                             }), 'marks_' + nextPlayerIdToMark);
 
                             this.placeOnObject(markId, 'overall_player_board_' + nextPlayerIdToMark);
-                            this.slideToObjectPos(markId, `shipment_${resourceTypeId}_${spaceId}_${nextPlayerIdToMark}`, this.higherPoint2NumberBoxX, this.higherPoint2NumberBoxY).play();
+                            this.slideToObjectPos(markId, `shipment_${resourceTypeId}_${spaceId}_${nextPlayerIdToMark}`, markXPos, markYPos).play();
                         }
                     }
                 }
@@ -721,7 +772,16 @@ define([
                     }), 'marks_' + nextPlayerIdToMark);
 
                     this.placeOnObject(markId, 'overall_player_board_' + nextPlayerIdToMark);
-                    this.slideToObject(markId, `contract_${contractId}_${nextPlayerIdToMark}`).play();
+                    let xPos, yPos;
+                    if (playerId == nextPlayerIdToMark) {
+                        xPos = this.contractCircleMarkXOffset;
+                        yPos = this.contractCircleMarkYOffset;
+                    }
+                    else {
+                        xPos = this.contractXMarkXOffset;
+                        yPos = this.contractXMarkYOffset;
+                    }
+                    this.slideToObjectPos(markId, `contract_${contractId}_${nextPlayerIdToMark}`, xPos, yPos).play();
                 }
 
                 this.scoreCtrl[playerId].incValue(notif.args.points);

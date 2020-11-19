@@ -97,7 +97,6 @@
     width: 50px;
     height: 53px;
     position: absolute;
-    border-radius: 50%;
 }
 
 .buyable {
@@ -107,9 +106,9 @@
 
 .settlement {
     position: absolute;
-    border: 3px solid black;
-    height: 25px;
-    width: 25px;
+    border: 5px solid black;
+    height: 35px;
+    width: 35px;
     border-radius: 50%;
 }
 
@@ -150,9 +149,14 @@
     -webkit-border-radius: 50%;
 }
 
+.mark_circle_office {
+    height: 45px;
+    width: 45px;
+}
+
 .mark_circle_small_number {
-    height: 18px;
-    width: 18px;
+    height: 20px;
+    width: 20px;
 }
 
 .mark_x {
@@ -164,6 +168,10 @@
 .mark_x::before {
     content: 'x';
     position: relative;
+}
+
+.mark_x_office {
+    font-size: 60px;
 }
 
 .mark_check {
