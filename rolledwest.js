@@ -240,8 +240,13 @@ define([
                         continue;
 
                     for (let [nextPlayerIdToMark, player] of Object.entries(this.gamedatas.players)) {
-                        if (type == 'office' || type == 'contract') {
-                            // if marked by player is same player viewing in browser, display owning mark
+                        if (type == 'office') {
+                            if (markedByPlayer == nextPlayerIdToMark)
+                                classes = 'mark_circle mark_circle_office';
+                            else
+                                classes = 'mark_x mark_x_office';
+                        }
+                        else if (type == 'contract') {
                             if (markedByPlayer == nextPlayerIdToMark)
                                 classes = 'mark_circle';
                             else
@@ -627,9 +632,9 @@ define([
                     // if marked by player is same player viewing in browser, display owning mark
                     let classes = '';
                     if (playerId == nextPlayerIdToMark)
-                        classes = 'mark_circle';
+                        classes = 'mark_circle mark_circle_office';
                     else
-                        classes = 'mark_x';
+                        classes = 'mark_x mark_x_office';
 
                     let markId = `office_mark_${officeId}_${nextPlayerIdToMark}`;
                     dojo.place(this.format_block('jstpl_mark', {
