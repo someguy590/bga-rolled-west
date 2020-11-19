@@ -41,9 +41,16 @@ define([
 
                 // 2 number shipment spaces offsets
                 this.higherPoint2NumberBoxX = 9;
-                this.higherPoint2NumberBoxY = 25;
+                this.higherPoint2NumberBoxY = 24;
                 this.lowerPoint2NumberBoxX = 34;
                 this.lowerPoint2NumberBoxY = 26;
+
+                this.shipCopperXMarkXOffset = 10;
+                this.shipCopperXMarkYOffset = 36;
+                this.shipSilverXMarkXOffset = 10;
+                this.shipSilverXMarkYOffset = 35;
+                this.shipGoldXMarkXOffset = 11;
+                this.shipGoldXMarkYOffset = 34;
 
                 // event connections
                 this.eventConnections = [];
@@ -335,9 +342,12 @@ define([
 
                             let markId = `shipment_mark_x_${resourceTypeId}_${spaceId}_${nextPlayerIdToMark}`;
                             let classes = 'mark_x';
+                            let [markXPos, markYPos] = this.getShipXMarkOffset(resourceTypeId);
                             if (markedByPlayer == nextPlayerIdToMark) {
                                 markId = `shipment_mark_circle_${resourceTypeId}_${spaceId}_${nextPlayerIdToMark}`;
                                 classes = 'mark_circle';
+                                markXPos = this.higherPoint2NumberBoxX;
+                                markYPos = this.higherPoint2NumberBoxY;
                             }
 
                             dojo.place(this.format_block('jstpl_mark', {
@@ -346,7 +356,7 @@ define([
                             }), 'marks_' + nextPlayerIdToMark);
 
                             this.placeOnObject(markId, 'overall_player_board_' + nextPlayerIdToMark);
-                            this.slideToObjectPos(markId, `shipment_${resourceTypeId}_${spaceId}_${nextPlayerIdToMark}`, this.higherPoint2NumberBoxX, this.higherPoint2NumberBoxY).play();
+                            this.slideToObjectPos(markId, `shipment_${resourceTypeId}_${spaceId}_${nextPlayerIdToMark}`, markXPos, markYPos).play();
 
                             if (markedByPlayer != nextPlayerIdToMark) {
                                 let checkCount = shipmentChecks[this.player_id][resourceTypeId];
@@ -399,6 +409,15 @@ define([
                     this.eventConnections.push(dojo.connect($(claimDivId), 'onclick', this, 'onBuildClaim'));
                     dojo.addClass(claimDivId, 'buyable');
                 }
+            },
+
+            getShipXMarkOffset: function (resourceTypeId) {
+                if (resourceTypeId == 0)
+                    return [this.shipCopperXMarkXOffset, this.shipCopperXMarkYOffset];
+                else if (resourceTypeId == 2)
+                    return [this.shipSilverXMarkXOffset, this.shipSilverXMarkYOffset];
+                else if (resourceTypeId == 3)
+                    return [this.shipGoldXMarkXOffset, this.shipGoldXMarkYOffset];
             },
 
             ///////////////////////////////////////////////////
@@ -680,14 +699,15 @@ define([
                         }
                         else if (space.has2Numbers && space.isFirstToBonus) {
                             let classes = 'mark_x';
-                            let markId = `shipment_mark_x_${resourceTypeId}_${spaceId}_${nextPlayerIdToMark}`
+                            let markId = `shipment_mark_x_${resourceTypeId}_${spaceId}_${nextPlayerIdToMark}`;
+                            let [markXPos, markYPos] = this.getShipXMarkOffset(resourceTypeId);
                             dojo.place(this.format_block('jstpl_mark', {
                                 markId: markId,
                                 classes: classes
                             }), 'marks_' + nextPlayerIdToMark);
 
                             this.placeOnObject(markId, 'overall_player_board_' + nextPlayerIdToMark);
-                            this.slideToObjectPos(markId, `shipment_${resourceTypeId}_${spaceId}_${nextPlayerIdToMark}`, this.higherPoint2NumberBoxX, this.higherPoint2NumberBoxY).play();
+                            this.slideToObjectPos(markId, `shipment_${resourceTypeId}_${spaceId}_${nextPlayerIdToMark}`, markXPos, markYPos).play();
                         }
                     }
                 }
