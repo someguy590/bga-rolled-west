@@ -55,8 +55,8 @@
 
     var jstpl_mark_triangle = '\
     <div id="${markId}" class="${classes}">\
-        <svg width="51" height="51" >\
-            <polygon points="0,51 25,0 51,51" style="fill:none;stroke:black;stroke-width:1" />\
+        <svg width="50" height="53" >\
+            <polygon points="5,45 26,5 45,45" style="fill:none;stroke:black;stroke-width:4" />\
         </svg>\
     </div>'
 
