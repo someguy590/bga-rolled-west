@@ -20,8 +20,8 @@
 <div id="personal_board" class="board">
     <!-- BEGIN personal_square -->
     <div id="{SQUARE_ID}_{PLAYER_ID}" class="{CLASSES}" style="left: {LEFT}px; top: {TOP}px;"></div>
-    <div id="marks_{PLAYER_ID}"></div>
     <!-- END personal_square -->
+    <div id="marks_{PERSONAL_PLAYER_ID}"></div>
 
 </div>
 
@@ -32,8 +32,8 @@
         <div id="board_{PLAYER_ID}" class="board">
             <!-- BEGIN other_player_square -->
             <div id="{SQUARE_ID}_{PLAYER_ID}" class="{CLASSES}" style="left: {LEFT}px; top: {TOP}px;"></div>
-            <div id="marks_{PLAYER_ID}"></div>
             <!-- END other_player_square -->
+            <div id="marks_{PLAYER_ID}"></div>
 
         </div>
     </div>

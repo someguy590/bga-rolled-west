@@ -155,7 +155,7 @@ class view_rolledwest_rolledwest extends game_view
 
     $this->tpl['MY_DICE'] = $this->_('My dice');
     $this->tpl['SPENT_OR_BANKED_DICE'] = $this->_('Spent or banked dice');
-
+    $this->tpl['PERSONAL_PLAYER_ID'] = $current_player_id;
 
     $this->page->begin_block($this->getGameName() . '_' . $this->getGameName(), 'personal_square');
     $this->build_player_board_content('personal_square', $current_player_id);
