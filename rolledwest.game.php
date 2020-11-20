@@ -742,7 +742,6 @@ class RolledWest extends Table
         } else {
             $sql = "UPDATE player SET $resource_db_name=$resource_db_name + 1, is_banking_in_between_turn=true WHERE player_id=$player_id";
             $this->DbQuery($sql);
-            $this->gamestate->setPlayerNonMultiactive($player_id, 'rollDice');
         }
 
         $resource_name = $this->dice_types[$resource]['name'];
@@ -753,6 +752,10 @@ class RolledWest extends Table
             'playerId' => $player_id,
             'diceRollerId' => $dice_roller_id
         ]);
+
+        if ($player_id != $dice_roller_id) {
+            $this->gamestate->setPlayerNonMultiactive($player_id, 'rollDice');
+        }
     }
 
     //////////////////////////////////////////////////////////////////////////////
