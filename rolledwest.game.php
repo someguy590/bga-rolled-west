@@ -162,6 +162,9 @@ class RolledWest extends Table
         $shipments = ['checks' => $checks];
         $result['shipments'] = $shipments;
 
+        foreach ($this->offices as $office_id => $office)
+            $result['officeDescriptions'][$office_id] = $office['description'];
+
         return $result;
     }
 
