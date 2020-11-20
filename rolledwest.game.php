@@ -966,8 +966,6 @@ class RolledWest extends Table
 
             foreach ($claim_majority_bigger_winners as $player_id)
                 $claim_majority_counts[$player_id]++;
-            foreach ($claim_majority_smaller_winners as $player_id)
-                $claim_majority_counts[$player_id]++;
 
             if (count($claim_majority_bigger_winners) > 0) {
                 $bigger_points = $this->claims[$terrain_type_id]['claimMajorityPoints'][0];
