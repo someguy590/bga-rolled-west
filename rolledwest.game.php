@@ -983,7 +983,7 @@ class RolledWest extends Table
                 foreach ($claim_majority_bigger_winners as $winner_id) {
                     $winner_name = $this->loadPlayersBasicInfos()[$winner_id]['player_name'];
                     $this->notifyAllPlayers(
-                        'endGameScoreClaims',
+                        'endGameScore',
                         $msg,
                         [
                             'player_name' => $winner_name,
