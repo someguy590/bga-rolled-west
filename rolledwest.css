@@ -67,6 +67,7 @@
     width: 55px;
     height: 52px;
     position: absolute;
+    z-index: 1;
 }
 
 .office_middle_row {

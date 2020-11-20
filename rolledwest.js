@@ -117,11 +117,6 @@ define([
                     this.addTooltip( officeDiv.id, _(this.gamedatas.officeDescriptions[officeId]), '');
                 }
 
-                for (let officeDiv of dojo.query('.mark_x_office, .mark_circle_office')) {
-                    let officeId = officeDiv.id.split('_')[2];
-                    this.addTooltip( officeDiv.id, _(this.gamedatas.officeDescriptions[officeId]), '');
-                }
-
                 // Setup game notifications to handle (see "setupNotifications" method below)
                 this.setupNotifications();
 
