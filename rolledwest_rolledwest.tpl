@@ -9,25 +9,26 @@
 -- See http://en.boardgamearena.com/#!doc/Studio for more information.
 -------
 -->
-<div id="rolled_dice_row" class="whiteblock">
-    <h3><span id="player_name_current_dice"></span> {ROLLED_DICE_TEXT}</h3>
-    <div id="rolled_dice" class="dice"></div>
-</div>
-<div id="used_dice_row" class="whiteblock">
-    <h3>{SPENT_OR_BANKED_DICE}</h3>
-    <div id="spent_or_banked_dice" class="dice"></div>
-</div>
-<div id="personal_board" class="board">
-    <!-- BEGIN personal_square -->
-    <div id="{SQUARE_ID}_{PLAYER_ID}" class="{CLASSES}" style="left: {LEFT}px; top: {TOP}px;"></div>
-    <!-- END personal_square -->
-    <div id="marks_{PERSONAL_PLAYER_ID}"></div>
-
+<div id="personal_info_wrapper">
+    <div id="rolled_dice_row" class="whiteblock">
+        <h3><span id="player_name_current_dice"></span> {ROLLED_DICE_TEXT}</h3>
+        <div id="rolled_dice" class="dice"></div>
+    </div>
+    <div id="used_dice_row" class="whiteblock">
+        <h3>{SPENT_OR_BANKED_DICE}</h3>
+        <div id="spent_or_banked_dice" class="dice"></div>
+    </div>
+    <div id="personal_board" class="board">
+        <!-- BEGIN personal_square -->
+        <div id="{SQUARE_ID}_{PLAYER_ID}" class="{CLASSES}" style="left: {LEFT}px; top: {TOP}px;"></div>
+        <!-- END personal_square -->
+        <div id="marks_{PERSONAL_PLAYER_ID}"></div>
+    </div>
 </div>
 
 <div id="other_players_board">
     <!-- BEGIN board -->
-    <div class="whiteblock" >
+    <div class="whiteblock">
         <h3 style="color:#{PLAYER_COLOR}">{PLAYER_NAME}</h3>
         <div id="board_{PLAYER_ID}" class="board">
             <!-- BEGIN other_player_square -->

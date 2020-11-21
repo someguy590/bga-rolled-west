@@ -57,9 +57,11 @@
 #other_players_board {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
 }
 
-#rolled_dice_row {
+#personal_info_wrapper {
+    width: 564px;
     margin: auto;
 }
 
