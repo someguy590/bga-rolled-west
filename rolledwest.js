@@ -117,6 +117,14 @@ define([
                     this.addTooltip( officeDiv.id, _(this.gamedatas.officeDescriptions[officeId]), '');
                 }
 
+                let color;
+                if (gamedatas.diceRollerId == -1)
+                    color = '#ffffff';
+                else
+                    color = '#' + gamedatas.players[gamedatas.diceRollerId].color;
+                dojo.style('player_name_current_dice', 'color', color);
+                $('player_name_current_dice').innerHTML = gamedatas.diceRollerName;
+
                 // Setup game notifications to handle (see "setupNotifications" method below)
                 this.setupNotifications();
 
@@ -640,6 +648,17 @@ define([
                 this.spentOrBankedResources.removeAll();
                 for (let die of dice)
                     this.playerResources.addToStock(die);
+
+                let color;
+                if (playerId == -1) {
+                    color = '#ffffff';
+                    $('player_name_current_dice').innerHTML = 'Ghost';
+                }
+                else {
+                    color = '#' + this.gamedatas.players[playerId].color;
+                    $('player_name_current_dice').innerHTML = this.gamedatas.players[playerId].name;
+                }
+                dojo.style('player_name_current_dice', 'color', color);
             },
 
             notif_purchaseOffice: function (notif) {

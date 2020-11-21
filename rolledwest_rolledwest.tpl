@@ -10,7 +10,7 @@
 -------
 -->
 <div id="rolled_dice_row" class="whiteblock">
-    <h3>{MY_DICE}</h3>
+    <h3><span id="player_name_current_dice"></span> {ROLLED_DICE_TEXT}</h3>
     <div id="rolled_dice" class="dice"></div>
 </div>
 <div id="used_dice_row" class="whiteblock">

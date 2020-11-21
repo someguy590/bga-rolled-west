@@ -165,6 +165,15 @@ class RolledWest extends Table
         foreach ($this->offices as $office_id => $office)
             $result['officeDescriptions'][$office_id] = $office['description'];
 
+        $dice_roller_id = $this->getGameStateValue('diceRollerId');
+        $result['diceRollerId'] = $dice_roller_id;
+        $player_name = '';
+        if ($dice_roller_id == -1)
+            $player_name = 'Ghost';
+        else
+            $player_name = $this->loadPlayersBasicInfos()[$dice_roller_id]['player_name'];
+        $result['diceRollerName'] = $player_name;
+
         return $result;
     }
 
@@ -832,7 +841,8 @@ class RolledWest extends Table
                     $this->setGameStateValue('spentOrBankedDie' . $i, -1);
 
                 $this->notifyAllPlayers('diceRolled', clienttranslate('Ghost rolls dice'), [
-                    'dice' => $dice
+                    'dice' => $dice,
+                    'playerId' => -1
                 ]);
 
                 $this->setGameStateValue('diceRollerId', -1);
@@ -848,7 +858,7 @@ class RolledWest extends Table
             $round++;
 
             // game end
-            if ($round == 3) {
+            if ($round == 111) {
                 $this->gamestate->nextState('score');
                 return;
             }
