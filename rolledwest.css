@@ -188,3 +188,30 @@
     font-size: 150%;
     line-height: 0%;
 }
+
+.turn_order_icon {
+    width: 35px;
+    height: 30px;
+    display: inline-block;
+    position: relative;
+    background-repeat: no-repeat;
+    background-image: url('img/turn_order_icons.jpg');
+    margin-top: 4px;
+    margin-right: 3px;
+}
+
+.turn_order_icon_1 {
+    background-position: 0px 0px;
+}
+
+.turn_order_icon_2 {
+    background-position: -35px 0px;
+}
+
+.turn_order_icon_3 {
+    background-position: -70px 0px;
+}
+
+.turn_order_icon_4 {
+    background-position: -105px 0px;
+}

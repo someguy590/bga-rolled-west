@@ -46,6 +46,7 @@
     // Javascript HTML templates
     var jstpl_player_board = '\
     <div class="cp_board">\
+        <div class="turn_order_icon turn_order_icon_${playerTurnOrder}"></div>\
         <div class="bank_icon bank_icon_copper"></div><span id="copper_count_${playerId}">0</span>\
         <div class="bank_icon bank_icon_wood"></div><span id="wood_count_${playerId}">0</span>\
         <div class="bank_icon bank_icon_silver"></div><span id="silver_count_${playerId}">0</span>\

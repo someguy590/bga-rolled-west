@@ -86,7 +86,7 @@ define([
                 for (let [player_id, player] of Object.entries(gamedatas.players)) {
                     // TODO: Setting up players boards if needed
                     let playerBoardDiv = $('player_board_' + player_id);
-                    dojo.place(this.format_block('jstpl_player_board', { playerId: player_id }), playerBoardDiv);
+                    dojo.place(this.format_block('jstpl_player_board', { playerId: player_id, playerTurnOrder: player.turnOrder }), playerBoardDiv);
 
                     this.copperCounters[player_id] = new ebg.counter();
                     this.copperCounters[player_id].create('copper_count_' + player_id);
