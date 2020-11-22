@@ -13,7 +13,7 @@
 $gameinfos = array(
 
     // Name of the game in English (will serve as the basis for translation) 
-    'game_name' => "Rolled West",
+    'game_name' => 'Rolled West',
 
     // Game designer (or game designers, separated by commas)
     'designer' => 'Daniel Newman',
@@ -22,7 +22,7 @@ $gameinfos = array(
     'artist' => 'Adam P. McIver, Ariel Seoane',
 
     // Year of FIRST publication of this game. Can be negative.
-    'year' => 2000,
+    'year' => 2019,
 
     // Game publisher (use empty string if there is no publisher)
     'publisher' => 'Tasty Minstrel Games',
