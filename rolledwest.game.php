@@ -789,26 +789,8 @@ class RolledWest extends Table
         $result = $this->getPossibleBuys();
         $result['roundNbr'] = $this->getGameStateValue('round');
         $result = array_merge($result, $this->loadPlayersBasicInfos());
-        $this->dump('arg spend or bank result', $result);
         return $result;
     }
-
-    /*
-    
-    Example for game state "MyGameState":
-    
-    function argMyGameState()
-    {
-        // Get some values from the current game situation in database...
-    
-        // return values:
-        return array(
-            'variable1' => $value1,
-            'variable2' => $value2,
-            ...
-        );
-    }    
-    */
 
     //////////////////////////////////////////////////////////////////////////////
     //////////// Game state actions
