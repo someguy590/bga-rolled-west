@@ -26,12 +26,12 @@ define([
             constructor: function () {
                 console.log('rolledwest constructor');
 
-                this.diceWidth = 15;
-                this.diceHeight = 15;
+                this.diceWidth = 27;
+                this.diceHeight = 25;
                 this.playerResources = new ebg.stock();
                 this.spentOrBankedResources = new ebg.stock();
-                this.playerResources.image_items_per_row = 4;
-                this.spentOrBankedResources.image_items_per_row = 4;
+                this.playerResources.image_items_per_row = 1;
+                this.spentOrBankedResources.image_items_per_row = 1;
                 this.playerResources.create(this, $('rolled_dice'), this.diceWidth, this.diceHeight);
                 this.spentOrBankedResources.create(this, $('spent_or_banked_dice'), this.diceWidth, this.diceHeight);
                 let resourceTypeIconLocation = {0: 2, 1: 3, 2: 0, 3: 1};
