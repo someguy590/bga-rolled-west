@@ -959,6 +959,8 @@ class RolledWest extends Table
             foreach ($claim_majority_bigger_winners as $player_id)
                 $claim_majority_counts[$player_id]++;
 
+            $terrain_type_name = $this->claims[$terrain_type_id]['name'];
+
             if (count($claim_majority_bigger_winners) > 0) {
                 $bigger_points = $this->claims[$terrain_type_id]['claimMajorityPoints'][0];
                 $sql = "UPDATE player SET player_score=player_score+$bigger_points WHERE ";
@@ -969,9 +971,9 @@ class RolledWest extends Table
                 $sql .= implode(' OR ', $values);
                 $this->DbQuery($sql);
 
-                $msg = clienttranslate('${player_name} ties for the bigger point majority claim and earns ${points} point(s)');
+                $msg = sprintf(clienttranslate('${player_name} ties for the %s bigger point majority claim and earns ${points} point(s)'), $terrain_type_name);
                 if (count($claim_majority_bigger_winners) == 1)
-                    $msg = clienttranslate('${player_name} win the bigger point majority claim and earns ${points} point(s)');
+                    $msg = sprintf(clienttranslate('${player_name} wins the %s bigger point majority claim and earns ${points} point(s)'), $terrain_type_name);
                 foreach ($claim_majority_bigger_winners as $winner_id) {
                     $winner_name = $this->loadPlayersBasicInfos()[$winner_id]['player_name'];
                     $this->notifyAllPlayers(
@@ -996,9 +998,9 @@ class RolledWest extends Table
                 $sql .= implode(' OR ', $values);
                 $this->DbQuery($sql);
 
-                $msg = clienttranslate('${player_name} ties for the smaller point majority claim and earns ${points} point(s)');
+                $msg = sprintf(clienttranslate('${player_name} ties for the %s smaller point majority claim and earns ${points} point(s)'), $terrain_type_name);
                 if (count($claim_majority_smaller_winners) == 1)
-                    $msg = clienttranslate('${player_name} win the smaller point majority claim and earns ${points} point(s)');
+                    $msg = sprintf(clienttranslate('${player_name} wins the %s smaller point majority claim and earns ${points} point(s)'), $terrain_type_name);
                 foreach ($claim_majority_smaller_winners as $winner_id) {
                     $winner_name = $this->loadPlayersBasicInfos()[$winner_id]['player_name'];
                     $this->notifyAllPlayers(
