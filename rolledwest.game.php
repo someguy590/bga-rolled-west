@@ -144,7 +144,7 @@ class RolledWest extends Table
 
         // Get information about players
         // Note: you can retrieve some extra field you added for "player" table in "dbmodel.sql" if you need it.
-        $sql = "SELECT player_id id, player_score score, copper, wood, silver, gold, is_banking_during_turn isBankingDuringTurn FROM player ";
+        $sql = "SELECT player_id id, player_score score, copper, wood, silver, gold, is_banking_during_turn isBankingDuringTurn, player_no turnOrder FROM player ";
         $result['players'] = self::getCollectionFromDb($sql);
 
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
@@ -161,6 +161,18 @@ class RolledWest extends Table
         $checks = $this->getCollectionFromDB($sql);
         $shipments = ['checks' => $checks];
         $result['shipments'] = $shipments;
+
+        foreach ($this->offices as $office_id => $office)
+            $result['officeDescriptions'][$office_id] = $office['description'];
+
+        $dice_roller_id = $this->getGameStateValue('diceRollerId');
+        $result['diceRollerId'] = $dice_roller_id;
+        $player_name = '';
+        if ($dice_roller_id == -1)
+            $player_name = 'Ghost';
+        else
+            $player_name = $this->loadPlayersBasicInfos()[$dice_roller_id]['player_name'];
+        $result['diceRollerName'] = $player_name;
 
         return $result;
     }
@@ -739,7 +751,6 @@ class RolledWest extends Table
         } else {
             $sql = "UPDATE player SET $resource_db_name=$resource_db_name + 1, is_banking_in_between_turn=true WHERE player_id=$player_id";
             $this->DbQuery($sql);
-            $this->gamestate->setPlayerNonMultiactive($player_id, 'rollDice');
         }
 
         $resource_name = $this->dice_types[$resource]['name'];
@@ -750,6 +761,10 @@ class RolledWest extends Table
             'playerId' => $player_id,
             'diceRollerId' => $dice_roller_id
         ]);
+
+        if ($player_id != $dice_roller_id) {
+            $this->gamestate->setPlayerNonMultiactive($player_id, 'rollDice');
+        }
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -774,26 +789,8 @@ class RolledWest extends Table
         $result = $this->getPossibleBuys();
         $result['roundNbr'] = $this->getGameStateValue('round');
         $result = array_merge($result, $this->loadPlayersBasicInfos());
-        $this->dump('arg spend or bank result', $result);
         return $result;
     }
-
-    /*
-    
-    Example for game state "MyGameState":
-    
-    function argMyGameState()
-    {
-        // Get some values from the current game situation in database...
-    
-        // return values:
-        return array(
-            'variable1' => $value1,
-            'variable2' => $value2,
-            ...
-        );
-    }    
-    */
 
     //////////////////////////////////////////////////////////////////////////////
     //////////// Game state actions
@@ -826,7 +823,8 @@ class RolledWest extends Table
                     $this->setGameStateValue('spentOrBankedDie' . $i, -1);
 
                 $this->notifyAllPlayers('diceRolled', clienttranslate('Ghost rolls dice'), [
-                    'dice' => $dice
+                    'dice' => $dice,
+                    'playerId' => -1
                 ]);
 
                 $this->setGameStateValue('diceRollerId', -1);
@@ -842,7 +840,7 @@ class RolledWest extends Table
             $round++;
 
             // game end
-            if ($round == 3) {
+            if ($round == 7) {
                 $this->gamestate->nextState('score');
                 return;
             }
@@ -960,8 +958,8 @@ class RolledWest extends Table
 
             foreach ($claim_majority_bigger_winners as $player_id)
                 $claim_majority_counts[$player_id]++;
-            foreach ($claim_majority_smaller_winners as $player_id)
-                $claim_majority_counts[$player_id]++;
+
+            $terrain_type_name = $this->claims[$terrain_type_id]['name'];
 
             if (count($claim_majority_bigger_winners) > 0) {
                 $bigger_points = $this->claims[$terrain_type_id]['claimMajorityPoints'][0];
@@ -973,13 +971,13 @@ class RolledWest extends Table
                 $sql .= implode(' OR ', $values);
                 $this->DbQuery($sql);
 
-                $msg = clienttranslate('${player_name} ties for the bigger point majority claim and earns ${points} point(s)');
+                $msg = sprintf(clienttranslate('${player_name} ties for the %s bigger point majority claim and earns ${points} point(s)'), $terrain_type_name);
                 if (count($claim_majority_bigger_winners) == 1)
-                    $msg = clienttranslate('${player_name} win the bigger point majority claim and earns ${points} point(s)');
+                    $msg = sprintf(clienttranslate('${player_name} wins the %s bigger point majority claim and earns ${points} point(s)'), $terrain_type_name);
                 foreach ($claim_majority_bigger_winners as $winner_id) {
                     $winner_name = $this->loadPlayersBasicInfos()[$winner_id]['player_name'];
                     $this->notifyAllPlayers(
-                        'endGameScoreClaims',
+                        'endGameScore',
                         $msg,
                         [
                             'player_name' => $winner_name,
@@ -1000,9 +998,9 @@ class RolledWest extends Table
                 $sql .= implode(' OR ', $values);
                 $this->DbQuery($sql);
 
-                $msg = clienttranslate('${player_name} ties for the smaller point majority claim and earns ${points} point(s)');
+                $msg = sprintf(clienttranslate('${player_name} ties for the %s smaller point majority claim and earns ${points} point(s)'), $terrain_type_name);
                 if (count($claim_majority_smaller_winners) == 1)
-                    $msg = clienttranslate('${player_name} win the smaller point majority claim and earns ${points} point(s)');
+                    $msg = sprintf(clienttranslate('${player_name} wins the %s smaller point majority claim and earns ${points} point(s)'), $terrain_type_name);
                 foreach ($claim_majority_smaller_winners as $winner_id) {
                     $winner_name = $this->loadPlayersBasicInfos()[$winner_id]['player_name'];
                     $this->notifyAllPlayers(

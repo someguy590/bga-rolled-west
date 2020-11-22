@@ -86,7 +86,7 @@ define([
                 for (let [player_id, player] of Object.entries(gamedatas.players)) {
                     // TODO: Setting up players boards if needed
                     let playerBoardDiv = $('player_board_' + player_id);
-                    dojo.place(this.format_block('jstpl_player_board', { playerId: player_id }), playerBoardDiv);
+                    dojo.place(this.format_block('jstpl_player_board', { playerId: player_id, playerTurnOrder: player.turnOrder }), playerBoardDiv);
 
                     this.copperCounters[player_id] = new ebg.counter();
                     this.copperCounters[player_id].create('copper_count_' + player_id);
@@ -111,6 +111,19 @@ define([
                 this.displayShipmentMarks(this.gamedatas.shipments, this.gamedatas.marks);
                 dojo.connect(this.playerResources, 'onChangeSelection', this, 'onDiceSelected');
                 dojo.connect(this.spentOrBankedResources, 'onChangeSelection', this, 'onDiceSelected');
+
+                for (let officeDiv of dojo.query('.office')) {
+                    let officeId = officeDiv.id.split('_')[1];
+                    this.addTooltip( officeDiv.id, _(this.gamedatas.officeDescriptions[officeId]), '');
+                }
+
+                let color;
+                if (gamedatas.diceRollerId == -1)
+                    color = '#ffffff';
+                else
+                    color = '#' + gamedatas.players[gamedatas.diceRollerId].color;
+                dojo.style('player_name_current_dice', 'color', color);
+                $('player_name_current_dice').innerHTML = gamedatas.diceRollerName;
 
                 // Setup game notifications to handle (see "setupNotifications" method below)
                 this.setupNotifications();
@@ -635,6 +648,17 @@ define([
                 this.spentOrBankedResources.removeAll();
                 for (let die of dice)
                     this.playerResources.addToStock(die);
+
+                let color;
+                if (playerId == -1) {
+                    color = '#ffffff';
+                    $('player_name_current_dice').innerHTML = 'Ghost';
+                }
+                else {
+                    color = '#' + this.gamedatas.players[playerId].color;
+                    $('player_name_current_dice').innerHTML = this.gamedatas.players[playerId].name;
+                }
+                dojo.style('player_name_current_dice', 'color', color);
             },
 
             notif_purchaseOffice: function (notif) {

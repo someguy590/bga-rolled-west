@@ -153,7 +153,7 @@ class view_rolledwest_rolledwest extends game_view
     global $g_user;
     $current_player_id = $g_user->get_id();
 
-    $this->tpl['MY_DICE'] = $this->_('My dice');
+    $this->tpl['ROLLED_DICE_TEXT'] = $this->_('rolled dice');
     $this->tpl['SPENT_OR_BANKED_DICE'] = $this->_('Spent or banked dice');
     $this->tpl['PERSONAL_PLAYER_ID'] = $current_player_id;
 
