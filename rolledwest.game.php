@@ -190,8 +190,17 @@ class RolledWest extends Table
     function getGameProgression()
     {
         // TODO: compute and return the game progression
-
-        return 0;
+        $state = $this->gamestate->state()['name'];
+        if ($state == 'spendOrBank') {
+            $round = $this->getGameStateValue('round');
+            $dice_roller_id = $this->getGameStateValue('diceRollerId');
+            $dice_roller_player_num = 2;
+            if ($dice_roller_id != -1)
+                $dice_roller_player_num = $this->loadPlayersBasicInfos()[$dice_roller_id]['player_no'];
+            $turn_count = ($round - 1) * $this->getPlayersNumber() + $dice_roller_player_num;
+            $max_game_turns = $this->getPlayersNumber() * 6;
+            return round(($turn_count / $max_game_turns) * 100);
+        }
     }
 
 

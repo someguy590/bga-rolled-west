@@ -98,6 +98,7 @@ $machinestates = array(
         'transitions' => ['rollDice' => STATE_ROLL_DICE],
         'descriptionDiceRollerTurn' => clienttranslate('Round ${roundNbr}: ${you} may play your turn or pass'),
         'descriptionNonDiceRollerTurn' => clienttranslate('Round ${roundNbr}: ${you} may bank a resource or pass'),
+        'updateGameProgression' => true
     ],
 
     STATE_SCORE => [
