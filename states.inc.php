@@ -84,7 +84,7 @@ $machinestates = array(
         'type' => 'activeplayer',
         'args' => 'argChooseTerrain',
         'possibleactions' => ['chooseTerrain'],
-        'transitions' => ['spendOrBank' => STATE_SPEND_OR_BANK]
+        'transitions' => ['spendOrBank' => STATE_SPEND_OR_BANK, 'zombiePass' => STATE_ROLL_DICE]
     ],
 
     STATE_SPEND_OR_BANK => [
