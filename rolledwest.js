@@ -34,9 +34,10 @@ define([
                 this.spentOrBankedResources.image_items_per_row = 4;
                 this.playerResources.create(this, $('rolled_dice'), this.diceWidth, this.diceHeight);
                 this.spentOrBankedResources.create(this, $('spent_or_banked_dice'), this.diceWidth, this.diceHeight);
+                let resourceTypeIconLocation = {0: 2, 1: 3, 2: 0, 3: 1};
                 for (let resourceTypeId = 0; resourceTypeId < 4; resourceTypeId++) {
-                    this.playerResources.addItemType(resourceTypeId, resourceTypeId, g_gamethemeurl + 'img/resource_icons.png', resourceTypeId);
-                    this.spentOrBankedResources.addItemType(resourceTypeId, resourceTypeId, g_gamethemeurl + 'img/resource_icons.png', resourceTypeId);
+                    this.playerResources.addItemType(resourceTypeId, resourceTypeId, g_gamethemeurl + 'img/resource_icons.png', resourceTypeIconLocation[resourceTypeId]);
+                    this.spentOrBankedResources.addItemType(resourceTypeId, resourceTypeId, g_gamethemeurl + 'img/resource_icons.png', resourceTypeIconLocation[resourceTypeId]);
                 }
 
                 // 2 number shipment spaces offsets

@@ -12,11 +12,11 @@
 <div id="personal_info_wrapper">
     <div id="rolled_dice_row" class="whiteblock">
         <h3><span id="player_name_current_dice"></span> {ROLLED_DICE_TEXT}</h3>
-        <div id="rolled_dice" class="dice"></div>
+        <div id="rolled_dice"></div>
     </div>
     <div id="used_dice_row" class="whiteblock">
         <h3>{SPENT_OR_BANKED_DICE}</h3>
-        <div id="spent_or_banked_dice" class="dice"></div>
+        <div id="spent_or_banked_dice"></div>
     </div>
     <div id="personal_board" class="board">
         <!-- BEGIN personal_square -->
@@ -47,10 +47,10 @@
     var jstpl_player_board = '\
     <div class="cp_board">\
         <div class="turn_order_icon turn_order_icon_${playerTurnOrder}"></div>\
-        <div class="bank_icon bank_icon_copper"></div><span id="copper_count_${playerId}">0</span>\
-        <div class="bank_icon bank_icon_wood"></div><span id="wood_count_${playerId}">0</span>\
-        <div class="bank_icon bank_icon_silver"></div><span id="silver_count_${playerId}">0</span>\
-        <div class="bank_icon bank_icon_gold"></div><span id="gold_count_${playerId}">0</span>\
+        <div class="bank_icon bank_icon_copper"></div><span id="copper_count_${playerId}" class="resource_counter">0</span>\
+        <div class="bank_icon bank_icon_wood"></div><span id="wood_count_${playerId}" class="resource_counter">0</span>\
+        <div class="bank_icon bank_icon_silver"></div><span id="silver_count_${playerId}" class="resource_counter">0</span>\
+        <div class="bank_icon bank_icon_gold"></div><span id="gold_count_${playerId}" class="resource_counter">0</span>\
     </div>';
 
     var jstpl_mark = '<div id="${markId}" class="${classes}"></div>';
