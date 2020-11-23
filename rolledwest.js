@@ -79,6 +79,11 @@ define([
             setup: function (gamedatas) {
                 console.log("Starting game setup");
 
+                // spectator
+                if (this.isSpectator) {
+                    $('personal_board').remove();
+                }
+
                 // Setting up player boards
                 this.copperCounters = {};
                 this.woodCounters = {};
@@ -401,7 +406,7 @@ define([
                             this.slideToObjectPos(markId, `shipment_${resourceTypeId}_${spaceId}_${nextPlayerIdToMark}`, markXPos, markYPos).play();
 
                             if (markedByPlayer != nextPlayerIdToMark) {
-                                let checkCount = shipmentChecks[this.player_id][resourceTypeId];
+                                let checkCount = shipmentChecks[nextPlayerIdToMark][resourceTypeId];
                                 let isSpaceDeliveredTo = (checkCount - 1) >= spaceId;
 
                                 if (isSpaceDeliveredTo) {

@@ -18,12 +18,14 @@
         <h3>{SPENT_OR_BANKED_DICE}</h3>
         <div id="spent_or_banked_dice"></div>
     </div>
+    <!-- BEGIN personal_board -->
     <div id="personal_board" class="board">
         <!-- BEGIN personal_square -->
         <div id="{SQUARE_ID}_{PLAYER_ID}" class="{CLASSES}" style="left: {LEFT}px; top: {TOP}px;"></div>
         <!-- END personal_square -->
         <div id="marks_{PERSONAL_PLAYER_ID}"></div>
     </div>
+    <!-- END personal_board -->
 </div>
 
 <div id="other_players_board">

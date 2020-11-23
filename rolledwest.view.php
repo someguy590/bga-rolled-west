@@ -152,27 +152,52 @@ class view_rolledwest_rolledwest extends game_view
     /*********** Place your code below:  ************/
     global $g_user;
     $current_player_id = $g_user->get_id();
+    $isSpectator = false;
+    if (!array_key_exists($current_player_id, $players)) {
+      $isSpectator = true;
+    }
+
+    if (!$isSpectator) {
+      $this->tpl['PERSONAL_PLAYER_ID'] = $current_player_id;
+
+      $this->page->begin_block($this->getGameName() . '_' . $this->getGameName(), 'personal_square');
+      $this->page->begin_block($this->getGameName() . '_' . $this->getGameName(), 'personal_board');
+      $this->build_player_board_content('personal_square', $current_player_id);
+      $this->page->insert_block('personal_board', []);
+    }
 
     $this->tpl['ROLLED_DICE_TEXT'] = $this->_('rolled dice');
     $this->tpl['SPENT_OR_BANKED_DICE'] = $this->_('Spent or banked dice');
-    $this->tpl['PERSONAL_PLAYER_ID'] = $current_player_id;
-
-    $this->page->begin_block($this->getGameName() . '_' . $this->getGameName(), 'personal_square');
-    $this->build_player_board_content('personal_square', $current_player_id);
 
     $this->page->begin_block($this->getGameName() . '_' . $this->getGameName(), 'other_player_square');
     $this->page->begin_block($this->getGameName() . '_' . $this->getGameName(), 'board');
 
-    $next_player_id = $this->game->getPlayerAfter($current_player_id);
-    while ($next_player_id != $current_player_id) {
-      $this->page->reset_subblocks('other_player_square');
-      $this->build_player_board_content('other_player_square', $next_player_id);
-      $this->page->insert_block('board', [
-        'PLAYER_ID' => $next_player_id,
-        'PLAYER_NAME' => $players[$next_player_id]['player_name'],
-        'PLAYER_COLOR' => $players[$next_player_id]['player_color'] 
-      ]);
-      $next_player_id = $this->game->getPlayerAfter($next_player_id);
+    if ($isSpectator) {
+      $first_player_id = $this->game->getNextPlayerTable()[0];
+      $next_player_id = $first_player_id;
+      do {
+        $this->page->reset_subblocks('other_player_square');
+        $this->build_player_board_content('other_player_square', $next_player_id);
+        $this->page->insert_block('board', [
+          'PLAYER_ID' => $next_player_id,
+          'PLAYER_NAME' => $players[$next_player_id]['player_name'],
+          'PLAYER_COLOR' => $players[$next_player_id]['player_color']
+        ]);
+        $next_player_id = $this->game->getPlayerAfter($next_player_id);
+      } while ($next_player_id != $first_player_id);
+    } 
+    else {
+      $next_player_id = $this->game->getPlayerAfter($current_player_id);
+      while ($next_player_id != $current_player_id) {
+        $this->page->reset_subblocks('other_player_square');
+        $this->build_player_board_content('other_player_square', $next_player_id);
+        $this->page->insert_block('board', [
+          'PLAYER_ID' => $next_player_id,
+          'PLAYER_NAME' => $players[$next_player_id]['player_name'],
+          'PLAYER_COLOR' => $players[$next_player_id]['player_color']
+        ]);
+        $next_player_id = $this->game->getPlayerAfter($next_player_id);
+      }
     }
     /*********** Do not change anything below this line  ************/
   }
