@@ -20,17 +20,17 @@
  *
  */
 $this->gameConstants = [
-  'COPPER_RESOURCE_NAME' => 'copper',
-  'WOOD_RESOURCE_NAME' => 'wood',
-  'SILVER_RESOURCE_NAME' => 'silver',
-  'GOLD_RESOURCE_NAME' => 'gold',
+  'COPPER_RESOURCE_NAME' => clienttranslate('copper'),
+  'WOOD_RESOURCE_NAME' => clienttranslate('wood'),
+  'SILVER_RESOURCE_NAME' => clienttranslate('silver'),
+  'GOLD_RESOURCE_NAME' => clienttranslate('gold')
 ];
 
 $this->dice_types = [
-  0 => ['name' => clienttranslate($this->gameConstants['COPPER_RESOURCE_NAME']), 'range' => [1, 4], 'dbName' => 'copper'],
-  1 => ['name' => clienttranslate($this->gameConstants['WOOD_RESOURCE_NAME']), 'range' => [5, 7], 'dbName' => 'wood'],
-  2 => ['name' => clienttranslate($this->gameConstants['SILVER_RESOURCE_NAME']), 'range' => [8, 10], 'dbName' => 'silver'],
-  3 => ['name' => clienttranslate($this->gameConstants['GOLD_RESOURCE_NAME']), 'range' => [11, 12], 'dbName' => 'gold'],
+  0 => ['name' => $this->gameConstants['COPPER_RESOURCE_NAME'], 'range' => [1, 4], 'dbName' => 'copper'],
+  1 => ['name' => $this->gameConstants['WOOD_RESOURCE_NAME'], 'range' => [5, 7], 'dbName' => 'wood'],
+  2 => ['name' => $this->gameConstants['SILVER_RESOURCE_NAME'], 'range' => [8, 10], 'dbName' => 'silver'],
+  3 => ['name' => $this->gameConstants['GOLD_RESOURCE_NAME'], 'range' => [11, 12], 'dbName' => 'gold'],
 ];
 
 $this->offices = [
@@ -74,7 +74,7 @@ $this->offices = [
 
 $this->shipments = [
   0 => [
-    'name' => clienttranslate($this->gameConstants['COPPER_RESOURCE_NAME']),
+    'name' => $this->gameConstants['COPPER_RESOURCE_NAME'],
     'spaces' => [
       [
         'points' => 0,
@@ -106,7 +106,7 @@ $this->shipments = [
     ]
   ],
   2 => [
-    'name' => clienttranslate($this->gameConstants['SILVER_RESOURCE_NAME']),
+    'name' => $this->gameConstants['SILVER_RESOURCE_NAME'],
     'spaces' => [
       [
         'points' => 0,
@@ -138,7 +138,7 @@ $this->shipments = [
     ]
   ],
   3 => [
-    'name' => clienttranslate($this->gameConstants['GOLD_RESOURCE_NAME']),
+    'name' => $this->gameConstants['GOLD_RESOURCE_NAME'],
     'spaces' => [
       [
         'points' => 0,
