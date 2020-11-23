@@ -46,6 +46,10 @@
 
 /********* You can start writing your CSS below this line: **********/
 
+#rolled_dice_row, #used_dice_row {
+    text-align: center;
+}
+
 .board {
     position: relative;
     width: 564px;
