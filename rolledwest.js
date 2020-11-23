@@ -498,7 +498,19 @@ define([
                                 resource: dice[0].type,
                                 isResourceSpent: isResourceSpent,
                                 lock: true
-                            }, this, function (result) { }, function (is_error) { }
+                            }, this, function (result) {
+                                let resourceName;
+                                if (dice[0].type == 0)
+                                    resourceName = 'copper';
+                                else if (dice[0].type == 1)
+                                    resourceName = 'wood';
+                                else if (dice[0].type == 2)
+                                    resourceName = 'silver';
+                                else
+                                    resourceName = 'gold';
+                                this.slideTemporaryObject(`<div class="bank_icon bank_icon_${resourceName}"></div>`, diceId, `${diceId}_item_${dice[0].id}`, `${resourceName}_count_${this.player_id}`, 1000);
+                            },
+                            function (is_error) { }
                         );
                     }
                     this.playerResources.unselectAll();
