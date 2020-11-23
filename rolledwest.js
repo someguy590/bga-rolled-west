@@ -34,7 +34,7 @@ define([
                 this.spentOrBankedResources.image_items_per_row = 1;
                 this.playerResources.create(this, $('rolled_dice'), this.diceWidth, this.diceHeight);
                 this.spentOrBankedResources.create(this, $('spent_or_banked_dice'), this.diceWidth, this.diceHeight);
-                let resourceTypeIconLocation = {0: 2, 1: 3, 2: 0, 3: 1};
+                let resourceTypeIconLocation = { 0: 2, 1: 3, 2: 0, 3: 1 };
                 for (let resourceTypeId = 0; resourceTypeId < 4; resourceTypeId++) {
                     this.playerResources.addItemType(resourceTypeId, resourceTypeId, g_gamethemeurl + 'img/resource_icons.png', resourceTypeIconLocation[resourceTypeId]);
                     this.spentOrBankedResources.addItemType(resourceTypeId, resourceTypeId, g_gamethemeurl + 'img/resource_icons.png', resourceTypeIconLocation[resourceTypeId]);
@@ -120,7 +120,7 @@ define([
 
                 for (let officeDiv of dojo.query('.office')) {
                     let officeId = officeDiv.id.split('_')[1];
-                    this.addTooltip( officeDiv.id, _(this.gamedatas.officeDescriptions[officeId]), '');
+                    this.addTooltip(officeDiv.id, _(this.gamedatas.officeDescriptions[officeId]), '');
                 }
 
                 let color;
@@ -206,18 +206,6 @@ define([
                         case 'spendOrBank':
                             this.addActionButton('pass_button', _('pass'), 'pass');
                             break;
-                        /*               
-                                         Example:
-                         
-                                         case 'myGameState':
-                                            
-                                            // Add 3 action buttons in the action status bar:
-                                            
-                                            this.addActionButton( 'button_1_id', _('Button 1 label'), 'onMyMethodToCall1' ); 
-                                            this.addActionButton( 'button_2_id', _('Button 2 label'), 'onMyMethodToCall2' ); 
-                                            this.addActionButton( 'button_3_id', _('Button 3 label'), 'onMyMethodToCall3' ); 
-                                            break;
-                        */
                     }
                 }
             },
@@ -630,16 +618,6 @@ define([
                 this.notifqueue.setSynchronous('endGameScore', 1000);
 
                 dojo.subscribe('updatePossibleBuys', this, 'notif_updatePossibleBuys');
-
-                // Example 1: standard notification handling
-                // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
-
-                // Example 2: standard notification handling + tell the user interface to wait
-                //            during 3 seconds after calling the method in order to let the players
-                //            see what is happening in the game.
-                // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
-                // this.notifqueue.setSynchronous( 'cardPlayed', 3000 );
-                // 
             },
 
             // TODO: from this point and below, you can write your game notifications handling methods
