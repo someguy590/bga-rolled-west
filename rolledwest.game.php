@@ -416,9 +416,9 @@ class RolledWest extends Table
             if (is_null($last_claimed_space_id))
                 $last_claimed_space_id = -1;
 
-            if ($available_resources[1] > 0)
+            if ($available_resources[1] > 0 && ($last_claimed_space_id + 1) < 8)
                 $claims[] = 'claim_' . $chosen_terrain . '_' . ($last_claimed_space_id + 1) . '_' . $dice_roller_id;
-            if ($available_resources[1] > 1)
+            if ($available_resources[1] > 1 && ($last_claimed_space_id + 2) < 8)
                 $claims[] = 'claim_' . $chosen_terrain . '_' . ($last_claimed_space_id + 2) . '_' . $dice_roller_id;
         }
 
