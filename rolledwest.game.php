@@ -97,8 +97,57 @@ class RolledWest extends Table
 
         // Init game statistics
         // (note: statistics used in this file must be defined in your stats.inc.php file)
-        //self::initStat( 'table', 'table_teststat1', 0 );    // Init a table statistics
-        //self::initStat( 'player', 'player_teststat1', 0 );  // Init a player statistics (for all players)
+        $this->initStat('player', 'office_points', 0);
+        $this->initStat('player', 'offices_purchased', 0);
+        $this->initStat('player', 'shipping_points', 0);
+        $this->initStat('player', 'copper_shipped', 0);
+        $this->initStat('player', 'silver_shipped', 0);
+        $this->initStat('player', 'gold_shipped', 0);
+        $this->initStat('player', 'two_numbered_shipping_spaces_marked_first', 0);
+        $this->initStat('player', 'contract_points', 0);
+        $this->initStat('player', 'contracts_completed', 0);
+        $this->initStat('player', 'claim_points', 0);
+        $this->initStat('player', 'claim_majority_points', 0);
+        $this->initStat('player', 'camps_built', 0);
+        $this->initStat('player', 'settlements_built', 0);
+        $this->initStat('player', 'number_of_first_most_claim_majorities', 0);
+        $this->initStat('player', 'completed_shipping_rows', 0);
+        $this->initStat('player', 'copper_in_shipping_and_contracts', 0);
+        $this->initStat('player', 'stars', 0);
+        $this->initStat('player', 'copper_rolled', 0);
+        $this->initStat('player', 'wood_rolled', 0);
+        $this->initStat('player', 'silver_rolled', 0);
+        $this->initStat('player', 'gold_rolled', 0);
+        $this->initStat('player', 'copper_selected_as_terrain', 0);
+        $this->initStat('player', 'wood_selected_as_terrain', 0);
+        $this->initStat('player', 'silver_selected_as_terrain', 0);
+        $this->initStat('player', 'gold_selected_as_terrain', 0);
+        $this->initStat('player', 'copper_banked', 0);
+        $this->initStat('player', 'wood_banked', 0);
+        $this->initStat('player', 'silver_banked', 0);
+        $this->initStat('player', 'gold_banked', 0);
+
+        $this->initStat('table', 'offices_purchased', 0);
+        $this->initStat('table', 'copper_shipped', 0);
+        $this->initStat('table', 'silver_shipped', 0);
+        $this->initStat('table', 'gold_shipped', 0);
+        $this->initStat('table', 'completed_shipping_rows', 0);
+        $this->initStat('table', 'contracts_completed', 0);
+        $this->initStat('table', 'camps_built', 0);
+        $this->initStat('table', 'settlements_built', 0);
+        $this->initStat('table', 'copper_rolled', 0);
+        $this->initStat('table', 'wood_rolled', 0);
+        $this->initStat('table', 'silver_rolled', 0);
+        $this->initStat('table', 'gold_rolled', 0);
+        $this->initStat('table', 'copper_selected_as_terrain', 0);
+        $this->initStat('table', 'wood_selected_as_terrain', 0);
+        $this->initStat('table', 'silver_selected_as_terrain', 0);
+        $this->initStat('table', 'gold_selected_as_terrain', 0);
+        $this->initStat('table', 'copper_banked', 0);
+        $this->initStat('table', 'wood_banked', 0);
+        $this->initStat('table', 'silver_banked', 0);
+        $this->initStat('table', 'gold_banked', 0);
+
 
         // init other db tables
         $sql = "INSERT INTO claim (player_id, terrain_type_id, space_id) VALUES ";
@@ -443,11 +492,29 @@ class RolledWest extends Table
     {
         $this->checkAction('chooseTerrain', true);
         $dice = $this->getAvailableDice();
+        $player_id = $this->getActivePlayerId();
 
         foreach ($dice as $i => $die) {
             if ($terrain_type == $die) {
                 $this->setGameStateValue('die' . $i, -1);
                 $this->setGameStateValue('chosenTerrain', $terrain_type);
+                if ($terrain_type == 0) {
+                    $this->incStat(1, 'copper_selected_as_terrain', $player_id);
+                    $this->incStat(1, 'copper_selected_as_terrain');
+                }
+                else if ($terrain_type == 1) {
+                    $this->incStat(1, 'wood_selected_as_terrain', $player_id);
+                    $this->incStat(1, 'wood_selected_as_terrain');
+                }
+                else if ($terrain_type == 2) {
+                    $this->incStat(1, 'silver_selected_as_terrain', $player_id);
+                    $this->incStat(1, 'silver_selected_as_terrain');
+                }
+                else if ($terrain_type == 3) {
+                    $this->incStat(1, 'gold_selected_as_terrain', $player_id);
+                    $this->incStat(1, 'gold_selected_as_terrain');
+                }
+
                 $this->notifyAllPlayers('chooseTerrain', clienttranslate('${player_name} chooses ${terrain_name} to represent the terrain for the turn'), [
                     'player_name' => $this->getActivePlayerName(),
                     'terrain_name' => $this->dice_types[$terrain_type]['name'],
@@ -548,6 +615,7 @@ class RolledWest extends Table
             $space = $this->shipments[$resourceTypeId]['spaces'][$space_id];
 
             if ($space['has2Numbers']) {
+                $this->incStat(1, 'stars', $player_id);
                 $exclusive_id = $space['exclusiveId'];
                 $sql = "SELECT marked_by_player FROM exclusive WHERE exclusive_id=$exclusive_id AND exclusive_type='shipment'";
                 $is_bonus_available = is_null($this->getUniqueValueFromDB($sql));
@@ -578,7 +646,15 @@ class RolledWest extends Table
             
             if ($isFirstToBonus)
                 $notification_msg = clienttranslate('${player_name} is the first to reach a 2 number bonus space! ${player_name} shipped ${n} ${metal} and earns ${points} points');
+
+            $this->incStat($points, 'shipping_points', $player_id);
         }
+
+        if ($isFirstToBonus)
+            $this->incStat(1, 'two_numbered_shipping_spaces_marked_first', $player_id);
+
+        if ($resourceTypeId == 0)
+            $this->incStat($amount_needed, 'copper_in_shipping_and_contracts', $player_id);
 
         // notify metals shipped and if rolled dice and/or banked resources were used
         $this->notifyAllPlayers(
@@ -630,6 +706,12 @@ class RolledWest extends Table
 
         $sql = "UPDATE exclusive SET marked_by_player=$player_id WHERE exclusive_type='contract' AND exclusive_id=$contractId";
         $this->DbQuery($sql);
+
+        $this->incStat($points, 'contract_points', $player_id);
+        $this->incStat(1, 'contracts_completed', $player_id);
+        $this->incStat(1, 'contracts_completed');
+        if (isset($resources_needed[0]))
+            $this->incStat($resources_needed[0], 'copper_in_shipping_and_contracts', $player_id);
 
         // notify contract completed and if rolled dice and/or banked resources were used
         $this->notifyAllPlayers(
@@ -695,18 +777,32 @@ class RolledWest extends Table
             $sql = "UPDATE claim SET claim_type='settlement' WHERE player_id=$player_id AND terrain_type_id=$terrainTypeId AND space_id=$targetSpaceId";
             $this->DbQuery($sql);
             $claims_built = [$targetSpaceId - 1 => 'camp', $targetSpaceId => 'settlement'];
+            $this->incStat(1, 'camps_built', $player_id);
+            $this->incStat(1, 'settlements_built', $player_id);
+            $this->incStat(1, 'camps_built');
+            $this->incStat(1, 'settlements_built');
+            if ($this->claims[$terrainTypeId]['spaces'][$targetSpaceId - 1]['isStarred'])
+                $this->incStat(1, 'stars', $player_id);
+            if ($this->claims[$terrainTypeId]['spaces'][$targetSpaceId]['isStarred'])
+                $this->incStat(1, 'stars', $player_id);
         }
         else {
             $sql = "UPDATE claim SET claim_type='camp' WHERE player_id=$player_id AND terrain_type_id=$terrainTypeId AND space_id=$targetSpaceId";
             $this->DbQuery($sql);
             $claims_built = [$targetSpaceId => 'camp'];
+            $this->incStat(1, 'camps_built', $player_id);
+            $this->incStat(1, 'camps_built');
+            if ($this->claims[$terrainTypeId]['spaces'][$targetSpaceId]['isStarred'])
+                $this->incStat(1, 'stars', $player_id);
         }
         $sql = "UPDATE player SET is_building_claim=true, player_score=player_score+$points WHERE player_id=$player_id";
         $this->DbQuery($sql);
 
         $notification_msg = clienttranslate('${player_name} built a claim');
-        if ($points > 0)
+        if ($points > 0) {
             $notification_msg = clienttranslate('${player_name} built a claim(s) and earns ${points} points');
+            $this->incStat($points, 'claim_points', $player_id);
+        }
 
         // notify claim(s) built and if rolled dice and/or banked resources were used
         $this->notifyAllPlayers(
@@ -760,6 +856,23 @@ class RolledWest extends Table
         } else {
             $sql = "UPDATE player SET $resource_db_name=$resource_db_name + 1, is_banking_in_between_turn=true WHERE player_id=$player_id";
             $this->DbQuery($sql);
+        }
+
+        if ($resource == 0) {
+            $this->incStat(1, 'copper_banked', $player_id);
+            $this->incStat(1, 'copper_banked');
+        }
+        else if ($resource == 1) {
+            $this->incStat(1, 'wood_banked', $player_id);
+            $this->incStat(1, 'wood_banked');
+        }
+        else if ($resource == 2) {
+            $this->incStat(1, 'silver_banked', $player_id);
+            $this->incStat(1, 'silver_banked');
+        }
+        else if ($resource == 3) {
+            $this->incStat(1, 'gold_banked', $player_id);
+            $this->incStat(1, 'gold_banked');
         }
 
         $resource_name = $this->dice_types[$resource]['name'];
@@ -849,7 +962,7 @@ class RolledWest extends Table
             $round++;
 
             // game end
-            if ($round == 7) {
+            if ($round == 3) {
                 $this->gamestate->nextState('score');
                 return;
             }
@@ -862,8 +975,26 @@ class RolledWest extends Table
         $this->DbQuery($sql);
 
         $dice = $this->rollDice();
-        foreach ($dice as $i => $value)
+        foreach ($dice as $i => $value) {
             $this->setGameStateValue('die' . $i, $value);
+            if ($value == 0) {
+                $this->incStat(1, 'copper_rolled', $player_id);
+                $this->incStat(1, 'copper_rolled');
+            }
+            else if ($value == 1) {
+                $this->incStat(1, 'wood_rolled', $player_id);
+                $this->incStat(1, 'wood_rolled');
+            }
+            else if ($value == 2) {
+                $this->incStat(1, 'silver_rolled', $player_id);
+                $this->incStat(1, 'silver_rolled');
+            }
+            else if ($value == 3) {
+                $this->incStat(1, 'gold_rolled', $player_id);
+                $this->incStat(1, 'gold_rolled');
+            }
+            
+        }
 
         for ($i = 0; $i < 3; $i++)
             $this->setGameStateValue('spentOrBankedDie' . $i, -1);
@@ -976,6 +1107,8 @@ class RolledWest extends Table
                 $values = [];
                 foreach ($claim_majority_bigger_winners as $player_id) {
                     $values[] = "player_id=$player_id";
+                    $this->incStat($bigger_points, 'claim_majority_points', $player_id);
+                    $this->incStat(1, 'number_of_first_most_claim_majorities', $player_id);
                 }
                 $sql .= implode(' OR ', $values);
                 $this->DbQuery($sql);
@@ -1003,6 +1136,7 @@ class RolledWest extends Table
                 $values = [];
                 foreach ($claim_majority_smaller_winners as $player_id) {
                     $values[] = "player_id=$player_id";
+                    $this->incStat($bigger_points, 'claim_majority_points', $player_id);
                 }
                 $sql .= implode(' OR ', $values);
                 $this->DbQuery($sql);
@@ -1027,6 +1161,8 @@ class RolledWest extends Table
 
         $sql = "SELECT exclusive_id, marked_by_player FROM exclusive WHERE marked_by_player IS NOT NULL AND exclusive_type='office'";
         $exclusives = $this->getObjectListFromDB($sql);
+        $this->setStat(count($exclusives), 'offices_purchased');
+
         foreach ($exclusives as $n => $exclusive) {
             $office_id = $exclusive['exclusive_id'];
             $marked_by_player = $exclusive['marked_by_player'];
@@ -1113,6 +1249,9 @@ class RolledWest extends Table
             if ($points > 0) {
                 $sql = "UPDATE player SET player_score=player_score+$points WHERE player_id=$marked_by_player";
                 $this->DbQuery($sql);
+
+                $this->incStat($points, 'office_points', $marked_by_player);
+                $this->incStat(1, 'offices_purchased', $marked_by_player);
             }
 
             $this->notifyAllPlayers(
@@ -1125,6 +1264,38 @@ class RolledWest extends Table
                     'points' => $points
                 ]
             );
+        }
+
+        // stats
+        $sql = "SELECT player_id, copper_shipped, silver_shipped, gold_shipped FROM player";
+        $shipped_metals = $this->getCollectionFromDB($sql);
+
+        foreach ($this->loadPlayersBasicInfos() as $player_id => $player_info) {
+            $copper_shipped = $shipped_metals[$player_id]['copper_shipped'];
+            $silver_shipped = $shipped_metals[$player_id]['silver_shipped'];
+            $gold_shipped = $shipped_metals[$player_id]['gold_shipped'];
+
+            $this->setStat($copper_shipped, 'copper_shipped', $player_id);
+            $this->incStat($copper_shipped, 'copper_shipped');
+
+            $this->setStat($silver_shipped, 'silver_shipped', $player_id);
+            $this->incStat($silver_shipped, 'silver_shipped');
+
+            $this->setStat($gold_shipped, 'gold_shipped', $player_id);
+            $this->incStat($gold_shipped, 'gold_shipped');
+
+            if ($copper_shipped == 5) {
+                $this->incStat(1, 'completed_shipping_rows', $player_id);
+                $this->incStat(1, 'completed_shipping_rows');
+            }
+            if ($silver_shipped == 5) {
+                $this->incStat(1, 'completed_shipping_rows', $player_id);
+                $this->incStat(1, 'completed_shipping_rows');
+            }
+            if ($gold_shipped == 5) {
+                $this->incStat(1, 'completed_shipping_rows', $player_id);
+                $this->incStat(1, 'completed_shipping_rows');
+            }
         }
 
         $this->gamestate->nextState('gameEnd');

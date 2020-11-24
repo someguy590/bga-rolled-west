@@ -51,12 +51,106 @@ $stats_type = array(
 
     // Statistics global to table
     "table" => array(
-
-        "turns_number" => array(
+        "offices_purchased" => [
             "id" => 10,
-            "name" => totranslate("Number of turns"),
+            "name" => totranslate("Offices purchased"),
             "type" => "int"
-        ),
+        ],
+        "copper_shipped" => [
+            "id" => 11,
+            "name" => totranslate("Copper shipped"),
+            "type" => "int"
+        ],
+        "silver_shipped" => [
+            "id" => 12,
+            "name" => totranslate("Silver shipped"),
+            "type" => "int"
+        ],
+        "gold_shipped" => [
+            "id" => 13,
+            "name" => totranslate("Gold Shipped"),
+            "type" => "int"
+        ],
+        "completed_shipping_rows" => [
+            "id" => 14,
+            "name" => totranslate("Completed shipping rows"),
+            "type" => "int"
+        ],
+        "contracts_completed" => [
+            "id" => 15,
+            "name" => totranslate("Contracts completed"),
+            "type" => "int"
+        ],
+        "camps_built" => [
+            "id" => 16,
+            "name" => totranslate("Camps built"),
+            "type" => "int"
+        ],
+        "settlements_built" => [
+            "id" => 17,
+            "name" => totranslate("Settlements built"),
+            "type" => "int"
+        ],
+        "copper_rolled" => [
+            "id" => 18,
+            "name" => totranslate("Copper rolled"),
+            "type" => "int"
+        ],
+        "wood_rolled" => [
+            "id" => 19,
+            "name" => totranslate("Wood rolled"),
+            "type" => "int"
+        ],
+        "silver_rolled" => [
+            "id" => 20,
+            "name" => totranslate("Silver rolled"),
+            "type" => "int"
+        ],
+        "gold_rolled" => [
+            "id" => 21,
+            "name" => totranslate("Gold rolled"),
+            "type" => "int"
+        ],
+        "copper_selected_as_terrain" => [
+            "id" => 22,
+            "name" => totranslate("Number of times copper was selected as terrain"),
+            "type" => "int"
+        ],
+        "wood_selected_as_terrain" => [
+            "id" => 23,
+            "name" => totranslate("Number of times wood was selected as terrain"),
+            "type" => "int"
+        ],
+        "silver_selected_as_terrain" => [
+            "id" => 24,
+            "name" => totranslate("Number of times silver was selected as terrain"),
+            "type" => "int"
+        ],
+        "gold_selected_as_terrain" => [
+            "id" => 25,
+            "name" => totranslate("Number of times gold was selected as terrain"),
+            "type" => "int"
+        ],
+        "copper_banked" => [
+            "id" => 26,
+            "name" => totranslate("Copper banked"),
+            "type" => "int"
+        ],
+        "wood_banked" => [
+            "id" => 27,
+            "name" => totranslate("Wood banked"),
+            "type" => "int"
+        ],
+        "silver_banked" => [
+            "id" => 28,
+            "name" => totranslate("Silver banked"),
+            "type" => "int"
+        ],
+        "gold_banked" => [
+            "id" => 29,
+            "name" => totranslate("Gold banked"),
+            "type" => "int"
+        ]
 
         /*
         Examples:
@@ -75,25 +169,151 @@ $stats_type = array(
     // Statistics existing for each player
     "player" => array(
 
-        "turns_number" => array(
+        "office_points" => [
             "id" => 10,
-            "name" => totranslate("Number of turns"),
+            "name" => totranslate("Office points"),
             "type" => "int"
-        ),
-
-        /*
-        Examples:    
-        
-        
-        "player_teststat1" => array(   "id"=> 10,
-                                "name" => totranslate("player test stat 1"), 
-                                "type" => "int" ),
-                                
-        "player_teststat2" => array(   "id"=> 11,
-                                "name" => totranslate("player test stat 2"), 
-                                "type" => "float" )
-
-*/
+        ],
+        "offices_purchased" => [
+            "id" => 11,
+            "name" => totranslate("Offices purchased"),
+            "type" => "int"
+        ],
+        "shipping_points" => [
+            "id" => 12,
+            "name" => totranslate("Shipping points"),
+            "type" => "int"
+        ],
+        "copper_shipped" => [
+            "id" => 13,
+            "name" => totranslate("Copper shipped"),
+            "type" => "int"
+        ],
+        "silver_shipped" => [
+            "id" => 14,
+            "name" => totranslate("Silver shipped"),
+            "type" => "int"
+        ],
+        "gold_shipped" => [
+            "id" => 15,
+            "name" => totranslate("Gold Shipped"),
+            "type" => "int"
+        ],
+        "two_numbered_shipping_spaces_marked_first" => [
+            "id" => 16,
+            "name" => totranslate("Two numbered shipping spaces marked first"),
+            "type" => "int"
+        ],
+        "contract_points" => [
+            "id" => 17,
+            "name" => totranslate("Contract points"),
+            "type" => "int"
+        ],
+        "contracts_completed" => [
+            "id" => 18,
+            "name" => totranslate("Contracts completed"),
+            "type" => "int"
+        ],
+        "claim_points" => [
+            "id" => 19,
+            "name" => totranslate("Claim points"),
+            "type" => "int"
+        ],
+        "claim_majority_points" => [
+            "id" => 20,
+            "name" => totranslate("Claim majority points (1st and 2nd most claims including ties)"),
+            "type" => "int"
+        ],
+        "camps_built" => [
+            "id" => 21,
+            "name" => totranslate("Camps built"),
+            "type" => "int"
+        ],
+        "settlements_built" => [
+            "id" => 22,
+            "name" => totranslate("Settlements built"),
+            "type" => "int"
+        ],
+        "number_of_first_most_claim_majorities" => [
+            "id" => 23,
+            "name" => totranslate("Number of first most claim majority (including ties)"),
+            "type" => "int"
+        ],
+        "completed_shipping_rows" => [
+            "id" => 24,
+            "name" => totranslate("Completed shipping rows"),
+            "type" => "int"
+        ],
+        "copper_in_shipping_and_contracts" => [
+            "id" => 25,
+            "name" => totranslate("Copper shipped and spent completing contracts"),
+            "type" => "int"
+        ],
+        "stars" => [
+            "id" => 26,
+            "name" => totranslate("Stars marked in shipping and in claims"),
+            "type" => "int"
+        ],
+        "copper_rolled" => [
+            "id" => 27,
+            "name" => totranslate("Copper rolled"),
+            "type" => "int"
+        ],
+        "wood_rolled" => [
+            "id" => 28,
+            "name" => totranslate("Wood rolled"),
+            "type" => "int"
+        ],
+        "silver_rolled" => [
+            "id" => 29,
+            "name" => totranslate("Silver rolled"),
+            "type" => "int"
+        ],
+        "gold_rolled" => [
+            "id" => 30,
+            "name" => totranslate("Gold rolled"),
+            "type" => "int"
+        ],
+        "copper_selected_as_terrain" => [
+            "id" => 31,
+            "name" => totranslate("Number of times copper was selected as terrain"),
+            "type" => "int"
+        ],
+        "wood_selected_as_terrain" => [
+            "id" => 32,
+            "name" => totranslate("Number of times wood was selected as terrain"),
+            "type" => "int"
+        ],
+        "silver_selected_as_terrain" => [
+            "id" => 33,
+            "name" => totranslate("Number of times silver was selected as terrain"),
+            "type" => "int"
+        ],
+        "gold_selected_as_terrain" => [
+            "id" => 34,
+            "name" => totranslate("Number of times gold was selected as terrain"),
+            "type" => "int"
+        ],
+        "copper_banked" => [
+            "id" => 35,
+            "name" => totranslate("Copper banked"),
+            "type" => "int"
+        ],
+        "wood_banked" => [
+            "id" => 36,
+            "name" => totranslate("Wood banked"),
+            "type" => "int"
+        ],
+        "silver_banked" => [
+            "id" => 37,
+            "name" => totranslate("Silver banked"),
+            "type" => "int"
+        ],
+        "gold_banked" => [
+            "id" => 38,
+            "name" => totranslate("Gold banked"),
+            "type" => "int"
+        ]
     )
 
 );
