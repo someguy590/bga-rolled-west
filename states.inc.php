@@ -104,7 +104,7 @@ $machinestates = array(
     STATE_SCORE => [
         'name' => 'score',
         'type' => 'game',
-        'description' => '',
+        'description' => 'Scoring offices and claim majorities',
         'action' => 'stScore',
         'transitions' => ['gameEnd' => STATE_END_GAME]
     ],
