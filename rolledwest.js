@@ -471,10 +471,10 @@ define([
             
             */
 
-            onDiceSelected: function (diceId) {
+            onDiceSelected: function (diceDivId) {
                 let dice = this.playerResources.getSelectedItems();
                 let isResourceSpent = false;
-                if (diceId == 'spent_or_banked_dice') {
+                if (diceDivId == 'spent_or_banked_dice') {
                     dice = this.spentOrBankedResources.getSelectedItems();
                     isResourceSpent = true;
                 }
@@ -497,19 +497,10 @@ define([
                             {
                                 resource: dice[0].type,
                                 isResourceSpent: isResourceSpent,
+                                diceDivId: diceDivId,
+                                bankedDieId: dice[0].id,
                                 lock: true
-                            }, this, function (result) {
-                                let resourceName;
-                                if (dice[0].type == 0)
-                                    resourceName = 'copper';
-                                else if (dice[0].type == 1)
-                                    resourceName = 'wood';
-                                else if (dice[0].type == 2)
-                                    resourceName = 'silver';
-                                else
-                                    resourceName = 'gold';
-                                this.slideTemporaryObject(`<div class="bank_icon bank_icon_${resourceName}"></div>`, diceId, `${diceId}_item_${dice[0].id}`, `${resourceName}_count_${this.player_id}`, 1000);
-                            },
+                            }, this, function (result) { },
                             function (is_error) { }
                         );
                     }
@@ -627,6 +618,7 @@ define([
                 dojo.subscribe('ship', this, "notif_ship");
                 dojo.subscribe('completeContract', this, "notif_completeContract");
                 dojo.subscribe('bank', this, "notif_bank");
+                this.notifqueue.setSynchronous('bank', 500);
                 dojo.subscribe('buildClaim', this, 'notif_buildClaim');
                 dojo.subscribe('endGameScore', this, 'notif_endGameScore');
                 this.notifqueue.setSynchronous('endGameScore', 1000);
@@ -852,6 +844,19 @@ define([
             notif_bank: function (notif) {
                 let resourceType = notif.args.resourceType;
                 let playerId = notif.args.playerId;
+                let diceDivId = notif.args.diceDivId;
+                let bankedDieId = notif.args.bankedDieId;
+                let resourceName;
+                if (resourceType == 0)
+                    resourceName = 'copper';
+                else if (resourceType == 1)
+                    resourceName = 'wood';
+                else if (resourceType == 2)
+                    resourceName = 'silver';
+                else
+                    resourceName = 'gold';
+                this.slideTemporaryObject(`<div class="bank_icon bank_icon_${resourceName}"></div>`, diceDivId, `${diceDivId}_item_${bankedDieId}`, `${resourceName}_count_${playerId}`, 500);
+
                 this.addToResources(playerId, resourceType, 1);
 
                 if (playerId == notif.args.diceRollerId) {

@@ -823,7 +823,7 @@ class RolledWest extends Table
         $this->notifyAllPlayers('updatePossibleBuys', '', $this->getPossibleBuys());
     }
 
-    function bank($resource, $isResourceSpent)
+    function bank($resource, $isResourceSpent, $diceDivId, $bankedDieId)
     {
         $this->checkAction('bank', true);
         $player_id = $this->getCurrentPlayerId();
@@ -881,7 +881,9 @@ class RolledWest extends Table
             'resource_name' => $resource_name,
             'resourceType' => $resource,
             'playerId' => $player_id,
-            'diceRollerId' => $dice_roller_id
+            'diceRollerId' => $dice_roller_id,
+            'diceDivId' => $diceDivId,
+            'bankedDieId' => $bankedDieId
         ]);
 
         if ($player_id != $dice_roller_id) {
@@ -962,7 +964,7 @@ class RolledWest extends Table
             $round++;
 
             // game end
-            if ($round == 3) {
+            if ($round == 111) {
                 $this->gamestate->nextState('score');
                 return;
             }

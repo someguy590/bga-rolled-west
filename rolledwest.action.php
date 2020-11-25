@@ -85,7 +85,9 @@ class action_rolledwest extends APP_GameAction
     $this->setAjaxMode();
     $resource = $this->getArg("resource", AT_int, true);
     $isResourceSpent = $this->getArg("isResourceSpent", AT_bool, true);
-    $this->game->bank($resource, $isResourceSpent);
+    $diceDivId = $this->getArg("diceDivId", AT_alphanum, true);
+    $bankedDieId = $this->getArg("bankedDieId", AT_alphanum, true);
+    $this->game->bank($resource, $isResourceSpent, $diceDivId, $bankedDieId);
     $this->ajaxResponse();
   }
 
