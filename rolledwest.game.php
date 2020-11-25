@@ -798,9 +798,12 @@ class RolledWest extends Table
         $sql = "UPDATE player SET is_building_claim=true, player_score=player_score+$points WHERE player_id=$player_id";
         $this->DbQuery($sql);
 
-        $notification_msg = clienttranslate('${player_name} built a claim');
+        $notification_msg = clienttranslate('${player_name} built a camp');
         if ($points > 0) {
-            $notification_msg = clienttranslate('${player_name} built a claim(s) and earns ${points} points');
+            if ($isBuildingSettlement)
+                $notification_msg = clienttranslate('${player_name} built a camp and a settlement and earns ${points} points');
+            else
+                $notification_msg = clienttranslate('${player_name} built a camp and earns ${points} point(s)');
             $this->incStat($points, 'claim_points', $player_id);
         }
 
