@@ -568,7 +568,7 @@ class RolledWest extends Table
         // notify office purchased and if rolled dice and/or banked resources were used
         $this->notifyAllPlayers(
             'purchaseOffice',
-            clienttranslate('${player_name} purchased an office and will earn ${office_description} at the end of the game'),
+            clienttranslate('${player_name} purchases an office and will earn ${office_description} at the end of the game'),
             [
                 'playerId' => $player_id,
                 'player_name' => $this->getCurrentPlayerName(),
@@ -638,14 +638,14 @@ class RolledWest extends Table
             }
         }
 
-        $notification_msg = clienttranslate('${player_name} shipped ${n} ${metal}');
+        $notification_msg = clienttranslate('${player_name} ships ${n} ${metal}');
         if ($points > 0) {
-            $notification_msg = clienttranslate('${player_name} shipped ${n} ${metal} and earns ${points} points');
+            $notification_msg = clienttranslate('${player_name} ships ${n} ${metal} and earns ${points} points');
             $sql = "UPDATE player SET player_score=player_score+$points WHERE player_id=$player_id";
             $this->DbQuery($sql);
             
             if ($isFirstToBonus)
-                $notification_msg = clienttranslate('${player_name} is the first to reach a 2 number bonus space! ${player_name} shipped ${n} ${metal} and earns ${points} points');
+                $notification_msg = clienttranslate('${player_name} is the first to reach a 2 number bonus space! ${player_name} ships ${n} ${metal} and earns ${points} points');
 
             $this->incStat($points, 'shipping_points', $player_id);
         }
@@ -716,7 +716,7 @@ class RolledWest extends Table
         // notify contract completed and if rolled dice and/or banked resources were used
         $this->notifyAllPlayers(
             'completeContract',
-            clienttranslate('${player_name} completed a contract and earns ${points} points'),
+            clienttranslate('${player_name} completes a contract and earns ${points} points'),
             [
                 'playerId' => $player_id,
                 'player_name' => $this->getCurrentPlayerName(),
@@ -798,12 +798,12 @@ class RolledWest extends Table
         $sql = "UPDATE player SET is_building_claim=true, player_score=player_score+$points WHERE player_id=$player_id";
         $this->DbQuery($sql);
 
-        $notification_msg = clienttranslate('${player_name} built a camp');
+        $notification_msg = clienttranslate('${player_name} builds a camp');
         if ($points > 0) {
             if ($isBuildingSettlement)
-                $notification_msg = clienttranslate('${player_name} built a camp and a settlement and earns ${points} points');
+                $notification_msg = clienttranslate('${player_name} builds a camp and a settlement and earns ${points} points');
             else
-                $notification_msg = clienttranslate('${player_name} built a camp and earns ${points} point(s)');
+                $notification_msg = clienttranslate('${player_name} builds a camp and earns ${points} point(s)');
             $this->incStat($points, 'claim_points', $player_id);
         }
 
@@ -879,7 +879,7 @@ class RolledWest extends Table
         }
 
         $resource_name = $this->dice_types[$resource]['name'];
-        $this->notifyAllPlayers('bank', clienttranslate('${player_name} banked ${resource_name}'), [
+        $this->notifyAllPlayers('bank', clienttranslate('${player_name} banks ${resource_name}'), [
             'player_name' => $this->getCurrentPlayerName(),
             'resource_name' => $resource_name,
             'resourceType' => $resource,
