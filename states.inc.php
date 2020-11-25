@@ -79,8 +79,8 @@ $machinestates = array(
 
     STATE_CHOOSE_TERRAIN => [
         'name' => 'chooseTerrain',
-        'description' => clienttranslate('Round ${roundNbr}: ${actplayer} must choose 1 die to represent the terrain for the turn'),
-        'descriptionmyturn' => clienttranslate('Round ${roundNbr}: ${you} must choose 1 die to represent the terrain for the turn'),
+        'description' => clienttranslate('Round ${roundNbr} / 6: ${actplayer} must choose 1 die to represent the terrain for the turn'),
+        'descriptionmyturn' => clienttranslate('Round ${roundNbr} / 6: ${you} must choose 1 die to represent the terrain for the turn'),
         'type' => 'activeplayer',
         'args' => 'argChooseTerrain',
         'possibleactions' => ['chooseTerrain'],
@@ -89,15 +89,15 @@ $machinestates = array(
 
     STATE_SPEND_OR_BANK => [
         'name' => 'spendOrBank',
-        'description' => clienttranslate('Round ${roundNbr}: Others may still play or pass'),
+        'description' => clienttranslate('Round ${roundNbr} / 6: Others may still play or pass'),
         'descriptionmyturn' => '',
         'type' => 'multipleactiveplayer',
         'action' => 'stSpendOrBank',
         'args' => 'argSpendOrBank',
         'possibleactions' => ['purchaseOffice', 'ship', 'completeContract', 'buildClaim', 'bank', 'pass'],
         'transitions' => ['rollDice' => STATE_ROLL_DICE],
-        'descriptionDiceRollerTurn' => clienttranslate('Round ${roundNbr}: ${you} may play your turn or pass'),
-        'descriptionNonDiceRollerTurn' => clienttranslate('Round ${roundNbr}: ${you} may bank a resource or pass'),
+        'descriptionDiceRollerTurn' => clienttranslate('Round ${roundNbr} / 6: ${you} may play your turn or pass'),
+        'descriptionNonDiceRollerTurn' => clienttranslate('Round ${roundNbr} / 6: ${you} may bank a resource or pass'),
         'updateGameProgression' => true
     ],
 
