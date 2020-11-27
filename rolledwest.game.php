@@ -976,7 +976,7 @@ class RolledWest extends Table
             $round++;
 
             // game end
-            if ($round == 111) {
+            if ($round == 7) {
                 $this->gamestate->nextState('score');
                 return;
             }
