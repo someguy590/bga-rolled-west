@@ -242,3 +242,4 @@ $this->claims = [
     'claimMajorityPoints' => [5, 2]
   ],
 ];
+$this->claim_majority_bonus_description = clienttranslate('At the end of the game, the player with the most camps (triangles) + settlements (circles) in the terrain track scores the higher number. The player with the next most camps and settlements scores the lower number. Ties are won by the player with more settlements. If still tied, all tied players share the points.');

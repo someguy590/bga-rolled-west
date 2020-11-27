@@ -210,11 +210,12 @@ class RolledWest extends Table
         $checks = $this->getCollectionFromDB($sql);
         $shipments = ['checks' => $checks];
         $result['shipments'] = $shipments;
+        $result['twoNumberShipScoreDescription'] = $this->two_number_ship_score_description;
+
+        $result['claimMajorityBonusDescription'] = $this->claim_majority_bonus_description;
 
         foreach ($this->offices as $office_id => $office)
             $result['officeDescriptions'][$office_id] = $office['description'];
-
-        $result['twoNumberShipScoreDescription'] = $this->two_number_ship_score_description;
 
         $dice_roller_id = $this->getGameStateValue('diceRollerId');
         $result['diceRollerId'] = $dice_roller_id;

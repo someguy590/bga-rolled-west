@@ -185,6 +185,25 @@ class view_rolledwest_rolledwest extends game_view
       ]);
       $y_px += $with_car_y_scale + $with_car_y_offset;
     }
+
+    // claim majority bonuses
+    $claim_majority_bonus_start_x = 489;
+    $claim_majority_bonus_start_y = 381;
+    $claim_majority_bonus_scale_y = 47;
+    $claim_majority_bonus_offset_y = 9;
+
+    $x_px = $claim_majority_bonus_start_x;
+    $y_px = $claim_majority_bonus_start_y;
+    for ($i = 0; $i < 4; $i++) {
+      $this->page->insert_block($square_tpl, [
+        'SQUARE_ID' => 'claim_majority_bonus_' . $i,
+        'PLAYER_ID' => $player_id,
+        'LEFT' => $x_px,
+        'TOP' => $y_px,
+        'CLASSES' => 'claim_majority_bonus'
+      ]);
+      $y_px += $claim_majority_bonus_scale_y + $claim_majority_bonus_offset_y;
+    }
   }
 
   function build_page($viewArgs)

@@ -129,6 +129,10 @@ define([
                     this.addTooltip(twoNumbersShip.id, _(this.gamedatas.twoNumberShipScoreDescription), '');
                 }
 
+                for (let claimMajorityBonus of dojo.query('.claim_majority_bonus')) {
+                    this.addTooltip(claimMajorityBonus.id, _(this.gamedatas.claimMajorityBonusDescription), '');
+                }
+
                 let color;
                 if (gamedatas.diceRollerId == -1)
                     color = '#ffffff';

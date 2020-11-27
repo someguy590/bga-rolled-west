@@ -242,3 +242,9 @@
     width: 47px;
     height: 28px;
 }
+
+.claim_majority_bonus {
+    position: absolute;
+    width: 28px;
+    height: 47px;
+}
