@@ -1149,7 +1149,7 @@ class RolledWest extends Table
                 $values = [];
                 foreach ($claim_majority_smaller_winners as $player_id) {
                     $values[] = "player_id=$player_id";
-                    $this->incStat($bigger_points, 'claim_majority_points', $player_id);
+                    $this->incStat($smaller_points, 'claim_majority_points', $player_id);
                 }
                 $sql .= implode(' OR ', $values);
                 $this->DbQuery($sql);
