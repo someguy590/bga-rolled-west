@@ -228,15 +228,6 @@ define([
                     this.spentOrBankedResources.addToStock(die);
             },
 
-            chooseTerrain: function (e) {
-                dojo.stopEvent(evt);
-
-                if (!this.checkAction)
-                    return;
-
-
-            },
-
             addToResources: function (playerId, resourceType, amount) {
                 if (resourceType == 0)
                     this.copperCounters[playerId].incValue(amount);
