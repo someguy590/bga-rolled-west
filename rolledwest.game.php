@@ -1024,6 +1024,8 @@ class RolledWest extends Table
     {
         $sql = "SELECT player_id FROM player WHERE is_banking_in_between_turn=false";
         $active_players = $this->getObjectListFromDB($sql, true);
+        foreach ($active_players as $i => $player_id)
+            $this->giveExtraTime($player_id);
         $this->gamestate->setPlayersMultiactive($active_players, 'rollDice');
     }
 
