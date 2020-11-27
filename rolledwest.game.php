@@ -107,7 +107,7 @@ class RolledWest extends Table
         $this->initStat('player', 'contract_points', 0);
         $this->initStat('player', 'contracts_completed', 0);
         $this->initStat('player', 'claim_points', 0);
-        $this->initStat('player', 'claim_majority_points', 0);
+        $this->initStat('player', 'claim_majority_bonus_points', 0);
         $this->initStat('player', 'camps_built', 0);
         $this->initStat('player', 'settlements_built', 0);
         $this->initStat('player', 'number_of_first_most_claim_majorities', 0);
@@ -1122,15 +1122,15 @@ class RolledWest extends Table
                 $values = [];
                 foreach ($claim_majority_bigger_winners as $player_id) {
                     $values[] = "player_id=$player_id";
-                    $this->incStat($bigger_points, 'claim_majority_points', $player_id);
+                    $this->incStat($bigger_points, 'claim_majority_bonus_points', $player_id);
                     $this->incStat(1, 'number_of_first_most_claim_majorities', $player_id);
                 }
                 $sql .= implode(' OR ', $values);
                 $this->DbQuery($sql);
 
-                $msg = sprintf(clienttranslate('${player_name} ties for the %s bigger point majority claim and earns ${points} point(s)'), $terrain_type_name);
+                $msg = sprintf(clienttranslate('${player_name} ties for the %s bigger majority claim bonus and earns ${points} point(s)'), $terrain_type_name);
                 if (count($claim_majority_bigger_winners) == 1)
-                    $msg = sprintf(clienttranslate('${player_name} wins the %s bigger point majority claim and earns ${points} point(s)'), $terrain_type_name);
+                    $msg = sprintf(clienttranslate('${player_name} wins the %s bigger majority claim bonus and earns ${points} point(s)'), $terrain_type_name);
                 foreach ($claim_majority_bigger_winners as $winner_id) {
                     $winner_name = $this->loadPlayersBasicInfos()[$winner_id]['player_name'];
                     $this->notifyAllPlayers(
@@ -1156,9 +1156,9 @@ class RolledWest extends Table
                 $sql .= implode(' OR ', $values);
                 $this->DbQuery($sql);
 
-                $msg = sprintf(clienttranslate('${player_name} ties for the %s smaller point majority claim and earns ${points} point(s)'), $terrain_type_name);
+                $msg = sprintf(clienttranslate('${player_name} ties for the %s smaller point majority claim bonus and earns ${points} point(s)'), $terrain_type_name);
                 if (count($claim_majority_smaller_winners) == 1)
-                    $msg = sprintf(clienttranslate('${player_name} wins the %s smaller point majority claim and earns ${points} point(s)'), $terrain_type_name);
+                    $msg = sprintf(clienttranslate('${player_name} wins the %s smaller point majority claim bonus and earns ${points} point(s)'), $terrain_type_name);
                 foreach ($claim_majority_smaller_winners as $winner_id) {
                     $winner_name = $this->loadPlayersBasicInfos()[$winner_id]['player_name'];
                     $this->notifyAllPlayers(

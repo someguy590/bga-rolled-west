@@ -219,9 +219,9 @@ $stats_type = array(
             "name" => totranslate("Claim points"),
             "type" => "int"
         ],
-        "claim_majority_points" => [
+        "claim_majority_bonus_points" => [
             "id" => 20,
-            "name" => totranslate("Claim majority points (1st and 2nd most claims including ties)"),
+            "name" => totranslate("Claim majority bonus points (1st and 2nd most built camps and settlements including ties)"),
             "type" => "int"
         ],
         "camps_built" => [
@@ -236,7 +236,7 @@ $stats_type = array(
         ],
         "number_of_first_most_claim_majorities" => [
             "id" => 23,
-            "name" => totranslate("Number of first most claim majority (including ties)"),
+            "name" => totranslate("Number of first most claim majorities (including ties)"),
             "type" => "int"
         ],
         "completed_shipping_rows" => [
