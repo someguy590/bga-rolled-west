@@ -111,6 +111,7 @@ class RolledWest extends Table
         $this->initStat('player', 'camps_built', 0);
         $this->initStat('player', 'settlements_built', 0);
         $this->initStat('player', 'number_of_first_most_claim_majorities', 0);
+        $this->initStat('player', 'number_of_second_most_claim_majorities', 0);
         $this->initStat('player', 'completed_shipping_rows', 0);
         $this->initStat('player', 'copper_in_shipping_and_contracts', 0);
         $this->initStat('player', 'stars', 0);
@@ -1152,6 +1153,7 @@ class RolledWest extends Table
                 foreach ($claim_majority_smaller_winners as $player_id) {
                     $values[] = "player_id=$player_id";
                     $this->incStat($smaller_points, 'claim_majority_points', $player_id);
+                    $this->incStat(1, 'number_of_second_most_claim_majorities', $player_id);
                 }
                 $sql .= implode(' OR ', $values);
                 $this->DbQuery($sql);

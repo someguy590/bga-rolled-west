@@ -239,78 +239,83 @@ $stats_type = array(
             "name" => totranslate("Number of first most claim majorities (including ties)"),
             "type" => "int"
         ],
-        "completed_shipping_rows" => [
+        "number_of_second_most_claim_majorities" => [
             "id" => 24,
+            "name" => totranslate("Number of second most claim majorities (including ties)"),
+            "type" => "int"
+        ],
+        "completed_shipping_rows" => [
+            "id" => 25,
             "name" => totranslate("Completed shipping rows"),
             "type" => "int"
         ],
         "copper_in_shipping_and_contracts" => [
-            "id" => 25,
+            "id" => 26,
             "name" => totranslate("Copper shipped and spent completing contracts"),
             "type" => "int"
         ],
         "stars" => [
-            "id" => 26,
+            "id" => 27,
             "name" => totranslate("Stars marked in shipping and in claims"),
             "type" => "int"
         ],
         "copper_rolled" => [
-            "id" => 27,
+            "id" => 28,
             "name" => totranslate("Copper rolled"),
             "type" => "int"
         ],
         "wood_rolled" => [
-            "id" => 28,
+            "id" => 29,
             "name" => totranslate("Wood rolled"),
             "type" => "int"
         ],
         "silver_rolled" => [
-            "id" => 29,
+            "id" => 30,
             "name" => totranslate("Silver rolled"),
             "type" => "int"
         ],
         "gold_rolled" => [
-            "id" => 30,
+            "id" => 31,
             "name" => totranslate("Gold rolled"),
             "type" => "int"
         ],
         "copper_selected_as_terrain" => [
-            "id" => 31,
+            "id" => 32,
             "name" => totranslate("Number of times copper was selected as terrain"),
             "type" => "int"
         ],
         "wood_selected_as_terrain" => [
-            "id" => 32,
+            "id" => 33,
             "name" => totranslate("Number of times wood was selected as terrain"),
             "type" => "int"
         ],
         "silver_selected_as_terrain" => [
-            "id" => 33,
+            "id" => 34,
             "name" => totranslate("Number of times silver was selected as terrain"),
             "type" => "int"
         ],
         "gold_selected_as_terrain" => [
-            "id" => 34,
+            "id" => 35,
             "name" => totranslate("Number of times gold was selected as terrain"),
             "type" => "int"
         ],
         "copper_banked" => [
-            "id" => 35,
+            "id" => 36,
             "name" => totranslate("Copper banked"),
             "type" => "int"
         ],
         "wood_banked" => [
-            "id" => 36,
+            "id" => 37,
             "name" => totranslate("Wood banked"),
             "type" => "int"
         ],
         "silver_banked" => [
-            "id" => 37,
+            "id" => 38,
             "name" => totranslate("Silver banked"),
             "type" => "int"
         ],
         "gold_banked" => [
-            "id" => 38,
+            "id" => 39,
             "name" => totranslate("Gold banked"),
             "type" => "int"
         ]
