@@ -90,6 +90,7 @@
     width: 37px;
     height: 55px;
     position: absolute;
+    z-index: 1;
 }
 
 .shipment_big {
@@ -224,4 +225,20 @@
 
 .turn_order_icon_4 {
     background-position: -105px 0px;
+}
+
+.two_numbers_ship_space {
+    position: absolute;
+    z-index: 2;
+    outline: none;
+}
+
+.two_numbers_ship_no_car {
+    width: 47px;
+    height: 29px;
+}
+
+.two_numbers_ship_with_car {
+    width: 47px;
+    height: 28px;
 }

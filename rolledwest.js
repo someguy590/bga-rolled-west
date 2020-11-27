@@ -125,6 +125,10 @@ define([
                     this.addTooltip(officeDiv.id, _(this.gamedatas.officeDescriptions[officeId]), '');
                 }
 
+                for (let twoNumbersShip of dojo.query('.two_numbers_ship_no_car, .two_numbers_ship_with_car')) {
+                    this.addTooltip(twoNumbersShip.id, _(this.gamedatas.twoNumberShipScoreDescription), '');
+                }
+
                 let color;
                 if (gamedatas.diceRollerId == -1)
                     color = '#ffffff';

@@ -214,6 +214,8 @@ class RolledWest extends Table
         foreach ($this->offices as $office_id => $office)
             $result['officeDescriptions'][$office_id] = $office['description'];
 
+        $result['twoNumberShipScoreDescription'] = $this->two_number_ship_score_description;
+
         $dice_roller_id = $this->getGameStateValue('diceRollerId');
         $result['diceRollerId'] = $dice_roller_id;
         $player_name = '';
@@ -453,8 +455,13 @@ class RolledWest extends Table
                 continue;
 
             $space_id = $shipped_resources[$resource_type_id];
-            for ($i = 0; $i < $available_resources[$resource_type_id] && $space_id < 5; $space_id++, $i++)
+            for ($i = 0; $i < $available_resources[$resource_type_id] && $space_id < 5; $space_id++, $i++) {
                 $shipments[] = 'shipment_' . $resource_type_id . '_' . $space_id . '_' . $dice_roller_id;
+                if ($space_id == 2)
+                    $shipments[] = 'twoNumbersShip_' . $resource_type_id . '_' . $space_id . '_' . $dice_roller_id;
+                else if ($space_id == 4)
+                    $shipments[] = 'twoNumbersShip_' . $resource_type_id . '_' . $space_id . '_' . $dice_roller_id;
+            }
         }
 
         // check possible claims

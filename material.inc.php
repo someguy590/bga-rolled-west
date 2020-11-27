@@ -170,6 +170,7 @@ $this->shipments = [
     ]
   ]
 ];
+$this->two_number_ship_score_description = clienttranslate('The first player to mark this space will earn the bigger number on the left as points. Others who mark this space will earn the lesser points on the right.');
 
 $this->contracts = [
   0 => ['points' => 8, 'resourcesNeeded' => [0 => 4]],

@@ -141,6 +141,50 @@ class view_rolledwest_rolledwest extends game_view
       }
       $y_px += $claim_scale + $claim_y_offset;
     }
+
+    // shipping 2 number spaces tooltips
+    $no_car_start_x = 373;
+    $no_car_start_y = 41;
+    $with_car_start_x = 476;
+    $with_car_start_y = 43;
+
+    $no_car_y_scale = 29;
+    $with_car_y_scale = 28;
+
+    $no_car_y_offset = 38;
+    $with_car_y_offset = 39;
+
+    $x_px = $no_car_start_x;
+    $y_px = $no_car_start_y;
+    for ($i = 0; $i < 4; $i++) {
+      if ($i == 1)
+        continue;
+
+      $this->page->insert_block($square_tpl, [
+        'SQUARE_ID' => 'twoNumbersShip_' . $i . '_' . 2,
+        'PLAYER_ID' => $player_id,
+        'LEFT' => $x_px,
+        'TOP' => $y_px,
+        'CLASSES' => 'two_numbers_ship_space two_numbers_ship_no_car'
+      ]);
+      $y_px += $no_car_y_scale + $no_car_y_offset;
+    }
+
+    $x_px = $with_car_start_x;
+    $y_px = $with_car_start_y;
+    for ($i = 0; $i < 4; $i++) {
+      if ($i == 1)
+        continue;
+      
+      $this->page->insert_block($square_tpl, [
+        'SQUARE_ID' => 'twoNumbersShip_' . $i . '_' . 4,
+        'PLAYER_ID' => $player_id,
+        'LEFT' => $x_px,
+        'TOP' => $y_px,
+        'CLASSES' => 'two_numbers_ship_space two_numbers_ship_with_car'
+      ]);
+      $y_px += $with_car_y_scale + $with_car_y_offset;
+    }
   }
 
   function build_page($viewArgs)
