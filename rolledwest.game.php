@@ -1129,9 +1129,9 @@ class RolledWest extends Table
                 $sql .= implode(' OR ', $values);
                 $this->DbQuery($sql);
 
-                $msg = sprintf(clienttranslate('${player_name} ties for the %s bigger majority claim bonus and earns ${points} point(s)'), $terrain_type_name);
+                $msg = sprintf($this->_('${player_name} ties for the %s bigger majority claim bonus and earns ${points} point(s)'), $terrain_type_name);
                 if (count($claim_majority_bigger_winners) == 1)
-                    $msg = sprintf(clienttranslate('${player_name} wins the %s bigger majority claim bonus and earns ${points} point(s)'), $terrain_type_name);
+                    $msg = sprintf($this->_('${player_name} wins the %s bigger majority claim bonus and earns ${points} point(s)'), $terrain_type_name);
                 foreach ($claim_majority_bigger_winners as $winner_id) {
                     $winner_name = $this->loadPlayersBasicInfos()[$winner_id]['player_name'];
                     $this->notifyAllPlayers(
@@ -1158,9 +1158,9 @@ class RolledWest extends Table
                 $sql .= implode(' OR ', $values);
                 $this->DbQuery($sql);
 
-                $msg = sprintf(clienttranslate('${player_name} ties for the %s smaller point majority claim bonus and earns ${points} point(s)'), $terrain_type_name);
+                $msg = sprintf($this->_('${player_name} ties for the %s smaller point majority claim bonus and earns ${points} point(s)'), $terrain_type_name);
                 if (count($claim_majority_smaller_winners) == 1)
-                    $msg = sprintf(clienttranslate('${player_name} wins the %s smaller point majority claim bonus and earns ${points} point(s)'), $terrain_type_name);
+                    $msg = sprintf($this->_('${player_name} wins the %s smaller point majority claim bonus and earns ${points} point(s)'), $terrain_type_name);
                 foreach ($claim_majority_smaller_winners as $winner_id) {
                     $winner_name = $this->loadPlayersBasicInfos()[$winner_id]['player_name'];
                     $this->notifyAllPlayers(
