@@ -38,8 +38,8 @@ define([
                 this.spentOrBankedResources.centerItems = true;
                 let resourceTypeIconLocation = { 0: 2, 1: 3, 2: 0, 3: 1 };
                 for (let resourceTypeId = 0; resourceTypeId < 4; resourceTypeId++) {
-                    this.playerResources.addItemType(resourceTypeId, resourceTypeId, g_gamethemeurl + 'img/resource_icons.png', resourceTypeIconLocation[resourceTypeId]);
-                    this.spentOrBankedResources.addItemType(resourceTypeId, resourceTypeId, g_gamethemeurl + 'img/resource_icons.png', resourceTypeIconLocation[resourceTypeId]);
+                    this.playerResources.addItemType(resourceTypeId, resourceTypeId, g_gamethemeurl + 'img/d12_icons.png', resourceTypeIconLocation[resourceTypeId]);
+                    this.spentOrBankedResources.addItemType(resourceTypeId, resourceTypeId, g_gamethemeurl + 'img/d12_icons.png', resourceTypeIconLocation[resourceTypeId]);
                 }
 
                 // 2 number shipment spaces offsets
