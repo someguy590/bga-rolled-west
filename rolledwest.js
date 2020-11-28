@@ -1,7 +1,7 @@
 /**
  *------
  * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
- * RolledWest implementation : © <Your name here> <Your email address here>
+ * RolledWest implementation : © Jonathan Moyett <someguy590@gmail.com>
  *
  * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
@@ -26,17 +26,20 @@ define([
             constructor: function () {
                 console.log('rolledwest constructor');
 
-                this.diceWidth = 15;
-                this.diceHeight = 15;
+                this.diceWidth = 27;
+                this.diceHeight = 25;
                 this.playerResources = new ebg.stock();
                 this.spentOrBankedResources = new ebg.stock();
-                this.playerResources.image_items_per_row = 4;
-                this.spentOrBankedResources.image_items_per_row = 4;
+                this.playerResources.image_items_per_row = 1;
+                this.spentOrBankedResources.image_items_per_row = 1;
                 this.playerResources.create(this, $('rolled_dice'), this.diceWidth, this.diceHeight);
                 this.spentOrBankedResources.create(this, $('spent_or_banked_dice'), this.diceWidth, this.diceHeight);
+                this.playerResources.centerItems = true;
+                this.spentOrBankedResources.centerItems = true;
+                let resourceTypeIconLocation = { 0: 2, 1: 3, 2: 0, 3: 1 };
                 for (let resourceTypeId = 0; resourceTypeId < 4; resourceTypeId++) {
-                    this.playerResources.addItemType(resourceTypeId, resourceTypeId, g_gamethemeurl + 'img/resource_icons.png', resourceTypeId);
-                    this.spentOrBankedResources.addItemType(resourceTypeId, resourceTypeId, g_gamethemeurl + 'img/resource_icons.png', resourceTypeId);
+                    this.playerResources.addItemType(resourceTypeId, resourceTypeId, g_gamethemeurl + 'img/resource_icons.png', resourceTypeIconLocation[resourceTypeId]);
+                    this.spentOrBankedResources.addItemType(resourceTypeId, resourceTypeId, g_gamethemeurl + 'img/resource_icons.png', resourceTypeIconLocation[resourceTypeId]);
                 }
 
                 // 2 number shipment spaces offsets
@@ -78,6 +81,11 @@ define([
             setup: function (gamedatas) {
                 console.log("Starting game setup");
 
+                // spectator
+                if (this.isSpectator) {
+                    $('personal_board').remove();
+                }
+
                 // Setting up player boards
                 this.copperCounters = {};
                 this.woodCounters = {};
@@ -114,7 +122,15 @@ define([
 
                 for (let officeDiv of dojo.query('.office')) {
                     let officeId = officeDiv.id.split('_')[1];
-                    this.addTooltip( officeDiv.id, _(this.gamedatas.officeDescriptions[officeId]), '');
+                    this.addTooltip(officeDiv.id, _(this.gamedatas.officeDescriptions[officeId]), '');
+                }
+
+                for (let twoNumbersShip of dojo.query('.two_numbers_ship_no_car, .two_numbers_ship_with_car')) {
+                    this.addTooltip(twoNumbersShip.id, _(this.gamedatas.twoNumberShipScoreDescription), '');
+                }
+
+                for (let claimMajorityBonus of dojo.query('.claim_majority_bonus')) {
+                    this.addTooltip(claimMajorityBonus.id, _(this.gamedatas.claimMajorityBonusDescription), '');
                 }
 
                 let color;
@@ -200,18 +216,6 @@ define([
                         case 'spendOrBank':
                             this.addActionButton('pass_button', _('pass'), 'pass');
                             break;
-                        /*               
-                                         Example:
-                         
-                                         case 'myGameState':
-                                            
-                                            // Add 3 action buttons in the action status bar:
-                                            
-                                            this.addActionButton( 'button_1_id', _('Button 1 label'), 'onMyMethodToCall1' ); 
-                                            this.addActionButton( 'button_2_id', _('Button 2 label'), 'onMyMethodToCall2' ); 
-                                            this.addActionButton( 'button_3_id', _('Button 3 label'), 'onMyMethodToCall3' ); 
-                                            break;
-                        */
                     }
                 }
             },
@@ -230,15 +234,6 @@ define([
                     this.playerResources.addToStock(die);
                 for (let die of spentOrBankedDice)
                     this.spentOrBankedResources.addToStock(die);
-            },
-
-            chooseTerrain: function (e) {
-                dojo.stopEvent(evt);
-
-                if (!this.checkAction)
-                    return;
-
-
             },
 
             addToResources: function (playerId, resourceType, amount) {
@@ -400,7 +395,7 @@ define([
                             this.slideToObjectPos(markId, `shipment_${resourceTypeId}_${spaceId}_${nextPlayerIdToMark}`, markXPos, markYPos).play();
 
                             if (markedByPlayer != nextPlayerIdToMark) {
-                                let checkCount = shipmentChecks[this.player_id][resourceTypeId];
+                                let checkCount = shipmentChecks[nextPlayerIdToMark][resourceTypeId];
                                 let isSpaceDeliveredTo = (checkCount - 1) >= spaceId;
 
                                 if (isSpaceDeliveredTo) {
@@ -475,10 +470,10 @@ define([
             
             */
 
-            onDiceSelected: function (diceId) {
+            onDiceSelected: function (diceDivId) {
                 let dice = this.playerResources.getSelectedItems();
                 let isResourceSpent = false;
-                if (diceId == 'spent_or_banked_dice') {
+                if (diceDivId == 'spent_or_banked_dice') {
                     dice = this.spentOrBankedResources.getSelectedItems();
                     isResourceSpent = true;
                 }
@@ -501,8 +496,11 @@ define([
                             {
                                 resource: dice[0].type,
                                 isResourceSpent: isResourceSpent,
+                                diceDivId: diceDivId,
+                                bankedDieId: dice[0].id,
                                 lock: true
-                            }, this, function (result) { }, function (is_error) { }
+                            }, this, function (result) { },
+                            function (is_error) { }
                         );
                     }
                     this.playerResources.unselectAll();
@@ -619,21 +617,12 @@ define([
                 dojo.subscribe('ship', this, "notif_ship");
                 dojo.subscribe('completeContract', this, "notif_completeContract");
                 dojo.subscribe('bank', this, "notif_bank");
+                this.notifqueue.setSynchronous('bank', 500);
                 dojo.subscribe('buildClaim', this, 'notif_buildClaim');
                 dojo.subscribe('endGameScore', this, 'notif_endGameScore');
                 this.notifqueue.setSynchronous('endGameScore', 1000);
 
                 dojo.subscribe('updatePossibleBuys', this, 'notif_updatePossibleBuys');
-
-                // Example 1: standard notification handling
-                // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
-
-                // Example 2: standard notification handling + tell the user interface to wait
-                //            during 3 seconds after calling the method in order to let the players
-                //            see what is happening in the game.
-                // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
-                // this.notifqueue.setSynchronous( 'cardPlayed', 3000 );
-                // 
             },
 
             // TODO: from this point and below, you can write your game notifications handling methods
@@ -854,6 +843,19 @@ define([
             notif_bank: function (notif) {
                 let resourceType = notif.args.resourceType;
                 let playerId = notif.args.playerId;
+                let diceDivId = notif.args.diceDivId;
+                let bankedDieId = notif.args.bankedDieId;
+                let resourceName;
+                if (resourceType == 0)
+                    resourceName = 'copper';
+                else if (resourceType == 1)
+                    resourceName = 'wood';
+                else if (resourceType == 2)
+                    resourceName = 'silver';
+                else
+                    resourceName = 'gold';
+                this.slideTemporaryObject(`<div class="bank_icon bank_icon_${resourceName}"></div>`, diceDivId, `${diceDivId}_item_${bankedDieId}`, `${resourceName}_count_${playerId}`, 500);
+
                 this.addToResources(playerId, resourceType, 1);
 
                 if (playerId == notif.args.diceRollerId) {

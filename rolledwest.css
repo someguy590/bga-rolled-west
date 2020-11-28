@@ -1,7 +1,7 @@
 /**
  *------
  * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
- * RolledWest implementation : © <Your name here> <Your email address here>
+ * RolledWest implementation : © Jonathan Moyett <someguy590@gmail.com>
  *
  * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
@@ -46,6 +46,10 @@
 
 /********* You can start writing your CSS below this line: **********/
 
+#rolled_dice_row, #used_dice_row {
+    text-align: center;
+}
+
 .board {
     position: relative;
     width: 564px;
@@ -58,6 +62,8 @@
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+    justify-content: center;
+    text-align: center;
 }
 
 #personal_info_wrapper {
@@ -84,6 +90,7 @@
     width: 37px;
     height: 55px;
     position: absolute;
+    z-index: 1;
 }
 
 .shipment_big {
@@ -116,8 +123,8 @@
 }
 
 .bank_icon {
-    width: 15px;
-    height: 15px;
+    width: 27px;
+    height: 25px;
     display: inline-block;
     position: relative;
     background-repeat: no-repeat;
@@ -126,20 +133,24 @@
     margin-right: 3px;
 }
 
-.bank_icon_copper {
+.bank_icon_silver {
     background-position: 0px 0px;
 }
 
-.bank_icon_wood {
-    background-position: -15px 0px;
-}
-
-.bank_icon_silver {
-    background-position: -30px 0px;
-}
-
 .bank_icon_gold {
-    background-position: -45px 0px;
+    background-position: 0px -25px;
+}
+
+.bank_icon_copper {
+    background-position: 0px -50px;
+}
+
+.bank_icon_wood {
+    background-position: 0px -75px;
+}
+
+.resource_counter {
+    font-size: 25px;
 }
 
 .mark_circle {
@@ -214,4 +225,26 @@
 
 .turn_order_icon_4 {
     background-position: -105px 0px;
+}
+
+.two_numbers_ship_space {
+    position: absolute;
+    z-index: 2;
+    outline: none;
+}
+
+.two_numbers_ship_no_car {
+    width: 47px;
+    height: 29px;
+}
+
+.two_numbers_ship_with_car {
+    width: 47px;
+    height: 28px;
+}
+
+.claim_majority_bonus {
+    position: absolute;
+    width: 28px;
+    height: 47px;
 }

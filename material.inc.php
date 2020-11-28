@@ -3,7 +3,7 @@
 /**
  *------
  * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
- * RolledWest implementation : © <Your name here> <Your email address here>
+ * RolledWest implementation : © Jonathan Moyett <someguy590@gmail.com>
  * 
  * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
@@ -20,17 +20,17 @@
  *
  */
 $this->gameConstants = [
-  'COPPER_RESOURCE_NAME' => 'copper',
-  'WOOD_RESOURCE_NAME' => 'wood',
-  'SILVER_RESOURCE_NAME' => 'silver',
-  'GOLD_RESOURCE_NAME' => 'gold',
+  'COPPER_RESOURCE_NAME' => clienttranslate('copper'),
+  'WOOD_RESOURCE_NAME' => clienttranslate('wood'),
+  'SILVER_RESOURCE_NAME' => clienttranslate('silver'),
+  'GOLD_RESOURCE_NAME' => clienttranslate('gold')
 ];
 
 $this->dice_types = [
-  0 => ['name' => clienttranslate($this->gameConstants['COPPER_RESOURCE_NAME']), 'range' => [1, 4], 'dbName' => 'copper'],
-  1 => ['name' => clienttranslate($this->gameConstants['WOOD_RESOURCE_NAME']), 'range' => [5, 7], 'dbName' => 'wood'],
-  2 => ['name' => clienttranslate($this->gameConstants['SILVER_RESOURCE_NAME']), 'range' => [8, 10], 'dbName' => 'silver'],
-  3 => ['name' => clienttranslate($this->gameConstants['GOLD_RESOURCE_NAME']), 'range' => [11, 12], 'dbName' => 'gold'],
+  0 => ['name' => $this->gameConstants['COPPER_RESOURCE_NAME'], 'range' => [1, 4], 'dbName' => 'copper'],
+  1 => ['name' => $this->gameConstants['WOOD_RESOURCE_NAME'], 'range' => [5, 7], 'dbName' => 'wood'],
+  2 => ['name' => $this->gameConstants['SILVER_RESOURCE_NAME'], 'range' => [8, 10], 'dbName' => 'silver'],
+  3 => ['name' => $this->gameConstants['GOLD_RESOURCE_NAME'], 'range' => [11, 12], 'dbName' => 'gold'],
 ];
 
 $this->offices = [
@@ -74,7 +74,7 @@ $this->offices = [
 
 $this->shipments = [
   0 => [
-    'name' => clienttranslate($this->gameConstants['COPPER_RESOURCE_NAME']),
+    'name' => $this->gameConstants['COPPER_RESOURCE_NAME'],
     'spaces' => [
       [
         'points' => 0,
@@ -106,7 +106,7 @@ $this->shipments = [
     ]
   ],
   2 => [
-    'name' => clienttranslate($this->gameConstants['SILVER_RESOURCE_NAME']),
+    'name' => $this->gameConstants['SILVER_RESOURCE_NAME'],
     'spaces' => [
       [
         'points' => 0,
@@ -138,7 +138,7 @@ $this->shipments = [
     ]
   ],
   3 => [
-    'name' => clienttranslate($this->gameConstants['GOLD_RESOURCE_NAME']),
+    'name' => $this->gameConstants['GOLD_RESOURCE_NAME'],
     'spaces' => [
       [
         'points' => 0,
@@ -170,6 +170,7 @@ $this->shipments = [
     ]
   ]
 ];
+$this->two_number_ship_score_description = clienttranslate('The first player to mark this space will earn the bigger number on the left as points. Others who mark this space will earn the lesser points on the right.');
 
 $this->contracts = [
   0 => ['points' => 8, 'resourcesNeeded' => [0 => 4]],
@@ -241,3 +242,4 @@ $this->claims = [
     'claimMajorityPoints' => [5, 2]
   ],
 ];
+$this->claim_majority_bonus_description = clienttranslate('At the end of the game, the player with the most camps (triangles) + settlements (circles) in the terrain track scores the higher number. The player with the next most camps and settlements scores the lower number. Ties are won by the player with more settlements. If still tied, all tied players share the points.');
