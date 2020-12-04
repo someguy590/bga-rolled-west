@@ -42,8 +42,8 @@ define([
                     this.spentOrBankedResources.addItemType(resourceTypeId, resourceTypeId, g_gamethemeurl + 'img/d12_icons.png', resourceTypeIconLocation[resourceTypeId]);
                 }
 
-                this.playerResources.onItemCreate = dojo.hitch( this, 'addDiceSidesToolTip' ); 
-                this.spentOrBankedResources.onItemCreate = dojo.hitch( this, 'addDiceSidesToolTip' ); 
+                this.playerResources.onItemCreate = dojo.hitch(this, 'addDiceSidesToolTip');
+                this.spentOrBankedResources.onItemCreate = dojo.hitch(this, 'addDiceSidesToolTip');
 
                 // 2 number shipment spaces offsets
                 this.higherPoint2NumberBoxX = 9;
@@ -459,7 +459,7 @@ define([
                     return [this.shipGoldXMarkXOffset, this.shipGoldXMarkYOffset];
             },
 
-            addDiceSidesToolTip: function(dieDiv) {
+            addDiceSidesToolTip: function (dieDiv) {
                 let html = '';
 
                 for (let i = 0; i < 4; i++)
