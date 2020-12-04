@@ -42,6 +42,9 @@ define([
                     this.spentOrBankedResources.addItemType(resourceTypeId, resourceTypeId, g_gamethemeurl + 'img/d12_icons.png', resourceTypeIconLocation[resourceTypeId]);
                 }
 
+                this.playerResources.onItemCreate = dojo.hitch( this, 'addDiceSidesToolTip' ); 
+                this.spentOrBankedResources.onItemCreate = dojo.hitch( this, 'addDiceSidesToolTip' ); 
+
                 // 2 number shipment spaces offsets
                 this.higherPoint2NumberBoxX = 9;
                 this.higherPoint2NumberBoxY = 24;
@@ -454,6 +457,21 @@ define([
                     return [this.shipSilverXMarkXOffset, this.shipSilverXMarkYOffset];
                 else if (resourceTypeId == 3)
                     return [this.shipGoldXMarkXOffset, this.shipGoldXMarkYOffset];
+            },
+
+            addDiceSidesToolTip: function(dieDiv) {
+                let html = '';
+
+                for (let i = 0; i < 4; i++)
+                    html += '<div class="bank_icon bank_icon_copper"></div>';
+                for (let i = 0; i < 3; i++)
+                    html += '<div class="bank_icon bank_icon_wood"></div>';
+                for (let i = 0; i < 3; i++)
+                    html += '<div class="bank_icon bank_icon_silver"></div>';
+                for (let i = 0; i < 2; i++)
+                    html += '<div class="bank_icon bank_icon_gold"></div>';
+
+                this.addTooltipHtml(dieDiv.id, html);
             },
 
             ///////////////////////////////////////////////////
