@@ -144,6 +144,10 @@ define([
                 dojo.style('player_name_current_dice', 'color', color);
                 $('player_name_current_dice').innerHTML = gamedatas.diceRollerName;
 
+                // last turn message
+                if (gamedatas.round == 6 && this.player_id == gamedatas.diceRollerId)
+                    this.showMessage(_(gamedatas.lastTurnMessage), 'info');
+
                 // Setup game notifications to handle (see "setupNotifications" method below)
                 this.setupNotifications();
 
@@ -641,6 +645,8 @@ define([
                 this.notifqueue.setSynchronous('endGameScore', 1000);
 
                 dojo.subscribe('updatePossibleBuys', this, 'notif_updatePossibleBuys');
+                dojo.subscribe('lastRound', this, 'notif_lastRound');
+                dojo.subscribe('lastTurn', this, 'notif_lastTurn');
             },
 
             // TODO: from this point and below, you can write your game notifications handling methods
@@ -880,6 +886,14 @@ define([
                     this.spentOrBankedResources.addToStock(resourceType, 'rolled_dice');
                     this.playerResources.removeFromStock(resourceType);
                 }
+            },
+
+            notif_lastRound(notif) {
+                this.showMessage(_(notif.args.lastRoundMessage), 'info');
+            },
+
+            notif_lastTurn(notif) {
+                this.showMessage(_(notif.args.lastTurnMessage), 'info');
             },
 
             notif_endGameScore: function (notif) {

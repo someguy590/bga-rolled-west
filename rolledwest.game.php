@@ -227,6 +227,9 @@ class RolledWest extends Table
             $player_name = $this->loadPlayersBasicInfos()[$dice_roller_id]['player_name'];
         $result['diceRollerName'] = $player_name;
 
+        $result['round'] = $this->getGameStateValue('round');
+        $result['lastTurnMessage'] = clienttranslate('This is your last turn!');
+
         return $result;
     }
 
@@ -975,12 +978,24 @@ class RolledWest extends Table
         if ($player_id == $roundStarterId) {
             $round++;
 
+            // last round warning
+            if ($round == 6) {
+                $last_round_msg = clienttranslate('Round 6, last round of the game!');
+                $this->notifyAllPlayers('lastRound', $last_round_msg, ['lastRoundMessage' => $last_round_msg]);
+            }
+
             // game end
             if ($round == 7) {
                 $this->gamestate->nextState('score');
                 return;
             }
             $this->setGameStateValue('round', $round);
+        }
+
+        // last turn warning
+        if ($round == 6) {
+            $msg = clienttranslate('This is your last turn!');
+            $this->notifyPlayer($player_id, 'lastTurn', $msg, ['lastTurnMessage' => $msg]);
         }
 
         $this->giveExtraTime($player_id);
