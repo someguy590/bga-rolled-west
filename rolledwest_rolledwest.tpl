@@ -30,7 +30,7 @@
 
 <div id="other_players_board">
     <!-- BEGIN board -->
-    <div class="whiteblock">
+    <div class="whiteblock" style="outline: solid #{PLAYER_COLOR};">
         <h3 style="color:#{PLAYER_COLOR}">{PLAYER_NAME}</h3>
         <div id="board_{PLAYER_ID}" class="board">
             <!-- BEGIN other_player_square -->
