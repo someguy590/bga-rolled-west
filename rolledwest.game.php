@@ -255,7 +255,7 @@ class RolledWest extends Table
                 $dice_roller_player_num = $this->loadPlayersBasicInfos()[$dice_roller_id]['player_no'];
             $turn_count = ($round - 1) * $this->getPlayersNumber() + $dice_roller_player_num;
             $max_game_turns = $this->getPlayersNumber() * 6;
-            return round(($turn_count / $max_game_turns) * 100);
+            return (int) round(($turn_count / $max_game_turns) * 100);
         }
     }
 
