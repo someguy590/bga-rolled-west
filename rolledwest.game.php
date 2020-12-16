@@ -848,10 +848,10 @@ class RolledWest extends Table
         if ($player_id == $dice_roller_id) {
             $sql = "SELECT is_banking_during_turn FROM player WHERE player_id=$player_id";
             $is_banking_during_turn = $this->getUniqueValueFromDB($sql);
-            if ($is_banking_during_turn)
-                throw new BgaUserException($this->_('You already banked a resource this turn'));
             if ($isResourceSpent)
                 throw new BgaUserException($this->_('You cannot bank a spent resource'));
+            if ($is_banking_during_turn)
+                throw new BgaUserException($this->_('You already banked a resource this turn'));
         }
         // check if already banked in between turn
         else {
