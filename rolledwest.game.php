@@ -1039,6 +1039,13 @@ class RolledWest extends Table
     function stSpendOrBank()
     {
         $sql = "SELECT player_id FROM player WHERE is_banking_in_between_turn=false";
+
+        if ($this->getGameStateValue('round') == 6) {
+            $dice_roller_id = $this->getGameStateValue('diceRollerId');
+            $dice_roller_player_number = $this->loadPlayersBasicInfos()[$dice_roller_id]['player_no'];
+            $sql = "SELECT player_id FROM player WHERE is_banking_in_between_turn=false AND player_no >= $dice_roller_player_number";
+        }
+
         $active_players = $this->getObjectListFromDB($sql, true);
         foreach ($active_players as $i => $player_id)
             $this->giveExtraTime($player_id);
