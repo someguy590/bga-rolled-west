@@ -511,7 +511,7 @@ define([
                             }, this, function (result) { }, function (is_error) { }
                         );
                     }
-                    else if (this.checkAction('bank')) {
+                    else {
                         // bank a resource
                         this.ajaxcall(
                             `/${this.game_name}/${this.game_name}/bank.html`,
@@ -647,6 +647,8 @@ define([
                 dojo.subscribe('updatePossibleBuys', this, 'notif_updatePossibleBuys');
                 dojo.subscribe('lastRound', this, 'notif_lastRound');
                 dojo.subscribe('lastTurn', this, 'notif_lastTurn');
+
+                dojo.subscribe('warnPlayer', this, 'notif_warnPlayer');
             },
 
             // TODO: from this point and below, you can write your game notifications handling methods
@@ -899,6 +901,10 @@ define([
             notif_endGameScore: function (notif) {
                 if (notif.args.points > 0)
                     this.scoreCtrl[notif.args.playerId].incValue(notif.args.points);
+            },
+
+            notif_warnPlayer: function(notif) {
+                this.showMessage(_(notif.args.msg), 'info');
             }
         });
     });

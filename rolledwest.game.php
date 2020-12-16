@@ -840,9 +840,24 @@ class RolledWest extends Table
 
     function bank($resource, $isResourceSpent, $diceDivId, $bankedDieId)
     {
-        $this->checkAction('bank', true);
+        $this->gamestate->checkPossibleAction('bank');
         $player_id = $this->getCurrentPlayerId();
         $dice_roller_id = $this->getGameStateValue('diceRollerId');
+
+        if ($this->getGameStateValue('round') == 6) {
+            $banker_player_number = $this->loadPlayersBasicInfos()[$player_id]['player_no'];
+            $dice_roller_player_number = $this->loadPlayersBasicInfos()[$dice_roller_id]['player_no'];
+
+            $msg = clienttranslate('You have no more turns, so there is no use in banking a resource');
+            if ($player_id == $dice_roller_id && !$isResourceSpent) {
+                $this->notifyPlayer($player_id, 'warnPlayer', $msg, ['msg' => $msg]);
+                return;
+            }
+            else if ($banker_player_number < $dice_roller_player_number) {
+                $this->notifyPlayer($player_id, 'warnPlayer', $msg, ['msg' => $msg]);
+                return;
+            }
+        }
 
         // check turn player banking
         if ($player_id == $dice_roller_id) {
@@ -860,6 +875,9 @@ class RolledWest extends Table
             if ($is_banking_in_between_turn)
                 throw new BgaUserException($this->_('You already banked a resource in between your turn'));
         }
+
+        // generic BGA check action message if custom ones above do not apply
+        $this->checkAction('bank');
 
         // bank resource and mark player as having banked this turn
         $resource_db_name = $this->dice_types[$resource]['dbName'];
