@@ -84,6 +84,11 @@ define([
             setup: function (gamedatas) {
                 console.log("Starting game setup");
 
+                // turn-based game only components
+                if (this.bRealtime) {
+                    $('auto_bank').remove();
+                }
+
                 // spectator
                 if (this.isSpectator) {
                     $('personal_board').remove();
@@ -148,7 +153,7 @@ define([
                 if (gamedatas.round == 6 && this.player_id == gamedatas.diceRollerId)
                     this.showMessage(_(gamedatas.lastTurnMessage), 'info');
 
-                if (!this.isSpectator) {
+                if (!this.bRealtime && !this.isSpectator) {
                     let autoBankResource = gamedatas.players[this.player_id].autoBankResource;
                     let autoBankResourceDivId = 'auto_bank_' + autoBankResource;
                     dojo.query('.auto_bank_option').connect('onclick', this, 'onChangeAutoBankResource');
@@ -698,9 +703,11 @@ define([
                 dojo.style('player_name_current_dice', 'color', color);
 
                 // reset auto bank preference
-                if (this.player_id == playerId) {
-                    dojo.query('.auto_bank_selected').toggleClass('bgabutton_blue auto_bank_selected bgabutton_gray');
-                    dojo.toggleClass('auto_bank_none', 'bgabutton_blue auto_bank_selected bgabutton_gray');
+                if (!this.bRealtime) {
+                    if (this.player_id == playerId) {
+                        dojo.query('.auto_bank_selected').toggleClass('bgabutton_blue auto_bank_selected bgabutton_gray');
+                        dojo.toggleClass('auto_bank_none', 'bgabutton_blue auto_bank_selected bgabutton_gray');
+                    }
                 }
             },
 
