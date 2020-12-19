@@ -263,6 +263,6 @@
     margin-right: unset;
 }
 
-.spectatorMode #auto_bank {
+.spectatorMode #auto_bank, .spectatorMode #personal_board {
     display: none;
 }

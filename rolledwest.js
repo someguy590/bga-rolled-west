@@ -89,11 +89,6 @@ define([
                     $('auto_bank').remove();
                 }
 
-                // spectator
-                if (this.isSpectator) {
-                    $('personal_board').remove();
-                }
-
                 // Setting up player boards
                 this.copperCounters = {};
                 this.woodCounters = {};
