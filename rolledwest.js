@@ -115,6 +115,7 @@ define([
                     this.goldCounters[player_id].create('gold_count_' + player_id);
                     this.goldCounters[player_id].setValue(player.gold);
                 }
+                this.addTooltipToClass('turn_order_icon', _('Turn order'), '');
 
                 // TODO: Set up your game interface here, according to "gamedatas"
                 this.displayDice(this.gamedatas.dice, this.gamedatas.spentOrBankedDice);
