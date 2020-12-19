@@ -194,7 +194,7 @@ class RolledWest extends Table
 
         // Get information about players
         // Note: you can retrieve some extra field you added for "player" table in "dbmodel.sql" if you need it.
-        $sql = "SELECT player_id id, player_score score, copper, wood, silver, gold, is_banking_during_turn isBankingDuringTurn, player_no turnOrder FROM player ";
+        $sql = "SELECT player_id id, player_score score, copper, wood, silver, gold, is_banking_during_turn isBankingDuringTurn, player_no turnOrder, auto_bank_resource autoBankResource FROM player ";
         $result['players'] = self::getCollectionFromDb($sql);
 
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
@@ -838,10 +838,12 @@ class RolledWest extends Table
         $this->notifyAllPlayers('updatePossibleBuys', '', $this->getPossibleBuys());
     }
 
-    function bank($resource, $isResourceSpent, $diceDivId, $bankedDieId)
+    function bank($resource, $isResourceSpent, $diceDivId, $bankedDieId, $player_id = null)
     {
         $this->gamestate->checkPossibleAction('bank');
-        $player_id = $this->getCurrentPlayerId();
+        if (is_null($player_id))
+            $player_id = $this->getCurrentPlayerId();
+
         $dice_roller_id = $this->getGameStateValue('diceRollerId');
 
         if ($this->getGameStateValue('round') == 6) {
@@ -876,9 +878,6 @@ class RolledWest extends Table
                 throw new BgaUserException($this->_('You already banked a resource in between your turn'));
         }
 
-        // generic BGA check action message if custom ones above do not apply
-        $this->checkAction('bank');
-
         // bank resource and mark player as having banked this turn
         $resource_db_name = $this->dice_types[$resource]['dbName'];
         if ($player_id == $dice_roller_id) {
@@ -910,7 +909,7 @@ class RolledWest extends Table
 
         $resource_name = $this->dice_types[$resource]['name'];
         $this->notifyAllPlayers('bank', clienttranslate('${player_name} banks ${resource_name}'), [
-            'player_name' => $this->getCurrentPlayerName(),
+            'player_name' => $this->loadPlayersBasicInfos()[$player_id]['player_name'],
             'resource_name' => $resource_name,
             'resourceType' => $resource,
             'playerId' => $player_id,
@@ -922,6 +921,23 @@ class RolledWest extends Table
         if ($player_id != $dice_roller_id) {
             $this->gamestate->setPlayerNonMultiactive($player_id, 'rollDice');
         }
+    }
+
+    function changeAutoBankResource($resource_type_id)
+    {
+        $player_id = $this->getCurrentPlayerId();
+        if ($this->getGameStateValue('round') == 6) {
+            $dice_roller_id = $this->getGameStateValue('diceRollerId');
+            if ($this->loadPlayersBasicInfos()[$player_id]['player_no'] <= $this->loadPlayersBasicInfos()[$dice_roller_id]['player_no']) {
+                $msg = clienttranslate('You have no more turns, so there is no use in banking a resource');
+                $this->notifyPlayer($player_id, 'warnPlayer', $msg, ['msg' => $msg]);
+                return;
+            }
+        }
+        $sql = "UPDATE player SET auto_bank_resource='$resource_type_id' WHERE player_id=$player_id";
+        $this->DbQuery($sql);
+
+        $this->notifyPlayer($player_id, 'changeAutoBankResource', '', ['resourceTypeId' => $resource_type_id]);
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -1018,7 +1034,7 @@ class RolledWest extends Table
 
         $this->giveExtraTime($player_id);
         $this->setGameStateValue('diceRollerId', $player_id);
-        $sql = "UPDATE player SET is_banking_during_turn=false, is_banking_in_between_turn=false, is_purchasing_office=false, is_purchasing_contract=false, is_building_claim=false WHERE player_id=$player_id";
+        $sql = "UPDATE player SET is_banking_during_turn=false, is_banking_in_between_turn=false, is_purchasing_office=false, is_purchasing_contract=false, is_building_claim=false, auto_bank_resource='none' WHERE player_id=$player_id";
         $this->DbQuery($sql);
 
         $dice = $this->rollDice();
@@ -1056,15 +1072,40 @@ class RolledWest extends Table
 
     function stSpendOrBank()
     {
+        $dice_roller_id = $this->getGameStateValue('diceRollerId');
         $sql = "SELECT player_id FROM player WHERE is_banking_in_between_turn=false";
 
         if ($this->getGameStateValue('round') == 6) {
-            $dice_roller_id = $this->getGameStateValue('diceRollerId');
             $dice_roller_player_number = $this->loadPlayersBasicInfos()[$dice_roller_id]['player_no'];
             $sql = "SELECT player_id FROM player WHERE is_banking_in_between_turn=false AND player_no >= $dice_roller_player_number";
         }
 
         $active_players = $this->getObjectListFromDB($sql, true);
+
+        // auto bank
+        if ($this->isAsync()) {
+            $sql = "SELECT player_id, auto_bank_resource FROM player WHERE auto_bank_resource != 'none' AND player_id != $dice_roller_id AND is_banking_in_between_turn=false";
+            $auto_bank_choices = $this->getCollectionFromDB($sql, true);
+            $available_dice = $this->getAvailableDice();
+            foreach ($auto_bank_choices as $player_id => $auto_bank_resource) {
+                $key = array_search($player_id, $active_players);
+                if ($key === false) {
+                    continue;
+                }
+
+                $is_last_chance_to_bank = $this->getPlayerBefore($player_id) == $dice_roller_id;
+                if (in_array($auto_bank_resource, $available_dice)) {
+                    if ($key !== false) {
+                        $this->bank($auto_bank_resource, false, 'rolled_dice', -1, $player_id);
+                        $is_last_chance_to_bank = false;
+                    }
+                }
+
+                if (!$is_last_chance_to_bank)
+                    unset($active_players[$key]);
+            }
+        }
+
         foreach ($active_players as $i => $player_id)
             $this->giveExtraTime($player_id);
         $this->gamestate->setPlayersMultiactive($active_players, 'rollDice');

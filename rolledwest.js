@@ -148,6 +148,14 @@ define([
                 if (gamedatas.round == 6 && this.player_id == gamedatas.diceRollerId)
                     this.showMessage(_(gamedatas.lastTurnMessage), 'info');
 
+                if (!this.isSpectator) {
+                    let autoBankResource = gamedatas.players[this.player_id].autoBankResource;
+                    let autoBankResourceDivId = 'auto_bank_' + autoBankResource;
+                    dojo.query('.auto_bank_option').connect('onclick', this, 'onChangeAutoBankResource');
+                    dojo.query('.auto_bank_selected').toggleClass('bgabutton_blue auto_bank_selected bgabutton_gray');
+                    dojo.toggleClass(autoBankResourceDivId, 'bgabutton_blue auto_bank_selected bgabutton_gray');
+                }
+
                 // Setup game notifications to handle (see "setupNotifications" method below)
                 this.setupNotifications();
 
@@ -617,6 +625,19 @@ define([
                 );
             },
 
+            onChangeAutoBankResource: function(e) {
+                dojo.stopEvent(e);
+                let autoBankResourceDivId = e.currentTarget.id;
+                let resourceTypeId = autoBankResourceDivId.split('_')[2];
+                this.ajaxcall(
+                    `/${this.game_name}/${this.game_name}/changeAutoBankResource.html`,
+                    {
+                        resourceTypeId: resourceTypeId,
+                        lock: true
+                    }, this, function (result) {}, function (is_error) { }
+                );
+            },
+
             ///////////////////////////////////////////////////
             //// Reaction to cometD notifications
 
@@ -649,6 +670,7 @@ define([
                 dojo.subscribe('lastTurn', this, 'notif_lastTurn');
 
                 dojo.subscribe('warnPlayer', this, 'notif_warnPlayer');
+                dojo.subscribe('changeAutoBankResource', this, 'notif_changeAutoBankResource');
             },
 
             // TODO: from this point and below, you can write your game notifications handling methods
@@ -674,6 +696,12 @@ define([
                     $('player_name_current_dice').innerHTML = this.gamedatas.players[playerId].name;
                 }
                 dojo.style('player_name_current_dice', 'color', color);
+
+                // reset auto bank preference
+                if (this.player_id == playerId) {
+                    dojo.query('.auto_bank_selected').toggleClass('bgabutton_blue auto_bank_selected bgabutton_gray');
+                    dojo.toggleClass('auto_bank_none', 'bgabutton_blue auto_bank_selected bgabutton_gray');
+                }
             },
 
             notif_purchaseOffice: function (notif) {
@@ -880,6 +908,15 @@ define([
                     resourceName = 'silver';
                 else
                     resourceName = 'gold';
+                
+                if (bankedDieId == -1) {
+                    for (let resource of this.playerResources.getAllItems()) {
+                        if (resourceType == resource.type) {
+                            bankedDieId = resource.id;
+                            break;
+                        }
+                    }
+                }
                 this.slideTemporaryObject(`<div class="bank_icon bank_icon_${resourceName}"></div>`, diceDivId, `${diceDivId}_item_${bankedDieId}`, `${resourceName}_count_${playerId}`, 500);
 
                 this.addToResources(playerId, resourceType, 1);
@@ -905,6 +942,11 @@ define([
 
             notif_warnPlayer: function(notif) {
                 this.showMessage(_(notif.args.msg), 'info');
+            },
+
+            notif_changeAutoBankResource: function(notif) {
+                dojo.query('.auto_bank_selected').toggleClass('bgabutton_blue auto_bank_selected bgabutton_gray');
+                dojo.toggleClass('auto_bank_' + notif.args.resourceTypeId, 'bgabutton_blue auto_bank_selected bgabutton_gray');
             }
         });
     });
