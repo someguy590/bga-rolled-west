@@ -84,9 +84,9 @@ define([
             setup: function (gamedatas) {
                 console.log("Starting game setup");
 
-                // spectator
-                if (this.isSpectator) {
-                    $('personal_board').remove();
+                // turn-based game only components
+                if (this.bRealtime) {
+                    $('auto_bank').remove();
                 }
 
                 // Setting up player boards
@@ -115,6 +115,7 @@ define([
                     this.goldCounters[player_id].create('gold_count_' + player_id);
                     this.goldCounters[player_id].setValue(player.gold);
                 }
+                this.addTooltipToClass('turn_order_icon', _('Turn order'), '');
 
                 // TODO: Set up your game interface here, according to "gamedatas"
                 this.displayDice(this.gamedatas.dice, this.gamedatas.spentOrBankedDice);
@@ -147,6 +148,14 @@ define([
                 // last turn message
                 if (gamedatas.round == 6 && this.player_id == gamedatas.diceRollerId)
                     this.showMessage(_(gamedatas.lastTurnMessage), 'info');
+
+                if (!this.bRealtime && !this.isSpectator) {
+                    let autoBankResource = gamedatas.players[this.player_id].autoBankResource;
+                    let autoBankResourceDivId = 'auto_bank_' + autoBankResource;
+                    dojo.query('.auto_bank_option').connect('onclick', this, 'onChangeAutoBankResource');
+                    dojo.query('.auto_bank_selected').toggleClass('bgabutton_blue auto_bank_selected bgabutton_gray');
+                    dojo.toggleClass(autoBankResourceDivId, 'bgabutton_blue auto_bank_selected bgabutton_gray');
+                }
 
                 // Setup game notifications to handle (see "setupNotifications" method below)
                 this.setupNotifications();
@@ -511,7 +520,7 @@ define([
                             }, this, function (result) { }, function (is_error) { }
                         );
                     }
-                    else if (this.checkAction('bank')) {
+                    else {
                         // bank a resource
                         this.ajaxcall(
                             `/${this.game_name}/${this.game_name}/bank.html`,
@@ -617,6 +626,19 @@ define([
                 );
             },
 
+            onChangeAutoBankResource: function(e) {
+                dojo.stopEvent(e);
+                let autoBankResourceDivId = e.currentTarget.id;
+                let resourceTypeId = autoBankResourceDivId.split('_')[2];
+                this.ajaxcall(
+                    `/${this.game_name}/${this.game_name}/changeAutoBankResource.html`,
+                    {
+                        resourceTypeId: resourceTypeId,
+                        lock: true
+                    }, this, function (result) {}, function (is_error) { }
+                );
+            },
+
             ///////////////////////////////////////////////////
             //// Reaction to cometD notifications
 
@@ -647,6 +669,9 @@ define([
                 dojo.subscribe('updatePossibleBuys', this, 'notif_updatePossibleBuys');
                 dojo.subscribe('lastRound', this, 'notif_lastRound');
                 dojo.subscribe('lastTurn', this, 'notif_lastTurn');
+
+                dojo.subscribe('warnPlayer', this, 'notif_warnPlayer');
+                dojo.subscribe('changeAutoBankResource', this, 'notif_changeAutoBankResource');
             },
 
             // TODO: from this point and below, you can write your game notifications handling methods
@@ -672,6 +697,14 @@ define([
                     $('player_name_current_dice').innerHTML = this.gamedatas.players[playerId].name;
                 }
                 dojo.style('player_name_current_dice', 'color', color);
+
+                // reset auto bank preference
+                if (!this.bRealtime) {
+                    if (this.player_id == playerId) {
+                        dojo.query('.auto_bank_selected').toggleClass('bgabutton_blue auto_bank_selected bgabutton_gray');
+                        dojo.toggleClass('auto_bank_none', 'bgabutton_blue auto_bank_selected bgabutton_gray');
+                    }
+                }
             },
 
             notif_purchaseOffice: function (notif) {
@@ -878,6 +911,15 @@ define([
                     resourceName = 'silver';
                 else
                     resourceName = 'gold';
+                
+                if (bankedDieId == -1) {
+                    for (let resource of this.playerResources.getAllItems()) {
+                        if (resourceType == resource.type) {
+                            bankedDieId = resource.id;
+                            break;
+                        }
+                    }
+                }
                 this.slideTemporaryObject(`<div class="bank_icon bank_icon_${resourceName}"></div>`, diceDivId, `${diceDivId}_item_${bankedDieId}`, `${resourceName}_count_${playerId}`, 500);
 
                 this.addToResources(playerId, resourceType, 1);
@@ -899,6 +941,15 @@ define([
             notif_endGameScore: function (notif) {
                 if (notif.args.points > 0)
                     this.scoreCtrl[notif.args.playerId].incValue(notif.args.points);
+            },
+
+            notif_warnPlayer: function(notif) {
+                this.showMessage(_(notif.args.msg), 'info');
+            },
+
+            notif_changeAutoBankResource: function(notif) {
+                dojo.query('.auto_bank_selected').toggleClass('bgabutton_blue auto_bank_selected bgabutton_gray');
+                dojo.toggleClass('auto_bank_' + notif.args.resourceTypeId, 'bgabutton_blue auto_bank_selected bgabutton_gray');
             }
         });
     });

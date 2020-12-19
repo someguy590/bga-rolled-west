@@ -33,6 +33,7 @@ ALTER TABLE `player` ADD `is_shipping` BIT(1) NOT NULL DEFAULT FALSE;
 ALTER TABLE `player` ADD `copper_shipped` INT UNSIGNED NOT NULL DEFAULT '0';
 ALTER TABLE `player` ADD `silver_shipped` INT UNSIGNED NOT NULL DEFAULT '0';
 ALTER TABLE `player` ADD `gold_shipped` INT UNSIGNED NOT NULL DEFAULT '0';
+ALTER TABLE `player` ADD `auto_bank_resource` varchar(16) NOT NULL DEFAULT 'none';
 
 CREATE TABLE IF NOT EXISTS `exclusive` (
   `exclusive_id` int(10) unsigned NOT NULL,

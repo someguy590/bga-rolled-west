@@ -97,4 +97,12 @@ class action_rolledwest extends APP_GameAction
     $this->game->pass();
     $this->ajaxResponse();
   }
+
+  public function changeAutoBankResource()
+  {
+    $this->setAjaxMode();
+    $resource_type_id = $this->getArg('resourceTypeId', AT_alphanum, true);
+    $this->game->changeAutoBankResource($resource_type_id);
+    $this->ajaxResponse();
+  }
 }

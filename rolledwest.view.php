@@ -231,6 +231,8 @@ class view_rolledwest_rolledwest extends game_view
 
     $this->tpl['ROLLED_DICE_TEXT'] = $this->_('rolled dice');
     $this->tpl['SPENT_OR_BANKED_DICE'] = $this->_('Spent or banked dice');
+    $this->tpl['AUTO_BANK_INFO_TEXT'] = $this->_('Automatically bank a resource if another player rolls it, otherwise you will get to bank a resource from the player before you (your last chance to bank):');
+    $this->tpl['AUTO_BANK_NONE_TEXT'] = $this->_('None');
 
     $this->page->begin_block($this->getGameName() . '_' . $this->getGameName(), 'other_player_square');
     $this->page->begin_block($this->getGameName() . '_' . $this->getGameName(), 'board');

@@ -18,6 +18,16 @@
         <h3>{SPENT_OR_BANKED_DICE}</h3>
         <div id="spent_or_banked_dice"></div>
     </div>
+    <div id="auto_bank" class="whiteblock">
+        <p>{AUTO_BANK_INFO_TEXT}</p>
+        <div id="auto_bank_options">
+            <a href="#" id="auto_bank_none" class="auto_bank_option bgabutton bgabutton_blue auto_bank_selected">{AUTO_BANK_NONE_TEXT}</a>
+            <a href="#" id="auto_bank_0" class="auto_bank_option bgabutton bgabutton_gray"><div class="bank_icon bank_icon_copper auto_bank_icon"></div></a>
+            <a href="#" id="auto_bank_1" class="auto_bank_option bgabutton bgabutton_gray"><div class="bank_icon bank_icon_wood auto_bank_icon"></div></a>
+            <a href="#" id="auto_bank_2" class="auto_bank_option bgabutton bgabutton_gray"><div class="bank_icon bank_icon_silver auto_bank_icon"></div></a>
+            <a href="#" id="auto_bank_3" class="auto_bank_option bgabutton bgabutton_gray"><div class="bank_icon bank_icon_gold auto_bank_icon"></div></a>
+        </div>
+    </div>
     <!-- BEGIN personal_board -->
     <div id="personal_board" class="board">
         <!-- BEGIN personal_square -->
@@ -30,7 +40,7 @@
 
 <div id="other_players_board">
     <!-- BEGIN board -->
-    <div class="whiteblock">
+    <div class="whiteblock" style="outline: solid #{PLAYER_COLOR};">
         <h3 style="color:#{PLAYER_COLOR}">{PLAYER_NAME}</h3>
         <div id="board_{PLAYER_ID}" class="board">
             <!-- BEGIN other_player_square -->
@@ -48,7 +58,7 @@
     // Javascript HTML templates
     var jstpl_player_board = '\
     <div class="cp_board">\
-        <div class="turn_order_icon turn_order_icon_${playerTurnOrder}"></div>\
+        <div id="turn_order_${playerTurnOrder}" class="turn_order_icon turn_order_icon_${playerTurnOrder}"></div>\
         <div class="bank_icon bank_icon_copper"></div><span id="copper_count_${playerId}" class="resource_counter">0</span>\
         <div class="bank_icon bank_icon_wood"></div><span id="wood_count_${playerId}" class="resource_counter">0</span>\
         <div class="bank_icon bank_icon_silver"></div><span id="silver_count_${playerId}" class="resource_counter">0</span>\
