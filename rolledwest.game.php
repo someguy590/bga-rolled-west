@@ -1465,6 +1465,14 @@ class RolledWest extends Table
         // $from_version is the current version of this game database, in numerical form.
         // For example, if the game was running with a release of your game named "140430-1345",
         // $from_version is equal to 1404301345
+        
+        if( $from_version <= 2012080954 ) {
+            // previous version: added gap between other player boards to make them easier to inspect and last round and last turn messages
+            
+            // ! important ! Use DBPREFIX_<table_name> for all tables
+            $sql = "ALTER TABLE DBPREFIX_player ADD `auto_bank_resource` varchar(16) NOT NULL DEFAULT 'none'";
+            self::applyDbUpgradeToAllDB($sql);
+        }
 
         // Example:
         //        if( $from_version <= 1404301345 )
