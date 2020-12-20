@@ -97,7 +97,7 @@ $machinestates = array(
         'possibleactions' => ['purchaseOffice', 'ship', 'completeContract', 'buildClaim', 'bank', 'pass'],
         'transitions' => ['rollDice' => STATE_ROLL_DICE],
         'descriptionDiceRollerTurn' => clienttranslate('Round ${roundNbr} / 6: ${you} may play your turn or pass'),
-        'descriptionNonDiceRollerTurn' => clienttranslate('Round ${roundNbr} / 6: ${you} may bank a resource or pass'),
+        'descriptionNonDiceRollerTurn' => clienttranslate('Round ${roundNbr} / 6: ${you} may bank any resource or pass'),
         'updateGameProgression' => true
     ],
 
