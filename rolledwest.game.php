@@ -1094,6 +1094,11 @@ class RolledWest extends Table
                 }
 
                 $is_last_chance_to_bank = $this->getPlayerBefore($player_id) == $dice_roller_id;
+                if ($this->getPlayersNumber() == 2) {
+                    if ($this->loadPlayersBasicInfos()[$player_id]['player_no'] == 1) {
+                        $is_last_chance_to_bank = $this->getGameStateValue('diceRollerId') == -1;
+                    }
+                }
                 if (in_array($auto_bank_resource, $available_dice)) {
                     if ($key !== false) {
                         $this->bank($auto_bank_resource, false, 'rolled_dice', -1, $player_id);
