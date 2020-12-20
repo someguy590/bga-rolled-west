@@ -10,24 +10,6 @@
 -------
 -->
 <div id="personal_info_wrapper">
-    <div id="rolled_dice_row" class="whiteblock">
-        <h3><span id="player_name_current_dice"></span> {ROLLED_DICE_TEXT}</h3>
-        <div id="rolled_dice"></div>
-    </div>
-    <div id="used_dice_row" class="whiteblock">
-        <h3>{SPENT_OR_BANKED_DICE}</h3>
-        <div id="spent_or_banked_dice"></div>
-    </div>
-    <div id="auto_bank" class="whiteblock">
-        <p>{AUTO_BANK_INFO_TEXT}</p>
-        <div id="auto_bank_options">
-            <a href="#" id="auto_bank_none" class="auto_bank_option bgabutton bgabutton_blue auto_bank_selected">{AUTO_BANK_NONE_TEXT}</a>
-            <a href="#" id="auto_bank_0" class="auto_bank_option bgabutton bgabutton_gray"><div class="bank_icon bank_icon_copper auto_bank_icon"></div></a>
-            <a href="#" id="auto_bank_1" class="auto_bank_option bgabutton bgabutton_gray"><div class="bank_icon bank_icon_wood auto_bank_icon"></div></a>
-            <a href="#" id="auto_bank_2" class="auto_bank_option bgabutton bgabutton_gray"><div class="bank_icon bank_icon_silver auto_bank_icon"></div></a>
-            <a href="#" id="auto_bank_3" class="auto_bank_option bgabutton bgabutton_gray"><div class="bank_icon bank_icon_gold auto_bank_icon"></div></a>
-        </div>
-    </div>
     <!-- BEGIN personal_board -->
     <div id="personal_board" class="board">
         <!-- BEGIN personal_square -->
@@ -36,6 +18,26 @@
         <div id="marks_{PERSONAL_PLAYER_ID}"></div>
     </div>
     <!-- END personal_board -->
+    <div id="dice_info">
+        <div id="rolled_dice_row" class="whiteblock">
+            <h3><span id="player_name_current_dice"></span> {ROLLED_DICE_TEXT}</h3>
+            <div id="rolled_dice"></div>
+        </div>
+        <div id="used_dice_row" class="whiteblock">
+            <h3>{SPENT_OR_BANKED_DICE}</h3>
+            <div id="spent_or_banked_dice"></div>
+        </div>
+        <div id="auto_bank" class="whiteblock">
+            <p>{AUTO_BANK_INFO_TEXT}</p>
+            <div id="auto_bank_options">
+                <a href="#" id="auto_bank_none" class="auto_bank_option bgabutton bgabutton_blue auto_bank_selected">{AUTO_BANK_NONE_TEXT}</a>
+                <a href="#" id="auto_bank_0" class="auto_bank_option bgabutton bgabutton_gray"><div class="bank_icon bank_icon_copper auto_bank_icon"></div></a>
+                <a href="#" id="auto_bank_1" class="auto_bank_option bgabutton bgabutton_gray"><div class="bank_icon bank_icon_wood auto_bank_icon"></div></a>
+                <a href="#" id="auto_bank_2" class="auto_bank_option bgabutton bgabutton_gray"><div class="bank_icon bank_icon_silver auto_bank_icon"></div></a>
+                <a href="#" id="auto_bank_3" class="auto_bank_option bgabutton bgabutton_gray"><div class="bank_icon bank_icon_gold auto_bank_icon"></div></a>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div id="other_players_board">
