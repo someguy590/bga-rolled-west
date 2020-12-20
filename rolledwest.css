@@ -53,6 +53,7 @@
 .board {
     position: relative;
     width: 564px;
+    max-width: 564px;
     height: 630px;
     background-image: url('img/board.jpg');
     margin: auto;
@@ -72,10 +73,27 @@
 }
 
 #personal_info_wrapper {
-    width: 564px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 75%;
     margin: auto;
 }
 
+#dice_info {
+    max-width: 564px;
+    flex: 1;
+    margin-left: 5px;
+}
+
+/* typical view has player's board and dice info side to side (dice rolled, auto bank options, etc.)  */
+/* on smaller screens, all game components are arranged in a column with dice info first */
+@media (max-width: 1200px) {
+    #personal_info_wrapper { flex-direction: column; align-items: center; }
+    #personal_board { order: 2; }
+    #dice_info { order: 1; width: 564px;}
+ }
 .office {
     width: 55px;
     height: 52px;

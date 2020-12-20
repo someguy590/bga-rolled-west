@@ -522,6 +522,12 @@ define([
                     }
                     else {
                         // bank a resource
+                        if (this.isSpectator) {
+                            this.checkAction('bank');
+                            this.playerResources.unselectAll();
+                            this.spentOrBankedResources.unselectAll();
+                            return;
+                        }
                         this.ajaxcall(
                             `/${this.game_name}/${this.game_name}/bank.html`,
                             {
