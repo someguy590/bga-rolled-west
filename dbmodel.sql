@@ -36,10 +36,11 @@ ALTER TABLE `player` ADD `gold_shipped` INT UNSIGNED NOT NULL DEFAULT '0';
 ALTER TABLE `player` ADD `auto_bank_resource` varchar(16) NOT NULL DEFAULT 'none';
 
 CREATE TABLE IF NOT EXISTS `exclusive` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `exclusive_id` int(10) unsigned NOT NULL,
   `exclusive_type` varchar(16) NOT NULL,
   `marked_by_player` int(10) unsigned NULL,
-  PRIMARY KEY (`exclusive_id`, `exclusive_type`),
+  PRIMARY KEY (`id`),
   FOREIGN KEY (`marked_by_player`) REFERENCES player(`player_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

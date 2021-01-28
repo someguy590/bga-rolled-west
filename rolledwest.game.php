@@ -1219,6 +1219,10 @@ class RolledWest extends Table
                 if (count($claim_majority_bigger_winners) == 1)
                     $msg = sprintf($this->_('${player_name} wins the %s bigger majority claim bonus and earns ${points} point(s)'), $terrain_type_name);
                 foreach ($claim_majority_bigger_winners as $winner_id) {
+                    $exclusive_id = $this->claims[$terrain_type_id]['exclusiveIds'][0];
+                    $sql = "INSERT INTO exclusive (exclusive_id, exclusive_type, marked_by_player) VALUES ($exclusive_id, 'claim', $winner_id)";
+                    $this->DbQuery($sql);
+
                     $winner_name = $this->loadPlayersBasicInfos()[$winner_id]['player_name'];
                     $this->notifyAllPlayers(
                         'endGameScore',
@@ -1226,7 +1230,8 @@ class RolledWest extends Table
                         [
                             'player_name' => $winner_name,
                             'playerId' => $winner_id,
-                            'points' => $bigger_points
+                            'points' => $bigger_points,
+                            'pointsType' => ['type' => 'claim', 'isBiggerMajorityClaimBonus' => true, 'terrainTypeId' => $terrain_type_id],
                         ]
                     );
                 }
@@ -1248,6 +1253,10 @@ class RolledWest extends Table
                 if (count($claim_majority_smaller_winners) == 1)
                     $msg = sprintf($this->_('${player_name} wins the %s smaller point majority claim bonus and earns ${points} point(s)'), $terrain_type_name);
                 foreach ($claim_majority_smaller_winners as $winner_id) {
+                    $exclusive_id = $this->claims[$terrain_type_id]['exclusiveIds'][1];
+                    $sql = "INSERT INTO exclusive (exclusive_id, exclusive_type, marked_by_player) VALUES ($exclusive_id, 'claim', $winner_id)";
+                    $this->DbQuery($sql);
+
                     $winner_name = $this->loadPlayersBasicInfos()[$winner_id]['player_name'];
                     $this->notifyAllPlayers(
                         'endGameScore',
@@ -1255,7 +1264,8 @@ class RolledWest extends Table
                         [
                             'player_name' => $winner_name,
                             'playerId' => $winner_id,
-                            'points' => $smaller_points
+                            'points' => $smaller_points,
+                            'pointsType' => ['type' => 'claim', 'isBiggerMajorityClaimBonus' => false, 'terrainTypeId' => $terrain_type_id],
                         ]
                     );
                 }
@@ -1364,7 +1374,8 @@ class RolledWest extends Table
                     'player_name' => $this->loadPlayersBasicInfos()[$marked_by_player]['player_name'],
                     'office_description' => $this->offices[$office_id]['description'],
                     'playerId' => $marked_by_player,
-                    'points' => $points
+                    'points' => $points,
+                    'pointsType' => ['type' => 'office']
                 ]
             );
         }

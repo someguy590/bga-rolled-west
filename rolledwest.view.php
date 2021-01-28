@@ -194,9 +194,9 @@ class view_rolledwest_rolledwest extends game_view
 
     $x_px = $claim_majority_bonus_start_x;
     $y_px = $claim_majority_bonus_start_y;
-    for ($i = 0; $i < 4; $i++) {
+    foreach ($this->game->claims as $terrain_type_id => $claim) {
       $this->page->insert_block($square_tpl, [
-        'SQUARE_ID' => 'claim_majority_bonus_' . $i,
+        'SQUARE_ID' => 'claim_majority_bonus_' . $terrain_type_id,
         'PLAYER_ID' => $player_id,
         'LEFT' => $x_px,
         'TOP' => $y_px,

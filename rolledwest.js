@@ -64,6 +64,12 @@ define([
                 this.contractXMarkXOffset = 13;
                 this.contractXMarkYOffset = 78;
 
+                // claim majority bonuses offsets
+                this.biggerMajorityBonusMarkXOffset = -1;
+                this.biggerMajorityBonusMarkYOffset = 0;
+                this.smallerMajorityBonusMarkXOffset = 1;
+                this.smallerMajorityBonusMarkYOffset = 25;
+
                 // event connections
                 this.eventConnections = [];
             },
@@ -282,6 +288,14 @@ define([
                             else
                                 classes = 'mark_x';
                         }
+                        else if (type == 'claim') {
+                            if (markedByPlayer != nextPlayerIdToMark)
+                                continue;
+
+                            classes = 'mark_circle';
+                            if (id % 2 == 1)
+                                classes += ' mark_circle_small_number'
+                        }
 
                         let markDivId = `${type}_mark_${id}_${nextPlayerIdToMark}`;
                         dojo.place(this.format_block('jstpl_mark', {
@@ -307,6 +321,29 @@ define([
                             }
 
                             this.slideToObjectPos(markDivId, `${type}_${id}_${nextPlayerIdToMark}`, xPos, yPos).play();
+                        }
+                        else if (type == 'claim') {
+                            let terrainTypeId;
+                            if (id == 0 || id == 1)
+                                terrainTypeId = 1;
+                            else if (id == 2 || id == 3)
+                                terrainTypeId = 0;
+                            else if (id == 4 || id == 5)
+                                terrainTypeId = 2;
+                            else
+                                terrainTypeId = 3;
+
+                            let xPos, yPos;
+                            if (id % 2 == 0) {
+                                xPos = this.biggerMajorityBonusMarkXOffset;
+                                yPos = this.biggerMajorityBonusMarkYOffset;
+                            }
+                            else {
+                                xPos = this.smallerMajorityBonusMarkXOffset;
+                                yPos = this.smallerMajorityBonusMarkYOffset;
+                            }
+
+                            this.slideToObjectPos(markDivId, `claim_majority_bonus_${terrainTypeId}_${nextPlayerIdToMark}`, xPos, yPos).play();
                         }
                     }
                 }
@@ -945,6 +982,33 @@ define([
             },
 
             notif_endGameScore: function (notif) {
+                let playerId = notif.args.playerId;
+                let pointsType = notif.args.pointsType;
+                if (pointsType.type == 'claim') {
+                    let classes = 'mark_circle';
+                    if (!pointsType.isBiggerMajorityClaimBonus)
+                        classes += ' mark_circle_small_number'
+
+                    let markId = `majority_claim_bonus_mark_circle_${pointsType.terrainTypeId}_${playerId}`;
+                    dojo.place(this.format_block('jstpl_mark', {
+                        markId: markId,
+                        classes: classes
+                    }), 'marks_' + playerId);
+
+                    let xPos, yPos;
+                    if (pointsType.isBiggerMajorityClaimBonus) {
+                        xPos = this.biggerMajorityBonusMarkXOffset;
+                        yPos = this.biggerMajorityBonusMarkYOffset;
+                    }
+                    else {
+                        xPos = this.smallerMajorityBonusMarkXOffset;
+                        yPos = this.smallerMajorityBonusMarkYOffset;
+                    }
+
+                    this.placeOnObject(markId, 'overall_player_board_' + playerId);
+                    this.slideToObjectPos(markId, `claim_majority_bonus_${pointsType.terrainTypeId}_${playerId}`, xPos, yPos).play();
+                }
+
                 if (notif.args.points > 0)
                     this.scoreCtrl[notif.args.playerId].incValue(notif.args.points);
             },

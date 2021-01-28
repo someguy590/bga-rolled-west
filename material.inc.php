@@ -197,7 +197,8 @@ $this->claims = [
       ['points' => 0, 'isStarred' => false],
       ['points' => 9, 'isStarred' => true]
     ],
-    'claimMajorityPoints' => [3, 1]
+    'claimMajorityPoints' => [3, 1],
+    'exclusiveIds' => [0, 1]
   ],
   0 => [
     'name' => clienttranslate('valley'),
@@ -211,7 +212,8 @@ $this->claims = [
       ['points' => 0, 'isStarred' => false],
       ['points' => 8, 'isStarred' => true]
     ],
-    'claimMajorityPoints' => [3, 1]
+    'claimMajorityPoints' => [3, 1],
+    'exclusiveIds' => [2, 3]
   ],
   2 => [
     'name' => 'hills',
@@ -225,7 +227,8 @@ $this->claims = [
       ['points' => 0, 'isStarred' => false],
       ['points' => 9, 'isStarred' => true]
     ],
-    'claimMajorityPoints' => [4, 2]
+    'claimMajorityPoints' => [4, 2],
+    'exclusiveIds' => [4, 5]
   ],
   3 => [
     'name' => 'mountains',
@@ -239,7 +242,8 @@ $this->claims = [
       ['points' => 0, 'isStarred' => false],
       ['points' => 10, 'isStarred' => true]
     ],
-    'claimMajorityPoints' => [5, 2]
+    'claimMajorityPoints' => [5, 2],
+    'exclusiveIds' => [6, 7]
   ],
 ];
 $this->claim_majority_bonus_description = clienttranslate('At the end of the game, the player with the most camps (triangles) + settlements (circles) in the terrain track scores the higher number. The player with the next most camps and settlements scores the lower number. Ties are won by the player with more settlements. If still tied, all tied players share the points.');
