@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS `exclusive` (
   `marked_by_player` int(10) unsigned NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`marked_by_player`) REFERENCES player(`player_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
 CREATE TABLE IF NOT EXISTS `claim` (
   `claim_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
